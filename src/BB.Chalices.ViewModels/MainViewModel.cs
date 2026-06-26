@@ -13,6 +13,8 @@ public class MainViewModel : ViewModelBase
     private readonly SaveFileService _saves;
     private readonly DungeonService _dungeons;
     private readonly SaveLocatorService _locator;
+    private readonly ConfigService _config;
+    private readonly BackupService _backups;
 
     private List<DungeonViewModel> _all = new();
     private bool _suppressEdits;
@@ -33,11 +35,14 @@ public class MainViewModel : ViewModelBase
     private bool _fourthLayerOpen;
     private string _slotHexDump = string.Empty;
 
-    public MainViewModel(SaveFileService saves, DungeonService dungeons, SaveLocatorService locator)
+    public MainViewModel(SaveFileService saves, DungeonService dungeons, SaveLocatorService locator,
+        ConfigService config, BackupService backups)
     {
         _saves = saves;
         _dungeons = dungeons;
         _locator = locator;
+        _config = config;
+        _backups = backups;
 
         Dungeons = new ObservableCollection<DungeonViewModel>();
         Categories = new ObservableCollection<string> { AllCategories };
@@ -196,6 +201,8 @@ public class MainViewModel : ViewModelBase
             var save = _saves.Load(path);
             CharacterName = save.CharacterName;
             HasLoadedSave = true;
+            _config.Settings.LastSavePath = path;
+            _config.Save();
             RefreshSlots();
             LoadSelectedSlot();
             StatusMessage = $"Loaded {System.IO.Path.GetFileName(path)} — Hunter “{save.CharacterName}”.";
@@ -211,8 +218,11 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
+            if (_config.Settings.AutoBackupEnabled && _saves.CurrentPath is { } path)
+                _backups.Create(path, "before save");
+
             _saves.Save();
-            StatusMessage = "Saved. A backup was written next to the save (/backup).";
+            StatusMessage = "Saved — a backup was written first.";
         }
         catch (Exception ex)
         {
@@ -236,10 +246,13 @@ public class MainViewModel : ViewModelBase
     {
         DetectedSaves.Clear();
 
-        var root = _locator.GuessShadPs4Root();
+        var configured = _config.Settings.ShadPs4FolderPath;
+        var root = !string.IsNullOrWhiteSpace(configured) && System.IO.Directory.Exists(configured)
+            ? configured
+            : _locator.GuessShadPs4Root();
         if (root is null)
         {
-            StatusMessage = "Couldn't find a shadPS4 folder — use Open Save to browse manually.";
+            StatusMessage = "Couldn't find a shadPS4 folder — set it in Settings or use Open Save.";
             return;
         }
 

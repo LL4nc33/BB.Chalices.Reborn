@@ -67,6 +67,8 @@ public partial class App : Application
 
         services.AddDbContext<ChaliceDbContext>(options => options.UseSqlite($"Data Source={dbPath}"));
 
+        services.AddSingleton<ConfigService>();
+        services.AddSingleton<BackupService>();
         services.AddSingleton<SaveFileService>();
         services.AddSingleton<SaveLocatorService>();
         services.AddTransient<DungeonService>();
