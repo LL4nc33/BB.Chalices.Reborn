@@ -8,6 +8,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/BB.Chalices.Core.Tests/BB.Chalices.Core.Tests.csproj" />
+    <Project Path="tests/BB.Chalices.Data.Tests/BB.Chalices.Data.Tests.csproj" />
     <Project Path="tests/BB.Chalices.Services.Tests/BB.Chalices.Services.Tests.csproj" />
   </Folder>
 </Solution>
