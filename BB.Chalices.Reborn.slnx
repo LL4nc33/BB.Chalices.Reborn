@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/BB.Chalices.App/BB.Chalices.App.csproj" />
     <Project Path="src/BB.Chalices.Core/BB.Chalices.Core.csproj" />
     <Project Path="src/BB.Chalices.Data/BB.Chalices.Data.csproj" />
     <Project Path="src/BB.Chalices.Services/BB.Chalices.Services.csproj" />

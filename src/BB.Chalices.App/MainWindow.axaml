@@ -1,0 +1,123 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:BB.Chalices.ViewModels"
+        x:Class="BB.Chalices.App.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Width="1040" Height="680" MinWidth="900" MinHeight="600"
+        RequestedThemeVariant="Dark"
+        FontFamily="{DynamicResource GothicFont}"
+        Background="{DynamicResource BgBase}"
+        Title="BB Chalices">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="{DynamicResource BgPanel}"
+                BorderBrush="{DynamicResource Blood}" BorderThickness="0,0,0,2" Padding="24,16">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="Chalice Dungeon Editor" FontSize="26" FontWeight="Bold"
+                               Foreground="{DynamicResource Parchment}" />
+                    <TextBlock FontSize="14" Foreground="{DynamicResource BloodBright}"
+                               Text="{Binding CharacterName, StringFormat='Hunter — {0}'}"
+                               IsVisible="{Binding HasLoadedSave}" />
+                    <TextBlock FontSize="14" Foreground="{DynamicResource ParchmentDim}"
+                               Text="No save loaded" IsVisible="{Binding !HasLoadedSave}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <Button Content="Open Save…" Click="OnOpenSaveClick" />
+                    <Button Content="Save" Command="{Binding SaveCommand}" IsEnabled="{Binding HasLoadedSave}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Body -->
+        <Grid Grid.Row="1" Margin="16" ColumnDefinitions="320,16,*">
+
+            <Grid Grid.Column="0" RowDefinitions="Auto,Auto,*,Auto">
+
+                <!-- shadPS4 detection -->
+                <Border Grid.Row="0" Background="{DynamicResource BgPanel}"
+                        BorderBrush="{DynamicResource Edge}" BorderThickness="1" Padding="14">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="shadPS4 saves" FontSize="16" Foreground="{DynamicResource Parchment}" />
+                        <Button Content="Detect saves" Command="{Binding DetectSavesCommand}" HorizontalAlignment="Stretch" />
+                        <ListBox ItemsSource="{Binding DetectedSaves}" SelectedItem="{Binding SelectedDetectedSave}"
+                                 MaxHeight="140" Background="Transparent" BorderThickness="0">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:DetectedSaveViewModel">
+                                    <StackPanel Margin="2">
+                                        <TextBlock Text="{Binding FileName}" Foreground="{DynamicResource Parchment}" />
+                                        <TextBlock Text="{Binding Location}" FontSize="11" Foreground="{DynamicResource ParchmentDim}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </Border>
+
+                <!-- Slots -->
+                <TextBlock Grid.Row="1" Text="Altar slots" FontSize="16"
+                           Foreground="{DynamicResource Parchment}" Margin="2,18,0,8" />
+                <Border Grid.Row="2" Background="{DynamicResource BgPanel}"
+                        BorderBrush="{DynamicResource Edge}" BorderThickness="1">
+                    <ListBox ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}"
+                             Background="Transparent" BorderThickness="0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SlotViewModel">
+                                <Grid ColumnDefinitions="*,Auto" Margin="2">
+                                    <TextBlock Grid.Column="0" Text="{Binding Label}" FontSize="15"
+                                               Foreground="{DynamicResource Parchment}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Summary}" FontSize="12"
+                                               Foreground="{DynamicResource ParchmentDim}" VerticalAlignment="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+
+                <Button Grid.Row="3" Content="Place dungeon in slot" Command="{Binding ApplyDungeonCommand}"
+                        HorizontalAlignment="Stretch" Margin="0,12,0,0" />
+            </Grid>
+
+            <!-- Dungeon catalog -->
+            <Border Grid.Column="2" Background="{DynamicResource BgPanel}"
+                    BorderBrush="{DynamicResource Edge}" BorderThickness="1" Padding="16">
+                <Grid RowDefinitions="Auto,*">
+                    <Grid Grid.Row="0" ColumnDefinitions="*,170" Margin="0,0,0,12">
+                        <TextBox Grid.Column="0" Text="{Binding SearchText}"
+                                 PlaceholderText="Search glyphs or descriptions…" Margin="0,0,8,0" />
+                        <ComboBox Grid.Column="1" ItemsSource="{Binding Categories}"
+                                  SelectedItem="{Binding SelectedCategory}" HorizontalAlignment="Stretch" />
+                    </Grid>
+                    <ListBox Grid.Row="1" ItemsSource="{Binding Dungeons}" SelectedItem="{Binding SelectedDungeon}"
+                             Background="Transparent" BorderThickness="0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:DungeonViewModel">
+                                <StackPanel Spacing="2" Margin="2">
+                                    <TextBlock Text="{Binding Glyph}" FontSize="15" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource Parchment}" />
+                                    <TextBlock Text="{Binding Category}" FontSize="11" Foreground="{DynamicResource BloodBright}" />
+                                    <TextBlock Text="{Binding Description}" FontSize="12" TextWrapping="Wrap"
+                                               Foreground="{DynamicResource ParchmentDim}"
+                                               IsVisible="{Binding Description, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Status bar -->
+        <Border Grid.Row="2" Background="{DynamicResource BgPanel}"
+                BorderBrush="{DynamicResource Blood}" BorderThickness="0,2,0,0" Padding="24,10">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="{Binding StatusMessage}"
+                           Foreground="{DynamicResource Parchment}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="{Binding Dungeons.Count, StringFormat='{}{0} shown'}"
+                           Foreground="{DynamicResource ParchmentDim}" VerticalAlignment="Center" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
