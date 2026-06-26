@@ -12,12 +12,15 @@ Built with Avalonia 12 and .NET 10, so it runs on Windows, Linux and macOS.
 The hard part — understanding the save format — stands on the shoulders of the
 Bloodborne data-mining community, plus my own research on top of it:
 
-- **The Tomb Prospectors community** and **[Hex Research Central](https://www.bloodborne-wiki.com/)**
-  ([data-mining notes](https://www.bloodborne-wiki.com/2017/12/data-mining.html)) —
-  the reverse-engineering of the headstone format that the rite, poison and
-  4th-layer byte logic is based on.
-- **Noxde's [Add Chalice Dungeons to your save](https://gist.github.com/Noxde/a29f699f4175bf315d9bd4baeebefb66)**
-  — the dungeon glyph list (`dungeons.json`) and the original tool that first inspired this one.
+- **The Tomb Prospectors community** — the reverse-engineering of the chalice save
+  format that the rite, poison and 4th-layer byte logic is based on:
+  - [Hex Research Central](https://www.bloodborne-wiki.com/) ([data-mining notes](https://www.bloodborne-wiki.com/2017/12/data-mining.html))
+  - the glyph and hex research sheets
+    ([one](https://docs.google.com/spreadsheets/d/1zFIzhnXHhYomlR-tFJcyk3cPywf1snqkDH900j6rtAI/edit?gid=1741467922#gid=1741467922),
+    [two](https://docs.google.com/spreadsheets/d/1psfenhcQJ06EUQgcEHBIQcfLD5Iq-kyKGTZINvy6228/edit?gid=1625060027#gid=1625060027))
+- **Noxde's [Add Chalice Dungeons to your save](https://www.nexusmods.com/bloodborne/mods/121)**
+  ([dungeon list](https://gist.github.com/Noxde/a29f699f4175bf315d9bd4baeebefb66)) — the
+  dungeon glyph list (`dungeons.json`) and the original tool that first inspired this one.
 - **The shadPS4 team** — the emulator this pairs with.
 
 ## Saves
