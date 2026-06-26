@@ -52,7 +52,7 @@ public class BackupService
         try
         {
             EnsureDirectory();
-            var stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            var stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
             var name = $"{Path.GetFileName(savePath)}_{stamp}.bak";
             var dest = Path.Combine(BackupDirectory, name);
 
