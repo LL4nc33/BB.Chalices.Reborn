@@ -15,6 +15,7 @@ public class MainViewModel : ViewModelBase
     private readonly SaveLocatorService _locator;
     private readonly ConfigService _config;
     private readonly BackupService _backups;
+    private readonly OnlineImportService _online;
 
     private List<DungeonViewModel> _all = new();
     private bool _suppressEdits;
@@ -36,13 +37,14 @@ public class MainViewModel : ViewModelBase
     private string _slotHexDump = string.Empty;
 
     public MainViewModel(SaveFileService saves, DungeonService dungeons, SaveLocatorService locator,
-        ConfigService config, BackupService backups)
+        ConfigService config, BackupService backups, OnlineImportService online)
     {
         _saves = saves;
         _dungeons = dungeons;
         _locator = locator;
         _config = config;
         _backups = backups;
+        _online = online;
 
         Dungeons = new ObservableCollection<DungeonViewModel>();
         Categories = new ObservableCollection<string> { AllCategories };
@@ -57,6 +59,7 @@ public class MainViewModel : ViewModelBase
         SaveCommand = ReactiveCommand.Create(Save);
         ApplyDungeonCommand = ReactiveCommand.Create(ApplyDungeon);
         DetectSavesCommand = ReactiveCommand.Create(DetectSaves);
+        UpdateDungeonsCommand = ReactiveCommand.CreateFromTask(UpdateDungeonsAsync);
     }
 
     public ObservableCollection<DungeonViewModel> Dungeons { get; }
@@ -163,6 +166,7 @@ public class MainViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
     public ReactiveCommand<Unit, Unit> ApplyDungeonCommand { get; }
     public ReactiveCommand<Unit, Unit> DetectSavesCommand { get; }
+    public ReactiveCommand<Unit, Unit> UpdateDungeonsCommand { get; }
 
     private async Task LoadDungeonsAsync()
     {
@@ -176,6 +180,14 @@ public class MainViewModel : ViewModelBase
 
         SelectedCategory = AllCategories;
         StatusMessage = $"{_all.Count} dungeons ready.";
+    }
+
+    private async Task UpdateDungeonsAsync()
+    {
+        StatusMessage = "Fetching the latest dungeons…";
+        var result = await _online.UpdateAsync();
+        await LoadDungeonsAsync();
+        StatusMessage = result;
     }
 
     private void ApplyFilter()

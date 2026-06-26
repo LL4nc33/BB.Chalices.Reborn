@@ -3,18 +3,34 @@ using BB.Chalices.Data.Entities;
 
 namespace BB.Chalices.Data;
 
-// Loads dungeons.json (grouped by category) into the database on first run.
-// The JSON stores each dungeon's bytes as an array of hex strings.
+// Loads dungeons.json (grouped by category) into the database. The JSON stores
+// each dungeon's bytes as an array of hex strings.
 public static class DungeonSeeder
 {
     private const int DungeonByteLength = 125;
 
+    // First-run seed from the bundled file; does nothing if already seeded.
     public static async Task SeedFromJsonAsync(ChaliceDbContext context, string jsonPath)
     {
         if (context.Dungeons.Any())
             return;
 
-        var json = await File.ReadAllTextAsync(jsonPath);
+        await ImportAsync(context, await File.ReadAllTextAsync(jsonPath));
+    }
+
+    // Parse a catalogue JSON string and load it. With replaceExisting the current
+    // catalogue is cleared first — used by the online updater.
+    public static async Task ImportAsync(ChaliceDbContext context, string json, bool replaceExisting = false)
+    {
+        if (context.Dungeons.Any())
+        {
+            if (!replaceExisting)
+                return;
+
+            context.Dungeons.RemoveRange(context.Dungeons);
+            await context.SaveChangesAsync();
+        }
+
         using var doc = JsonDocument.Parse(json);
 
         var dungeons = new List<DungeonEntity>();

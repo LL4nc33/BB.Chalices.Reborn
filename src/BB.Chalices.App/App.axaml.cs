@@ -72,6 +72,7 @@ public partial class App : Application
         services.AddSingleton<SaveFileService>();
         services.AddSingleton<SaveLocatorService>();
         services.AddTransient<DungeonService>();
+        services.AddTransient<OnlineImportService>();
         services.AddTransient<MainViewModel>();
     }
 }

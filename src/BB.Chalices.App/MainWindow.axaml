@@ -98,7 +98,11 @@
             <Border Grid.Column="2" Background="{DynamicResource BgPanel}"
                     BorderBrush="{DynamicResource Edge}" BorderThickness="1" Padding="16">
                 <Grid RowDefinitions="Auto,Auto,*,Auto">
-                    <TextBlock Grid.Row="0" Classes="section" Text="CATALOGUE" Margin="0,0,0,10" />
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+                        <TextBlock Grid.Column="0" Classes="section" Text="CATALOGUE" VerticalAlignment="Center" />
+                        <Button Grid.Column="1" Content="Update online" Command="{Binding UpdateDungeonsCommand}"
+                                Padding="10,4" FontSize="12" />
+                    </Grid>
                     <Grid Grid.Row="1" ColumnDefinitions="*,170" Margin="0,0,0,12">
                         <TextBox Grid.Column="0" Text="{Binding SearchText}"
                                  PlaceholderText="Search glyphs or descriptions…" Margin="0,0,8,0" />
