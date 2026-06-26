@@ -36,7 +36,7 @@ public class OnlineImportService
             await DungeonSeeder.ImportAsync(_db, content, replaceExisting: true);
 
             var count = await _db.Dungeons.CountAsync();
-            return $"Updated — {count} dungeons from Noxde's gist.";
+            return $"Updated to {count} dungeons from Noxde's gist.";
         }
         catch (Exception ex)
         {

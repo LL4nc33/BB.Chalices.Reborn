@@ -78,7 +78,7 @@ public class SaveFile
         _data.AsSpan(GetSlotOffset(slot), DungeonStructure.Size).ToArray();
 
     // Write a 125-byte record straight into a slot without touching the discovery
-    // flags — used when editing rites/poison/4th-layer on an already-placed dungeon.
+    // flags. Used when editing rites/poison/4th-layer on an already-placed dungeon.
     public void WriteSlotRaw(int slot, ReadOnlySpan<byte> record)
     {
         if (record.Length != DungeonStructure.Size)

@@ -29,7 +29,7 @@ public class MainViewModel : ViewModelBase
     private SlotViewModel? _selectedSlot;
     private DetectedSaveViewModel? _selectedDetectedSave;
 
-    private string _selectedSlotType = "—";
+    private string _selectedSlotType = "";
     private bool _poisonPossible;
     private bool _poisonEnabled;
     private bool _fourthLayerPossible;
@@ -219,7 +219,7 @@ public class MainViewModel : ViewModelBase
             _config.Save();
             RefreshSlots();
             LoadSelectedSlot();
-            StatusMessage = $"Loaded {System.IO.Path.GetFileName(path)} — Hunter “{save.CharacterName}”.";
+            StatusMessage = $"Loaded {System.IO.Path.GetFileName(path)} (Hunter {save.CharacterName}).";
         }
         catch (Exception ex)
         {
@@ -236,7 +236,7 @@ public class MainViewModel : ViewModelBase
                 _backups.Create(path, "before save");
 
             _saves.Save();
-            StatusMessage = "Saved — a backup was written first.";
+            StatusMessage = "Saved. A backup was written first.";
         }
         catch (Exception ex)
         {
@@ -266,7 +266,7 @@ public class MainViewModel : ViewModelBase
             : _locator.GuessShadPs4Root();
         if (root is null)
         {
-            StatusMessage = "Couldn't find a shadPS4 folder — set it in Settings or use Open Save.";
+            StatusMessage = "Couldn't find a shadPS4 folder. Set it in Settings or use Open Save.";
             return;
         }
 
@@ -325,7 +325,7 @@ public class MainViewModel : ViewModelBase
         {
             if (!HasLoadedSave || SelectedSlot is null)
             {
-                SelectedSlotType = "—";
+                SelectedSlotType = "";
                 foreach (var rite in RiteSlots) rite.Set(Headstone.Rite.None);
                 PoisonPossible = FourthLayerPossible = false;
                 PoisonEnabled = FourthLayerOpen = false;
@@ -384,7 +384,7 @@ public class MainViewModel : ViewModelBase
         catch
         {
             slot.Occupied = false;
-            slot.Headline = "—";
+            slot.Headline = "?";
         }
     }
 

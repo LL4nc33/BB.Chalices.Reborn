@@ -4,7 +4,7 @@ namespace BB.Chalices.Core.Binary;
 //
 // Every byte preset and the per-dungeon-type rules below are reverse-engineered
 // values carried over verbatim from the OidaNice Custom Chalices editor. The game
-// reads these exact bytes, so they must not be changed — only understood.
+// reads these exact bytes, so they must not be changed, only understood.
 //
 // All offsets are relative to the start of the 125-byte record.
 public static class Headstone

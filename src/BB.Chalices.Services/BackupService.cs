@@ -79,7 +79,7 @@ public class BackupService
             // Always keep an escape hatch: back up the current state before overwriting it.
             Create(savePath, "before restore");
             File.Copy(backup.FilePath, savePath, overwrite: true);
-            return "Backup restored — the previous state was backed up first.";
+            return "Backup restored. The previous state was backed up first.";
         }
         catch (Exception ex)
         {

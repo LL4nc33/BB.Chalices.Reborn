@@ -19,7 +19,7 @@ public static class DungeonSeeder
     }
 
     // Parse a catalogue JSON string and load it. With replaceExisting the current
-    // catalogue is cleared first — used by the online updater.
+    // catalogue is cleared first, which is what the online updater uses.
     public static async Task ImportAsync(ChaliceDbContext context, string json, bool replaceExisting = false)
     {
         if (context.Dungeons.Any() && !replaceExisting)

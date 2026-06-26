@@ -12,7 +12,7 @@ public class SlotViewModel : ViewModelBase
 
     public int Number { get; }
     public string Label => $"Slot {Number}";
-    public string Display => $"Slot {Number}  —  {(_occupied ? _headline : "empty")}";
+    public string Display => $"Slot {Number}:  {(_occupied ? _headline : "empty")}";
 
     public bool Occupied
     {
