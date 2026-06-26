@@ -57,6 +57,39 @@ public class SaveFileService
         _save.SetSlot(slot, dungeonBytes);
     }
 
+    // --- Headstone field editing (rites / poison / 4th layer) ---
+
+    private SaveFile Loaded => _save ?? throw new InvalidOperationException("No save file loaded");
+
+    public byte[] GetSlotBytes(int slot) => Loaded.GetSlotBytes(slot);
+
+    public string SlotHexDump(int slot) => Loaded.HexDumpSlot(slot);
+
+    public void SetRite(int slot, int riteIndex, Headstone.Rite rite)
+    {
+        var record = Loaded.GetSlotBytes(slot);
+        Headstone.RiteBytes(rite).CopyTo(record, Headstone.RiteSlotOffsets[riteIndex]);
+        Loaded.WriteSlotRaw(slot, record);
+    }
+
+    public void SetPoison(int slot, bool enabled)
+    {
+        var record = Loaded.GetSlotBytes(slot);
+        Headstone.SmartPoison(record, enabled).CopyTo(record, Headstone.PoisonOffset);
+        Loaded.WriteSlotRaw(slot, record);
+    }
+
+    public void SetFourthLayer(int slot, bool open)
+    {
+        var record = Loaded.GetSlotBytes(slot);
+        var (possible, openByte, closedByte) = Headstone.FourthLayerControl(Headstone.JoinRequirementsHex(record));
+        if (!possible)
+            return;
+
+        Headstone.FourthLayerBytes(open ? openByte : closedByte).CopyTo(record, Headstone.FourthLayerOffset);
+        Loaded.WriteSlotRaw(slot, record);
+    }
+
     public void Close()
     {
         _save = null;

@@ -70,6 +70,26 @@ public class SaveFile
 
     public byte[] GetBytes() => _data;
 
+    // --- Field-level access for the headstone editor ---
+
+    public int GetSlotOffset(int slot) => SaveFileReader.GetHeadstoneOffset(_inventoryOffset, slot);
+
+    public byte[] GetSlotBytes(int slot) =>
+        _data.AsSpan(GetSlotOffset(slot), DungeonStructure.Size).ToArray();
+
+    // Write a 125-byte record straight into a slot without touching the discovery
+    // flags — used when editing rites/poison/4th-layer on an already-placed dungeon.
+    public void WriteSlotRaw(int slot, ReadOnlySpan<byte> record)
+    {
+        if (record.Length != DungeonStructure.Size)
+            throw new ArgumentException($"Record must be {DungeonStructure.Size} bytes", nameof(record));
+
+        record.CopyTo(_data.AsSpan(GetSlotOffset(slot), DungeonStructure.Size));
+    }
+
+    public string HexDumpSlot(int slot) =>
+        Headstone.HexDump(_data, GetSlotOffset(slot), DungeonStructure.Size);
+
     public void SaveToFile(string path) => File.WriteAllBytes(path, _data);
 
     public static SaveFile LoadFromFile(string path)
