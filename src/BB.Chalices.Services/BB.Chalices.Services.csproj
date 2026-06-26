@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\BB.Chalices.Core\BB.Chalices.Core.csproj" />
+    <ProjectReference Include="..\BB.Chalices.Data\BB.Chalices.Data.csproj" />
+  </ItemGroup>
+
+</Project>
