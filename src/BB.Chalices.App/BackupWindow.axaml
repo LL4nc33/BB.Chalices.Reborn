@@ -1,0 +1,38 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:services="using:BB.Chalices.Services"
+        x:Class="BB.Chalices.App.BackupWindow"
+        Width="660" Height="480"
+        WindowStartupLocation="CenterOwner"
+        RequestedThemeVariant="Dark"
+        FontFamily="{DynamicResource GothicFont}"
+        Background="{DynamicResource BgBase}"
+        Title="Backups">
+
+    <Grid Margin="22" RowDefinitions="Auto,*,Auto">
+        <TextBlock Grid.Row="0" Text="Backups" FontSize="22" FontWeight="Bold"
+                   Foreground="{DynamicResource Parchment}" Margin="0,0,0,12" />
+
+        <Border Grid.Row="1" Background="{DynamicResource BgPanel}" BorderBrush="{DynamicResource Edge}" BorderThickness="1">
+            <ListBox x:Name="BackupList" Background="Transparent" BorderThickness="0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="services:BackupInfo">
+                        <StackPanel Margin="2,3">
+                            <TextBlock Text="{Binding DisplayName}" Foreground="{DynamicResource Parchment}" />
+                            <TextBlock Text="{Binding Notes}" FontSize="11" Foreground="{DynamicResource ParchmentDim}"
+                                       IsVisible="{Binding Notes, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" Margin="0,12,0,0">
+            <Button Content="Back up now" Click="OnCreate" />
+            <Button Content="Restore selected" Click="OnRestore" />
+            <Button Content="Delete" Click="OnDelete" />
+            <Button Content="Open folder" Click="OnOpenFolder" />
+            <Button Content="Close" Click="OnClose" HorizontalAlignment="Right" />
+        </StackPanel>
+    </Grid>
+</Window>

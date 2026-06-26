@@ -1,0 +1,40 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="BB.Chalices.App.SettingsWindow"
+        Width="560" Height="320"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        RequestedThemeVariant="Dark"
+        FontFamily="{DynamicResource GothicFont}"
+        Background="{DynamicResource BgBase}"
+        Title="Settings">
+
+    <StackPanel Margin="22" Spacing="16">
+        <TextBlock Text="Settings" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource Parchment}" />
+
+        <StackPanel Spacing="4">
+            <TextBlock Text="shadPS4 folder" Foreground="{DynamicResource ParchmentDim}" />
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBox x:Name="ShadBox" Grid.Column="0" PlaceholderText="leave empty to auto-detect" Margin="0,0,8,0" />
+                <Button Grid.Column="1" Content="Browse…" Click="OnBrowseShad" />
+            </Grid>
+        </StackPanel>
+
+        <StackPanel Spacing="4">
+            <TextBlock Text="Backup folder" Foreground="{DynamicResource ParchmentDim}" />
+            <Grid ColumnDefinitions="*,Auto,Auto">
+                <TextBox x:Name="BackupBox" Grid.Column="0" Margin="0,0,8,0" />
+                <Button Grid.Column="1" Content="Browse…" Click="OnBrowseBackup" Margin="0,0,8,0" />
+                <Button Grid.Column="2" Content="Open" Click="OnOpenBackup" />
+            </Grid>
+        </StackPanel>
+
+        <CheckBox x:Name="AutoBackupBox" Content="Back up automatically before every save"
+                  Foreground="{DynamicResource Parchment}" />
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+            <Button Content="Cancel" Click="OnCancel" />
+            <Button Content="Save" Click="OnSave" />
+        </StackPanel>
+    </StackPanel>
+</Window>

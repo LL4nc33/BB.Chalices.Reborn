@@ -65,6 +65,8 @@ public class MainViewModel : ViewModelBase
     public ObservableCollection<DetectedSaveViewModel> DetectedSaves { get; }
     public ObservableCollection<RiteSlotViewModel> RiteSlots { get; }
 
+    public string? CurrentSavePath => _saves.CurrentPath;
+
     public string? CharacterName
     {
         get => _characterName;
