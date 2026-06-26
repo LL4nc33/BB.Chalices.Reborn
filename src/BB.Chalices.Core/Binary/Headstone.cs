@@ -170,24 +170,6 @@ public static class Headstone
 
     public static byte[] FromHex(string hex) => Convert.FromHexString(hex);
 
-    // Clean hex view of the record: a relative offset and 16 bytes per row,
-    // narrow enough to read the whole 125-byte record without scrolling sideways.
-    public static string CompactDump(ReadOnlySpan<byte> record, int perLine = 16)
-    {
-        var sb = new System.Text.StringBuilder();
-        for (int i = 0; i < record.Length; i += perLine)
-        {
-            sb.Append($"{i:X2}:  ");
-
-            int count = Math.Min(perLine, record.Length - i);
-            for (int j = 0; j < count; j++)
-                sb.Append($"{record[i + j]:X2} ");
-
-            sb.AppendLine();
-        }
-        return sb.ToString();
-    }
-
     // HxD-style dump of the record's bytes in their file context: bytes outside
     // the record show as "..", aligned to 16-byte rows. Used for the live view.
     public static string HexDump(ReadOnlySpan<byte> fileBytes, int recordStart, int recordLength)
