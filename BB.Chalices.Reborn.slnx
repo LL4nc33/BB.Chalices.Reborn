@@ -2,4 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/BB.Chalices.Core/BB.Chalices.Core.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BB.Chalices.Core.Tests/BB.Chalices.Core.Tests.csproj" />
+  </Folder>
 </Solution>
