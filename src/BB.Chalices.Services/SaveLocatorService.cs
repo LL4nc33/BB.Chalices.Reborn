@@ -45,19 +45,26 @@ public class SaveLocatorService
             .ToList();
     }
 
-    // The usual places people unpack shadPS4 to. Returns null if none look right.
+    // The usual places shadPS4 ends up, across Windows, Linux and macOS.
+    // Returns null if none look right (the user can still browse manually).
     public string? GuessShadPs4Root()
     {
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var roaming = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);      // Windows %AppData%, Unix ~/.config
+        var local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);   // Windows %LocalAppData%, Unix ~/.local/share
 
         string[] candidates =
         [
-            Path.Combine(appData, "shadPS4"),
+            // Portable installs people keep around (all platforms)
             Path.Combine(home, "shadPS4"),
             Path.Combine(home, "Downloads", "shadPS4"),
             Path.Combine(home, "Desktop", "shadPS4"),
             Path.Combine(home, "Documents", "shadPS4"),
+            // Per-OS app-data locations
+            Path.Combine(roaming, "shadPS4"),
+            Path.Combine(local, "shadPS4"),
+            Path.Combine(home, "Library", "Application Support", "shadPS4"),          // macOS
+            Path.Combine(home, ".var", "app", "net.shadps4.shadPS4", "data", "shadPS4"), // Linux (Flatpak)
         ];
 
         return Array.Find(candidates, c => Directory.Exists(Path.Combine(c, "user")));
