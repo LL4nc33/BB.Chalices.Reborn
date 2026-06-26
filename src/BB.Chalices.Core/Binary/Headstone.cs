@@ -170,9 +170,9 @@ public static class Headstone
 
     public static byte[] FromHex(string hex) => Convert.FromHexString(hex);
 
-    // Compact dump of just the record's bytes with relative offsets — narrow
-    // enough to read the whole 125-byte record without scrolling sideways.
-    public static string CompactDump(ReadOnlySpan<byte> record, int perLine = 8)
+    // Clean hex view of the record: a relative offset and 16 bytes per row,
+    // narrow enough to read the whole 125-byte record without scrolling sideways.
+    public static string CompactDump(ReadOnlySpan<byte> record, int perLine = 16)
     {
         var sb = new System.Text.StringBuilder();
         for (int i = 0; i < record.Length; i += perLine)
@@ -182,15 +182,7 @@ public static class Headstone
             int count = Math.Min(perLine, record.Length - i);
             for (int j = 0; j < count; j++)
                 sb.Append($"{record[i + j]:X2} ");
-            for (int j = count; j < perLine; j++)
-                sb.Append("   ");
 
-            sb.Append(' ');
-            for (int j = 0; j < count; j++)
-            {
-                byte b = record[i + j];
-                sb.Append(b is >= 32 and <= 126 ? (char)b : '.');
-            }
             sb.AppendLine();
         }
         return sb.ToString();

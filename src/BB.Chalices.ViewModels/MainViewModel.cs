@@ -375,39 +375,19 @@ public class MainViewModel : ViewModelBase
             {
                 slot.Occupied = false;
                 slot.Headline = "empty";
-                slot.Detail = string.Empty;
                 return;
             }
 
             slot.Occupied = true;
             slot.Headline = Headstone.DungeonType(record);
-            slot.Detail = BuildDetail(record);
         }
         catch
         {
             slot.Occupied = false;
             slot.Headline = "—";
-            slot.Detail = string.Empty;
         }
     }
 
     private static bool IsEmpty(byte[] record) =>
         record.Length >= 4 && record[0] == 0xFF && record[1] == 0xFF && record[2] == 0xFF && record[3] == 0xFF;
-
-    private static string BuildDetail(byte[] record)
-    {
-        var parts = new List<string>();
-
-        for (int i = 0; i < Headstone.RiteSlotOffsets.Length; i++)
-        {
-            var rite = Headstone.ReadRite(record, Headstone.RiteSlotOffsets[i]);
-            if (rite != Headstone.Rite.None)
-                parts.Add(rite.ToString());
-        }
-
-        if (Headstone.IsPoisoned(record)) parts.Add("poison");
-        if (Headstone.IsFourthLayerOpen(record)) parts.Add("4th layer");
-
-        return string.Join(" · ", parts);
-    }
 }
