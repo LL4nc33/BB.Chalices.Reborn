@@ -22,14 +22,8 @@ public static class DungeonSeeder
     // catalogue is cleared first — used by the online updater.
     public static async Task ImportAsync(ChaliceDbContext context, string json, bool replaceExisting = false)
     {
-        if (context.Dungeons.Any())
-        {
-            if (!replaceExisting)
-                return;
-
-            context.Dungeons.RemoveRange(context.Dungeons);
-            await context.SaveChangesAsync();
-        }
+        if (context.Dungeons.Any() && !replaceExisting)
+            return;
 
         using var doc = JsonDocument.Parse(json);
 
@@ -68,6 +62,10 @@ public static class DungeonSeeder
                 });
             }
         }
+
+        // Parsing succeeded, so it's now safe to swap the catalogue out.
+        if (context.Dungeons.Any())
+            context.Dungeons.RemoveRange(context.Dungeons);
 
         context.Dungeons.AddRange(dungeons);
         await context.SaveChangesAsync();
