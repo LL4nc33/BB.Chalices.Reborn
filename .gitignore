@@ -1,0 +1,24 @@
+## .NET / build output
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+.vs/
+.idea/
+*.DotSettings.user
+
+## Rider / Visual Studio
+*.sln.iml
+
+## SQLite databases produced at runtime / design-time
+*.db
+*.db-shm
+*.db-wal
+
+## Avalonia / packaging
+publish/
+artifacts/
+
+## OS
+.DS_Store
+Thumbs.db
