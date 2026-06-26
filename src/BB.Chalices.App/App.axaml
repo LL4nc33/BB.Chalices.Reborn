@@ -61,5 +61,29 @@
         <Style Selector="ComboBox">
             <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
         </Style>
+
+        <!-- Primary action buttons (Save, Apply, Restore…) -->
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="{DynamicResource Blood}" />
+            <Setter Property="Foreground" Value="#F7F0DC" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BloodBright}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <!-- Roomier list rows + a blood accent bar on the selected one -->
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="10,8" />
+        </Style>
+        <Style Selector="ListBoxItem:selected">
+            <Setter Property="BorderBrush" Value="{DynamicResource Blood}" />
+            <Setter Property="BorderThickness" Value="3,0,0,0" />
+        </Style>
+
+        <!-- Small-caps-ish section labels -->
+        <Style Selector="TextBlock.section">
+            <Setter Property="Foreground" Value="{DynamicResource ParchmentDim}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
     </Application.Styles>
 </Application>

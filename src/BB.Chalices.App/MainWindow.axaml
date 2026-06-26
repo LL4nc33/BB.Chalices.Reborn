@@ -3,11 +3,17 @@
         xmlns:vm="using:BB.Chalices.ViewModels"
         x:Class="BB.Chalices.App.MainWindow"
         x:DataType="vm:MainViewModel"
-        Width="1240" Height="720" MinWidth="1100" MinHeight="640"
+        Width="1240" Height="760" MinWidth="1120" MinHeight="680"
         RequestedThemeVariant="Dark"
         FontFamily="{DynamicResource GothicFont}"
-        Background="{DynamicResource BgBase}"
         Title="BB Chalices">
+
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+            <GradientStop Offset="0" Color="#100F14" />
+            <GradientStop Offset="1" Color="#070709" />
+        </LinearGradientBrush>
+    </Window.Background>
 
     <Grid RowDefinitions="Auto,*,Auto">
 
@@ -16,7 +22,7 @@
                 BorderBrush="{DynamicResource Blood}" BorderThickness="0,0,0,2" Padding="24,16">
             <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                    <TextBlock Text="Chalice Dungeon Editor" FontSize="26" FontWeight="Bold"
+                    <TextBlock Text="Chalice Dungeon Editor" FontSize="27" FontWeight="Bold"
                                Foreground="{DynamicResource Parchment}" />
                     <TextBlock FontSize="14" Foreground="{DynamicResource BloodBright}"
                                Text="{Binding CharacterName, StringFormat='Hunter — {0}'}"
@@ -24,28 +30,31 @@
                     <TextBlock FontSize="14" Foreground="{DynamicResource ParchmentDim}"
                                Text="No save loaded" IsVisible="{Binding !HasLoadedSave}" />
                 </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Button Content="Backups" Click="OnBackupsClick" />
+                    <Button Content="Settings" Click="OnSettingsClick" />
                     <Button Content="Open Save…" Click="OnOpenSaveClick" />
-                    <Button Content="Save" Command="{Binding SaveCommand}" IsEnabled="{Binding HasLoadedSave}" />
+                    <Button Classes="primary" Content="Save" Command="{Binding SaveCommand}" IsEnabled="{Binding HasLoadedSave}" />
                 </StackPanel>
             </Grid>
         </Border>
 
         <!-- Body -->
-        <Grid Grid.Row="1" Margin="16" ColumnDefinitions="300,12,*,12,400">
+        <Grid Grid.Row="1" Margin="16" ColumnDefinitions="304,14,*,14,404">
 
-            <!-- Column 1: saves + slots -->
-            <Grid Grid.Column="0" RowDefinitions="Auto,Auto,*">
+            <!-- Saves + slots -->
+            <Grid Grid.Column="0" RowDefinitions="Auto,*">
                 <Border Grid.Row="0" Background="{DynamicResource BgPanel}"
-                        BorderBrush="{DynamicResource Edge}" BorderThickness="1" Padding="14">
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="shadPS4 saves" FontSize="15" Foreground="{DynamicResource Parchment}" />
+                        BorderBrush="{DynamicResource Edge}" BorderThickness="1" Padding="16" Margin="0,0,0,14">
+                    <StackPanel Spacing="10">
+                        <TextBlock Classes="section" Text="SHADPS4 SAVES" />
                         <Button Content="Detect saves" Command="{Binding DetectSavesCommand}" HorizontalAlignment="Stretch" />
                         <ListBox ItemsSource="{Binding DetectedSaves}" SelectedItem="{Binding SelectedDetectedSave}"
-                                 MaxHeight="110" Background="Transparent" BorderThickness="0">
+                                 Background="Transparent" BorderThickness="0"
+                                 ScrollViewer.VerticalScrollBarVisibility="Disabled">
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="vm:DetectedSaveViewModel">
-                                    <StackPanel Margin="2">
+                                    <StackPanel>
                                         <TextBlock Text="{Binding FileName}" Foreground="{DynamicResource Parchment}" />
                                         <TextBlock Text="{Binding Location}" FontSize="11" Foreground="{DynamicResource ParchmentDim}" />
                                     </StackPanel>
@@ -55,48 +64,52 @@
                     </StackPanel>
                 </Border>
 
-                <TextBlock Grid.Row="1" Text="Altar slots" FontSize="15"
-                           Foreground="{DynamicResource Parchment}" Margin="2,16,0,8" />
-
-                <ListBox Grid.Row="2" ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}"
-                         Background="{DynamicResource BgPanel}" BorderBrush="{DynamicResource Edge}" BorderThickness="1">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="vm:SlotViewModel">
-                            <Grid ColumnDefinitions="Auto,*" Margin="2,4">
-                                <Ellipse Grid.Column="0" Width="8" Height="8" Margin="0,0,10,0"
-                                         VerticalAlignment="Center" Fill="{DynamicResource Blood}"
-                                         IsVisible="{Binding Occupied}" />
-                                <StackPanel Grid.Column="1">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <TextBlock Grid.Column="0" Text="{Binding Label}" FontSize="15"
-                                                   Foreground="{DynamicResource Parchment}" />
-                                        <TextBlock Grid.Column="1" Text="{Binding Headline}" FontSize="13"
-                                                   Foreground="{DynamicResource ParchmentDim}" VerticalAlignment="Center" />
+                <Border Grid.Row="1" Background="{DynamicResource BgPanel}"
+                        BorderBrush="{DynamicResource Edge}" BorderThickness="1" Padding="16">
+                    <Grid RowDefinitions="Auto,*">
+                        <TextBlock Grid.Row="0" Classes="section" Text="ALTAR SLOTS" Margin="0,0,0,8" />
+                        <ListBox Grid.Row="1" ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}"
+                                 Background="Transparent" BorderThickness="0"
+                                 ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SlotViewModel">
+                                    <Grid ColumnDefinitions="14,*">
+                                        <Ellipse Grid.Column="0" Width="7" Height="7" VerticalAlignment="Center"
+                                                 Fill="{DynamicResource Blood}" IsVisible="{Binding Occupied}" />
+                                        <StackPanel Grid.Column="1" Spacing="1">
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <TextBlock Grid.Column="0" Text="{Binding Label}" FontSize="15" FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource Parchment}" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Headline}" FontSize="13"
+                                                           Foreground="{DynamicResource ParchmentDim}" VerticalAlignment="Center" />
+                                            </Grid>
+                                            <TextBlock Text="{Binding Detail}" FontSize="11" Foreground="{DynamicResource BloodBright}"
+                                                       IsVisible="{Binding Occupied}" />
+                                        </StackPanel>
                                     </Grid>
-                                    <TextBlock Text="{Binding Detail}" FontSize="11" Foreground="{DynamicResource BloodBright}"
-                                               IsVisible="{Binding Occupied}" />
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Border>
             </Grid>
 
-            <!-- Column 2: dungeon catalogue -->
+            <!-- Dungeon catalogue -->
             <Border Grid.Column="2" Background="{DynamicResource BgPanel}"
                     BorderBrush="{DynamicResource Edge}" BorderThickness="1" Padding="16">
-                <Grid RowDefinitions="Auto,*,Auto">
-                    <Grid Grid.Row="0" ColumnDefinitions="*,170" Margin="0,0,0,12">
+                <Grid RowDefinitions="Auto,Auto,*,Auto">
+                    <TextBlock Grid.Row="0" Classes="section" Text="CATALOGUE" Margin="0,0,0,10" />
+                    <Grid Grid.Row="1" ColumnDefinitions="*,170" Margin="0,0,0,12">
                         <TextBox Grid.Column="0" Text="{Binding SearchText}"
                                  PlaceholderText="Search glyphs or descriptions…" Margin="0,0,8,0" />
                         <ComboBox Grid.Column="1" ItemsSource="{Binding Categories}"
                                   SelectedItem="{Binding SelectedCategory}" HorizontalAlignment="Stretch" />
                     </Grid>
-                    <ListBox Grid.Row="1" ItemsSource="{Binding Dungeons}" SelectedItem="{Binding SelectedDungeon}"
+                    <ListBox Grid.Row="2" ItemsSource="{Binding Dungeons}" SelectedItem="{Binding SelectedDungeon}"
                              Background="Transparent" BorderThickness="0">
                         <ListBox.ItemTemplate>
                             <DataTemplate x:DataType="vm:DungeonViewModel">
-                                <StackPanel Spacing="2" Margin="2">
+                                <StackPanel Spacing="2">
                                     <TextBlock Text="{Binding Glyph}" FontSize="15" FontWeight="SemiBold"
                                                Foreground="{DynamicResource Parchment}" />
                                     <TextBlock Text="{Binding Category}" FontSize="11" Foreground="{DynamicResource BloodBright}" />
@@ -107,49 +120,46 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-                    <Button Grid.Row="2" Content="Place in selected slot" Command="{Binding ApplyDungeonCommand}"
-                            HorizontalAlignment="Stretch" Margin="0,12,0,0" />
+                    <Button Grid.Row="3" Classes="primary" Content="Place in selected slot"
+                            Command="{Binding ApplyDungeonCommand}" HorizontalAlignment="Stretch" Margin="0,12,0,0" />
                 </Grid>
             </Border>
 
-            <!-- Column 3: headstone editor -->
+            <!-- Headstone editor -->
             <Border Grid.Column="4" Background="{DynamicResource BgPanel}"
                     BorderBrush="{DynamicResource Edge}" BorderThickness="1" Padding="16">
-                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*">
-                    <TextBlock Grid.Row="0" Text="Selected slot" FontSize="15" Foreground="{DynamicResource Parchment}" />
-                    <TextBlock Grid.Row="1" Text="{Binding SelectedSlotType}" FontSize="20" FontWeight="Bold"
-                               Foreground="{DynamicResource BloodBright}" Margin="0,2,0,14" />
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*">
+                    <TextBlock Grid.Row="0" Classes="section" Text="SELECTED SLOT" />
+                    <TextBlock Grid.Row="1" Text="{Binding SelectedSlotType}" FontSize="21" FontWeight="Bold"
+                               Foreground="{DynamicResource BloodBright}" Margin="0,2,0,16" />
 
-                    <StackPanel Grid.Row="2" Spacing="4" Margin="0,0,0,12">
-                        <TextBlock Text="Rites" FontSize="13" Foreground="{DynamicResource ParchmentDim}" Margin="0,0,0,2" />
-                        <ItemsControl ItemsSource="{Binding RiteSlots}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="vm:RiteSlotViewModel">
-                                    <Grid ColumnDefinitions="64,*" Margin="0,3">
-                                        <TextBlock Grid.Column="0" Text="{Binding Label}" VerticalAlignment="Center"
-                                                   Foreground="{DynamicResource ParchmentDim}" />
-                                        <ComboBox Grid.Column="1" ItemsSource="{Binding Options}"
-                                                  SelectedItem="{Binding Rite}" HorizontalAlignment="Stretch" />
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
+                    <TextBlock Grid.Row="2" Classes="section" Text="RITES" Margin="0,0,0,6" />
+                    <ItemsControl Grid.Row="3" ItemsSource="{Binding RiteSlots}" Margin="0,0,0,14">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:RiteSlotViewModel">
+                                <Grid ColumnDefinitions="64,*" Margin="0,3">
+                                    <TextBlock Grid.Column="0" Text="{Binding Label}" VerticalAlignment="Center"
+                                               Foreground="{DynamicResource ParchmentDim}" />
+                                    <ComboBox Grid.Column="1" ItemsSource="{Binding Options}"
+                                              SelectedItem="{Binding Rite}" HorizontalAlignment="Stretch" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
-                    <StackPanel Grid.Row="3" Spacing="6" Margin="0,0,0,14">
+                    <StackPanel Grid.Row="4" Spacing="6" Margin="0,0,0,16">
                         <CheckBox Content="Poison" IsChecked="{Binding PoisonEnabled}" IsEnabled="{Binding PoisonPossible}" />
                         <CheckBox Content="Open 4th layer" IsChecked="{Binding FourthLayerOpen}" IsEnabled="{Binding FourthLayerPossible}" />
                     </StackPanel>
 
-                    <TextBlock Grid.Row="4" Text="Live bytes (125)" FontSize="13"
-                               Foreground="{DynamicResource ParchmentDim}" Margin="0,0,0,4" />
-                    <Border Grid.Row="5" Background="{DynamicResource BgBase}" BorderBrush="{DynamicResource Edge}" BorderThickness="1">
+                    <TextBlock Grid.Row="5" Classes="section" Text="LIVE BYTES" Margin="0,0,0,6" />
+                    <Border Grid.Row="6" Background="{DynamicResource BgBase}"
+                            BorderBrush="{DynamicResource Edge}" BorderThickness="1" Padding="8">
                         <TextBox Text="{Binding SlotHexDump, Mode=OneWay}" IsReadOnly="True"
-                                 FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="11"
+                                 FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="12"
                                  Foreground="{DynamicResource Parchment}" Background="Transparent" BorderThickness="0"
-                                 AcceptsReturn="True" TextWrapping="NoWrap"
-                                 VerticalAlignment="Stretch"
-                                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                 AcceptsReturn="True" TextWrapping="NoWrap" Padding="0"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  ScrollViewer.VerticalScrollBarVisibility="Auto" />
                     </Border>
                 </Grid>

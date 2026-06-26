@@ -88,7 +88,7 @@ public class SaveFile
     }
 
     public string HexDumpSlot(int slot) =>
-        Headstone.HexDump(_data, GetSlotOffset(slot), DungeonStructure.Size);
+        Headstone.CompactDump(_data.AsSpan(GetSlotOffset(slot), DungeonStructure.Size));
 
     public void SaveToFile(string path) => File.WriteAllBytes(path, _data);
 
