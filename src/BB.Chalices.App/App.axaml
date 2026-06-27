@@ -89,8 +89,16 @@
         <!-- Small-caps-ish section labels -->
         <Style Selector="TextBlock.section">
             <Setter Property="Foreground" Value="{DynamicResource ParchmentDim}" />
-            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontSize" Value="13" />
             <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <!-- Vertical action buttons in the left sidebar -->
+        <Style Selector="Button.nav">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Padding" Value="12,9" />
+            <Setter Property="FontSize" Value="14" />
         </Style>
     </Application.Styles>
 </Application>

@@ -136,6 +136,13 @@ public class MainViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref _selectedSlotType, value);
     }
 
+    private string _selectedSlotJoin = string.Empty;
+    public string SelectedSlotJoin
+    {
+        get => _selectedSlotJoin;
+        private set => this.RaiseAndSetIfChanged(ref _selectedSlotJoin, value);
+    }
+
     public bool PoisonPossible
     {
         get => _poisonPossible;
@@ -423,6 +430,7 @@ public class MainViewModel : ViewModelBase
             if (!HasLoadedSave || SelectedSlot is null)
             {
                 SelectedSlotType = "";
+                SelectedSlotJoin = "";
                 foreach (var rite in RiteSlots) rite.Set(Headstone.Rite.None);
                 PoisonPossible = FourthLayerPossible = false;
                 PoisonEnabled = FourthLayerOpen = false;
@@ -439,6 +447,7 @@ public class MainViewModel : ViewModelBase
             if (IsEmpty(record))
             {
                 SelectedSlotType = "empty";
+                SelectedSlotJoin = "";
                 foreach (var rite in RiteSlots) rite.Set(Headstone.Rite.None);
                 PoisonPossible = FourthLayerPossible = false;
                 PoisonEnabled = FourthLayerOpen = false;
@@ -446,6 +455,7 @@ public class MainViewModel : ViewModelBase
             }
 
             SelectedSlotType = Headstone.DungeonType(record);
+            SelectedSlotJoin = Headstone.JoinRequirementsLabel(Headstone.JoinRequirementsHex(record));
             for (int i = 0; i < RiteSlots.Count; i++)
                 RiteSlots[i].Set(Headstone.ReadRite(record, Headstone.RiteSlotOffsets[i]));
 
