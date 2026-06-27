@@ -24,40 +24,22 @@
             <Border Grid.Column="0" Background="{DynamicResource BgPanel}"
                     BorderBrush="{DynamicResource Edge}" BorderThickness="0,0,1,0">
                 <DockPanel Margin="16,18">
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="9" Margin="2,0,0,20">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="9" Margin="2,0,0,22">
                         <Image Source="/Assets/favicon.png" Width="26" Height="26" VerticalAlignment="Center" />
                         <TextBlock Text="BB Chalices" FontSize="18" FontWeight="Bold"
                                    Foreground="{DynamicResource Parchment}" VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <StackPanel DockPanel.Dock="Bottom" Margin="2,16,0,0">
-                        <TextBlock Text="{Binding CharacterName, StringFormat='Hunter: {0}'}" FontSize="13"
-                                   Foreground="{DynamicResource BloodBright}" TextWrapping="Wrap"
-                                   IsVisible="{Binding HasLoadedSave}" />
-                        <TextBlock Text="No save loaded" FontSize="13" Foreground="{DynamicResource ParchmentDim}"
-                                   IsVisible="{Binding !HasLoadedSave}" />
-                    </StackPanel>
-
-                    <StackPanel Spacing="7">
-                        <Grid>
-                            <Border Width="3" HorizontalAlignment="Left" Background="{DynamicResource Blood}"
-                                    IsVisible="{Binding IsCatalogueView}" />
-                            <Button Classes="nav" Content="Catalogue" Click="OnShowCatalogue"
-                                    ToolTip.Tip="Browse and place dungeons" />
+                    <!-- the save lives in its own block at the bottom, with one big Save button -->
+                    <StackPanel DockPanel.Dock="Bottom" Spacing="9">
+                        <Border Height="1" Background="{DynamicResource Edge}" />
+                        <TextBlock Classes="section" Text="CURRENT SAVE" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="6">
+                            <Button Grid.Column="0" Content="Open" Click="OnOpenSaveClick" HotKey="Ctrl+O"
+                                    HorizontalAlignment="Stretch" ToolTip.Tip="Open a Bloodborne save file (Ctrl+O)" />
+                            <Button Grid.Column="1" Content="Detect" Command="{Binding DetectSavesCommand}"
+                                    HorizontalAlignment="Stretch" ToolTip.Tip="Find your shadPS4 characters automatically" />
                         </Grid>
-                        <Grid>
-                            <Border Width="3" HorizontalAlignment="Left" Background="{DynamicResource Blood}"
-                                    IsVisible="{Binding IsSettingsView}" />
-                            <Button Classes="nav" Content="Settings" Click="OnShowSettings"
-                                    ToolTip.Tip="shadPS4 folder, backups, credits and sources" />
-                        </Grid>
-
-                        <Border Height="1" Background="{DynamicResource Edge}" Margin="0,10" />
-
-                        <Button Classes="nav" Content="Open save" Click="OnOpenSaveClick" HotKey="Ctrl+O"
-                                ToolTip.Tip="Open a Bloodborne save file (Ctrl+O)" />
-                        <Button Classes="nav" Content="Detect saves" Command="{Binding DetectSavesCommand}"
-                                ToolTip.Tip="Find your shadPS4 characters automatically" />
                         <ComboBox ItemsSource="{Binding DetectedSaves}" SelectedItem="{Binding SelectedDetectedSave}"
                                   HorizontalAlignment="Stretch" PlaceholderText="detected characters"
                                   ToolTip.Tip="Pick a detected character to load it">
@@ -71,14 +53,34 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-
-                        <Border Height="1" Background="{DynamicResource Edge}" Margin="0,10" />
-
-                        <Button Classes="nav primary" Content="Save" Command="{Binding SaveCommand}"
+                        <TextBlock Text="{Binding CharacterName, StringFormat='Hunter: {0}'}" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BloodBright}" TextWrapping="Wrap" Margin="0,2,0,0"
+                                   IsVisible="{Binding HasLoadedSave}" />
+                        <TextBlock Text="No save loaded" FontSize="13" Foreground="{DynamicResource ParchmentDim}" Margin="0,2,0,0"
+                                   IsVisible="{Binding !HasLoadedSave}" />
+                        <Button Classes="primary" Content="Save changes" Command="{Binding SaveCommand}"
                                 IsEnabled="{Binding HasLoadedSave}" HotKey="Ctrl+S"
-                                ToolTip.Tip="Write your changes to the save (Ctrl+S). A backup is made first." />
-                        <Button Classes="nav" Content="Undo" Command="{Binding UndoSlotCommand}" IsEnabled="{Binding CanUndo}"
-                                ToolTip.Tip="Revert the last slot change before saving" />
+                                HorizontalAlignment="Stretch" Padding="12,13" FontSize="16" FontWeight="Bold" Margin="0,2,0,0"
+                                ToolTip.Tip="Write all your changes to the save (Ctrl+S). A backup is made first." />
+                        <Button Content="Undo last change" Command="{Binding UndoSlotCommand}" IsEnabled="{Binding CanUndo}"
+                                HorizontalAlignment="Stretch" ToolTip.Tip="Revert the last slot change before saving" />
+                    </StackPanel>
+
+                    <!-- navigation between the centre views -->
+                    <StackPanel VerticalAlignment="Top" Spacing="6">
+                        <TextBlock Classes="section" Text="VIEWS" Margin="0,0,0,4" />
+                        <Grid>
+                            <Border Width="3" HorizontalAlignment="Left" Background="{DynamicResource Blood}"
+                                    IsVisible="{Binding IsCatalogueView}" />
+                            <Button Classes="nav" Content="Catalogue" Click="OnShowCatalogue"
+                                    ToolTip.Tip="Browse and place dungeons" />
+                        </Grid>
+                        <Grid>
+                            <Border Width="3" HorizontalAlignment="Left" Background="{DynamicResource Blood}"
+                                    IsVisible="{Binding IsSettingsView}" />
+                            <Button Classes="nav" Content="Settings" Click="OnShowSettings"
+                                    ToolTip.Tip="shadPS4 folder, auto-backup, credits and sources" />
+                        </Grid>
                         <Button Classes="nav" Content="Backups" Click="OnBackupsClick"
                                 ToolTip.Tip="Browse, restore or delete backups" />
                     </StackPanel>
@@ -92,16 +94,36 @@
                 <Grid ColumnDefinitions="*,580" IsVisible="{Binding IsCatalogueView}">
 
                     <Grid Grid.Column="0" Margin="22,18" RowDefinitions="Auto,Auto,*,Auto,Auto">
-                        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,12">
-                            <TextBlock Grid.Column="0" Text="Catalogue" FontSize="20" FontWeight="Bold"
-                                       Foreground="{DynamicResource Parchment}" VerticalAlignment="Center" />
-                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="0" VerticalAlignment="Center">
-                                <Button Classes="toggle" Classes.active="{Binding ShowNox}" Content="Noxde" Click="OnShowNox"
-                                        ToolTip.Tip="Noxde's curated farming, equipment and gem dungeons" />
-                                <Button Classes="toggle" Classes.active="{Binding ShowAll}" Content="All" Click="OnShowAll"
-                                        ToolTip.Tip="The full Tomb Prospectors set by area" />
-                            </StackPanel>
-                        </Grid>
+                        <StackPanel Grid.Row="0">
+                            <Border IsVisible="{Binding !HasLoadedSave}" Background="{DynamicResource BgPanelAlt}"
+                                    BorderBrush="{DynamicResource Blood}" BorderThickness="1" Padding="20,18" Margin="0,0,0,16">
+                                <StackPanel Spacing="9">
+                                    <TextBlock Text="Welcome to BB Chalices" FontSize="19" FontWeight="Bold"
+                                               Foreground="{DynamicResource Parchment}" />
+                                    <TextBlock TextWrapping="Wrap" FontSize="14" Foreground="{DynamicResource ParchmentDim}"
+                                               Text="Swap the chalice dungeons in your Bloodborne save. Drop any of 2300+ ready-made dungeons onto your altar, turn rites and effects on or off, or build your own. Every change is backed up before it is written." />
+                                    <TextBlock Classes="section" Text="HOW IT WORKS" Margin="0,5,0,1" />
+                                    <TextBlock FontSize="14" Foreground="{DynamicResource Parchment}" TextWrapping="Wrap"
+                                               Text="1.  Load your save: Open save or Detect saves, bottom left." />
+                                    <TextBlock FontSize="14" Foreground="{DynamicResource Parchment}" TextWrapping="Wrap"
+                                               Text="2.  Pick a dungeon below. Search by boss, loot or glyph." />
+                                    <TextBlock FontSize="14" Foreground="{DynamicResource Parchment}" TextWrapping="Wrap"
+                                               Text="3.  Choose a slot on the right, then Place in selected slot." />
+                                    <TextBlock FontSize="14" Foreground="{DynamicResource Parchment}" TextWrapping="Wrap"
+                                               Text="4.  Tweak rites if you like, then Save changes." />
+                                </StackPanel>
+                            </Border>
+                            <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,12">
+                                <TextBlock Grid.Column="0" Text="Catalogue" FontSize="20" FontWeight="Bold"
+                                           Foreground="{DynamicResource Parchment}" VerticalAlignment="Center" />
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="0" VerticalAlignment="Center">
+                                    <Button Classes="toggle" Classes.active="{Binding ShowNox}" Content="Noxde" Click="OnShowNox"
+                                            ToolTip.Tip="Noxde's curated farming, equipment and gem dungeons" />
+                                    <Button Classes="toggle" Classes.active="{Binding ShowAll}" Content="All" Click="OnShowAll"
+                                            ToolTip.Tip="The full Tomb Prospectors set by area" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
                         <Grid Grid.Row="1" ColumnDefinitions="*,200" Margin="0,0,0,12">
                             <TextBox Grid.Column="0" Text="{Binding SearchText}" FontSize="15"
                                      PlaceholderText="Search glyph, boss or loot" Margin="0,0,10,0"
