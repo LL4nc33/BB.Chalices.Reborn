@@ -64,6 +64,8 @@ public class SaveFile
         flag[3] = 0xE8;
         flag[4] = 0x00;
         flag[5] = 0x04;
+        flag[16] = 0x03; // the second part of the discovery pattern; the
+        flag[17] = 0x02; // original index.js setFlag writes it and the game needs it
 
         Array.Copy(flag, 0, _data, flagOffset, DungeonStructure.Size);
     }

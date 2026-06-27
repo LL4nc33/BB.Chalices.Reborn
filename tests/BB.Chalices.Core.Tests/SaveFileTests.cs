@@ -119,6 +119,8 @@ public class SaveFileTests
 
         var flagHead = buffer.AsSpan(flagOffset, 7).ToArray();
         Assert.Equal(new byte[] { 0x30, 0x00, 0x03, 0xE8, 0x00, 0x04, 0x00 }, flagHead);
+        Assert.Equal(0x03, buffer[flagOffset + 16]); // the second part of the discovery pattern
+        Assert.Equal(0x02, buffer[flagOffset + 17]);
     }
 
     [Fact]
