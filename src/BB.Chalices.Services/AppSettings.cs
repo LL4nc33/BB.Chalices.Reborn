@@ -14,4 +14,9 @@ public class AppSettings
 
     // Where managed backups live (defaults to <LocalAppData>/BBChalices/Backups).
     public string? BackupDirectory { get; set; }
+
+    // Remembered main-window size so it reopens the way you left it.
+    public int? WindowWidth { get; set; }
+    public int? WindowHeight { get; set; }
+    public bool WindowMaximized { get; set; }
 }

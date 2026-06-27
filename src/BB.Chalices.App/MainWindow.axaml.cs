@@ -15,6 +15,36 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        Opened += OnWindowOpened;
+        Closing += OnWindowClosing;
+    }
+
+    private void OnWindowOpened(object? sender, EventArgs e)
+    {
+        if (Services?.GetService<ConfigService>() is not { Settings: { } settings })
+            return;
+
+        if (settings.WindowWidth is > 0 && settings.WindowHeight is > 0)
+        {
+            Width = settings.WindowWidth.Value;
+            Height = settings.WindowHeight.Value;
+        }
+        if (settings.WindowMaximized)
+            WindowState = WindowState.Maximized;
+    }
+
+    private void OnWindowClosing(object? sender, WindowClosingEventArgs e)
+    {
+        if (Services?.GetService<ConfigService>() is not { Settings: { } settings })
+            return;
+
+        settings.WindowMaximized = WindowState == WindowState.Maximized;
+        if (WindowState == WindowState.Normal && !double.IsNaN(Width) && !double.IsNaN(Height))
+        {
+            settings.WindowWidth = (int)Width;
+            settings.WindowHeight = (int)Height;
+        }
+        Services.GetRequiredService<ConfigService>().Save();
     }
 
     private void OnCatalogueDoubleTapped(object? sender, TappedEventArgs e)

@@ -57,13 +57,18 @@ public partial class BackupWindow : Window
         Refresh();
     }
 
-    private void OnDelete(object? sender, RoutedEventArgs e)
+    private async void OnDelete(object? sender, RoutedEventArgs e)
     {
-        if (BackupList.SelectedItem is BackupInfo backup)
-        {
-            _backups.Delete(backup);
-            Refresh();
-        }
+        if (BackupList.SelectedItem is not BackupInfo backup)
+            return;
+
+        bool confirmed = await new ConfirmWindow($"Delete this backup?\n\n{backup.DisplayName}\n\nThis cannot be undone.")
+            .ShowDialog<bool>(this);
+        if (!confirmed)
+            return;
+
+        _backups.Delete(backup);
+        Refresh();
     }
 
     private async void OnOpenFolder(object? sender, RoutedEventArgs e)

@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="BB.Chalices.App.ConfirmWindow"
+        Width="420" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        RequestedThemeVariant="Dark"
+        FontFamily="{DynamicResource GothicFont}"
+        Background="{DynamicResource BgBase}"
+        Icon="/Assets/favicon.png"
+        Title="Confirm">
+
+    <StackPanel Margin="24" Spacing="22">
+        <TextBlock x:Name="MessageText" TextWrapping="Wrap" Foreground="{DynamicResource Parchment}" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+            <Button Content="Cancel" Click="OnCancel" />
+            <Button Classes="primary" Content="Confirm" Click="OnConfirm" />
+        </StackPanel>
+    </StackPanel>
+</Window>
