@@ -22,7 +22,7 @@ public class MainViewModel : ViewModelBase
 
     private string? _characterName;
     private bool _hasLoadedSave;
-    private string _statusMessage = "Open a save to begin.";
+    private string _statusMessage = "Welcome. Open a save, or use Detect to find your shadPS4 characters.";
     private string _searchText = string.Empty;
     private string _selectedCategory = AllCategories;
     private DungeonViewModel? _selectedDungeon;
@@ -360,8 +360,8 @@ public class MainViewModel : ViewModelBase
                 DetectedSaves.Add(new DetectedSaveViewModel(file));
 
         StatusMessage = DetectedSaves.Count == 0
-            ? $"No Bloodborne saves found under {root}."
-            : $"Found {DetectedSaves.Count} save(s) under shadPS4.";
+            ? $"No Bloodborne saves found under {root}. Use Open Save, or set the folder in Settings."
+            : $"Found {DetectedSaves.Count} character save(s). Pick one above to start editing.";
     }
 
     // --- Editing the selected slot's headstone fields ---
