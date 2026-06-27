@@ -1,0 +1,76 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:BB.Chalices.ViewModels"
+        x:Class="BB.Chalices.App.DungeonBuilderWindow"
+        x:DataType="vm:DungeonBuilderViewModel"
+        Width="680" Height="660"
+        WindowStartupLocation="CenterOwner"
+        RequestedThemeVariant="Dark"
+        FontFamily="{DynamicResource GothicFont}"
+        Background="{DynamicResource BgBase}"
+        Title="Dungeon builder">
+
+    <Grid Margin="22" RowDefinitions="Auto,Auto,*,Auto">
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="Dungeon builder" FontSize="22" FontWeight="Bold"
+                       Foreground="{DynamicResource Parchment}" />
+            <TextBlock Text="Generate a fresh dungeon by area and layout. Set rites and modifiers in the editor afterwards."
+                       FontSize="12" Foreground="{DynamicResource ParchmentDim}" Margin="0,4,0,0" TextWrapping="Wrap" />
+        </StackPanel>
+
+        <Border Grid.Row="1" Background="{DynamicResource BgPanel}" BorderBrush="{DynamicResource Edge}"
+                BorderThickness="1" Padding="18">
+            <StackPanel Spacing="14">
+                <Grid ColumnDefinitions="130,*">
+                    <TextBlock Grid.Column="0" Text="Area and depth" VerticalAlignment="Center"
+                               Foreground="{DynamicResource Parchment}" />
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding Areas}" SelectedItem="{Binding SelectedArea}"
+                              HorizontalAlignment="Stretch"
+                              ToolTip.Tip="Where the dungeon is and how deep. This sets the area byte and picks a valid base." />
+                </Grid>
+
+                <Grid ColumnDefinitions="130,*">
+                    <TextBlock Grid.Column="0" Text="Variant" VerticalAlignment="Center"
+                               Foreground="{DynamicResource Parchment}" />
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding Variants}" SelectedItem="{Binding SelectedVariant}"
+                              HorizontalAlignment="Stretch"
+                              ToolTip.Tip="Normal, Defiled (a harder cursed depth) or Sinister (can be invaded, no 4th layer)." />
+                </Grid>
+
+                <Grid ColumnDefinitions="130,*">
+                    <TextBlock Grid.Column="0" Text="Second map" VerticalAlignment="Center"
+                               Foreground="{DynamicResource Parchment}" />
+                    <CheckBox Grid.Column="1" Content="Use the second hundred layouts"
+                              IsChecked="{Binding SecondMap}" IsEnabled="{Binding SecondMapPossible}"
+                              ToolTip.Tip="Depth 4 and 5 draw from two maps of 100 layouts each. Tick this for the second map." />
+                </Grid>
+
+                <Grid ColumnDefinitions="130,*">
+                    <TextBlock Grid.Column="0" Text="Layout number" VerticalAlignment="Center"
+                               Foreground="{DynamicResource Parchment}" />
+                    <NumericUpDown Grid.Column="1" Minimum="0" Maximum="99" Increment="1" FormatString="0"
+                                   Value="{Binding DungeonNumber}" HorizontalAlignment="Left" Width="140"
+                                   ToolTip.Tip="Which of the 100 layouts in the map (0 to 99). This is the seed byte at 0x03." />
+                </Grid>
+
+                <TextBlock Text="{Binding Status}" Foreground="{DynamicResource BloodBright}" FontSize="12" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="2" Background="{DynamicResource BgPanel}" BorderBrush="{DynamicResource Edge}"
+                BorderThickness="1" Margin="0,14,0,0" Padding="12,10">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <SelectableTextBlock Text="{Binding PreviewHex}"
+                                     FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="12"
+                                     Foreground="{DynamicResource Parchment}" />
+            </ScrollViewer>
+        </Border>
+
+        <Grid Grid.Row="3" ColumnDefinitions="*,Auto" Margin="0,14,0,0">
+            <Button Grid.Column="0" Classes="primary" Content="Place in selected slot" Click="OnPlace"
+                    HorizontalAlignment="Left"
+                    ToolTip.Tip="Write this dungeon into the slot selected in the main window" />
+            <Button Grid.Column="1" Content="Close" Click="OnClose" />
+        </Grid>
+    </Grid>
+</Window>

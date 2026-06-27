@@ -275,6 +275,25 @@ public class MainViewModel : ViewModelBase
         StatusMessage = $"Cleared slot {SelectedSlot.Number}. Save to write it to disk.";
     }
 
+    public void PlaceBuiltDungeon(byte[]? record)
+    {
+        if (record is null)
+        {
+            StatusMessage = "Could not build that dungeon.";
+            return;
+        }
+        if (!HasLoadedSave || SelectedSlot is null)
+        {
+            StatusMessage = "Open a save and pick a slot first.";
+            return;
+        }
+
+        _saves.SetSlot(SelectedSlot.Number, record);
+        RefreshSlot(SelectedSlot);
+        LoadSelectedSlot();
+        StatusMessage = $"Built dungeon placed in slot {SelectedSlot.Number}. Save to write it to disk.";
+    }
+
     private void DetectSaves()
     {
         DetectedSaves.Clear();

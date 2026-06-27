@@ -43,6 +43,16 @@ public partial class MainWindow : Window
             await new AdvancedWindow { DataContext = viewModel }.ShowDialog(this);
     }
 
+    private async void OnBuilderClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel main || Services is not { } services)
+            return;
+
+        var viewModel = new DungeonBuilderViewModel(services.GetRequiredService<DungeonService>());
+        await viewModel.InitAsync();
+        await new DungeonBuilderWindow(main) { DataContext = viewModel }.ShowDialog(this);
+    }
+
     private async void OnBackupsClick(object? sender, RoutedEventArgs e)
     {
         if (Services is not { } services)

@@ -7,7 +7,10 @@ namespace BB.Chalices.Core.Binary;
 // Central" reference by DrAnger.
 public static class DungeonBuilder
 {
-    public sealed record Area(string Name, byte MapByte, bool HasTwoMaps);
+    public sealed record Area(string Name, byte MapByte, bool HasTwoMaps)
+    {
+        public override string ToString() => Name;
+    }
 
     // Area and depth pick the map byte at 0x01. Depth 4-5 chalices draw from two
     // maps (200 layouts), depth 1-3 from one (100 layouts).

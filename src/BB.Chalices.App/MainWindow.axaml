@@ -99,9 +99,14 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-                        <Button Grid.Row="3" Classes="primary" Content="Place in selected slot"
-                                Command="{Binding ApplyDungeonCommand}" HorizontalAlignment="Stretch" Margin="0,12,0,0"
-                                ToolTip.Tip="Write the selected dungeon into the chosen altar slot" />
+                        <Grid Grid.Row="3" ColumnDefinitions="*,Auto" ColumnSpacing="8" Margin="0,12,0,0">
+                            <Button Grid.Column="0" Classes="primary" Content="Place in selected slot"
+                                    Command="{Binding ApplyDungeonCommand}" HorizontalAlignment="Stretch"
+                                    ToolTip.Tip="Write the selected dungeon into the chosen altar slot" />
+                            <Button Grid.Column="1" Content="Build new…" Click="OnBuilderClick"
+                                    IsEnabled="{Binding HasLoadedSave}"
+                                    ToolTip.Tip="Generate a fresh dungeon by area, variant and layout" />
+                        </Grid>
                     </Grid>
                 </Border>
             </Grid>
