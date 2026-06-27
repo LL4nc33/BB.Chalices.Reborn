@@ -17,8 +17,23 @@ public class DungeonViewModel : ViewModelBase
     public string? Description => _entity.Description;
     public byte[] Bytes => _entity.Bytes;
 
-    // Area and depth read from the map byte, for the catalogue tooltip.
+    // Area and depth read from the map byte, for the catalogue.
     public string Type => Bytes.Length > 1 ? Headstone.DungeonType(Bytes) : "Unknown";
+
+    // What the dungeon already carries, decoded from its bytes for the detail view.
+    public string Rites
+    {
+        get
+        {
+            string joined = string.Join(", ", Headstone.RiteSlotOffsets
+                .Select(offset => Headstone.ReadRite(Bytes, offset))
+                .Where(rite => rite != Headstone.Rite.None));
+            return string.IsNullOrEmpty(joined) ? "None" : joined;
+        }
+    }
+
+    public bool IsPoisoned => Headstone.IsPoisoned(Bytes);
+    public bool HasFourthLayer => Headstone.IsFourthLayerOpen(Bytes);
 
     public string DisplayName =>
         string.IsNullOrEmpty(Description) ? Glyph : $"{Glyph} - {Description}";

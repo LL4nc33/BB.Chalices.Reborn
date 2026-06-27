@@ -76,7 +76,7 @@
 
                 <Border Grid.Row="1" Background="{DynamicResource BgPanel}"
                         BorderBrush="{DynamicResource Edge}" BorderThickness="1" Padding="16">
-                    <Grid RowDefinitions="Auto,Auto,*,Auto">
+                    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
                         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
                             <TextBlock Grid.Column="0" Classes="section" Text="CATALOGUE" VerticalAlignment="Center" />
                             <Button Grid.Column="1" Content="Update online" Command="{Binding UpdateDungeonsCommand}"
@@ -122,7 +122,33 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-                        <Grid Grid.Row="3" ColumnDefinitions="*,Auto" ColumnSpacing="8" Margin="0,12,0,0">
+                        <Border Grid.Row="3" Margin="0,12,0,0" Padding="0,12,0,0"
+                                BorderBrush="{DynamicResource Edge}" BorderThickness="0,1,0,0"
+                                IsVisible="{Binding SelectedDungeon, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <StackPanel DataContext="{Binding SelectedDungeon}" x:DataType="vm:DungeonViewModel" Spacing="6">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <TextBlock Text="{Binding Glyph}" FontSize="16" FontWeight="Bold"
+                                               Foreground="{DynamicResource Parchment}" />
+                                    <TextBlock Text="{Binding Type}" FontSize="13" VerticalAlignment="Center"
+                                               Foreground="{DynamicResource BloodBright}" />
+                                </StackPanel>
+                                <WrapPanel>
+                                    <TextBlock Text="{Binding Rites, StringFormat='Rites: {0}'}" FontSize="12"
+                                               Foreground="{DynamicResource Parchment}" Margin="0,0,16,0" />
+                                    <TextBlock Text="Poison" FontSize="12" Foreground="{DynamicResource BloodBright}"
+                                               Margin="0,0,16,0" IsVisible="{Binding IsPoisoned}" />
+                                    <TextBlock Text="4th layer" FontSize="12" Foreground="{DynamicResource BloodBright}"
+                                               IsVisible="{Binding HasFourthLayer}" />
+                                </WrapPanel>
+                                <ScrollViewer MaxHeight="92" VerticalScrollBarVisibility="Auto"
+                                              IsVisible="{Binding Description, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <TextBlock Text="{Binding Description}" FontSize="12" TextWrapping="Wrap"
+                                               Foreground="{DynamicResource ParchmentDim}" />
+                                </ScrollViewer>
+                            </StackPanel>
+                        </Border>
+
+                        <Grid Grid.Row="4" ColumnDefinitions="*,Auto" ColumnSpacing="8" Margin="0,12,0,0">
                             <Button Grid.Column="0" Classes="primary" Content="Place in selected slot"
                                     Command="{Binding ApplyDungeonCommand}" HorizontalAlignment="Stretch"
                                     IsEnabled="{Binding HasLoadedSave}"
