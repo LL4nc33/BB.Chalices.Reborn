@@ -38,6 +38,11 @@ public class DungeonViewModel : ViewModelBase
     // The chalice required to enter, decoded from the join requirements.
     public string JoinRequirement => Headstone.JoinRequirementsLabel(Headstone.JoinRequirementsHex(Bytes));
 
+    // The unique coffin item this dungeon holds, from the dungeon-groups table.
+    public string? UniqueItem => Bytes.Length > 3
+        ? DungeonGroups.UniqueItem(Bytes[1], Bytes[2], Bytes[3])
+        : null;
+
     public string DisplayName =>
         string.IsNullOrEmpty(Description) ? Glyph : $"{Glyph} - {Description}";
 }

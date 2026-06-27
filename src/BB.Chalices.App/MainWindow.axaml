@@ -138,6 +138,10 @@
                                     <TextBlock Text="{Binding Type}" FontSize="14" VerticalAlignment="Center"
                                                Foreground="{DynamicResource BloodBright}" />
                                 </StackPanel>
+                                <TextBlock Text="{Binding UniqueItem, StringFormat='Coffin: {0}'}"
+                                           FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource BloodBright}"
+                                           IsVisible="{Binding UniqueItem, Converter={x:Static ObjectConverters.IsNotNull}}" />
                                 <TextBlock Text="{Binding JoinRequirement, StringFormat='Requires: {0} chalice'}"
                                            FontSize="13" Foreground="{DynamicResource ParchmentDim}" />
                                 <WrapPanel>
