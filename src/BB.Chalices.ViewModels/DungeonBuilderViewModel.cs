@@ -112,4 +112,40 @@ public class DungeonBuilderViewModel : ViewModelBase
         string map = SelectedArea.HasTwoMaps ? (SecondMap ? ", map 2" : ", map 1") : string.Empty;
         Status = $"{SelectedArea.Name} ({SelectedVariant}){map}, layout {DungeonNumber}";
     }
+
+    // --- Wizard steps -------------------------------------------------------
+    // 0 = pick area and depth, 1 = pick the layout, 2 = review and place.
+
+    private int _step;
+    public int Step
+    {
+        get => _step;
+        private set
+        {
+            this.RaiseAndSetIfChanged(ref _step, value);
+            this.RaisePropertyChanged(nameof(IsAreaStep));
+            this.RaisePropertyChanged(nameof(IsLayoutStep));
+            this.RaisePropertyChanged(nameof(IsPlaceStep));
+            this.RaisePropertyChanged(nameof(CanGoBack));
+            this.RaisePropertyChanged(nameof(StepLabel));
+        }
+    }
+
+    public bool IsAreaStep => Step == 0;
+    public bool IsLayoutStep => Step == 1;
+    public bool IsPlaceStep => Step == 2;
+    public bool CanGoBack => Step > 0;
+    public string StepLabel => $"Step {Step + 1} of 3";
+
+    public void Next()
+    {
+        if (Step < 2)
+            Step++;
+    }
+
+    public void Back()
+    {
+        if (Step > 0)
+            Step--;
+    }
 }
