@@ -251,14 +251,38 @@ public class MainViewModel : ViewModelBase
     {
         var all = await _dungeons.GetAllAsync();
         _all = all.Select(d => new DungeonViewModel(d)).ToList();
+        RebuildCategories();
+        StatusMessage = $"{_all.Count} dungeons ready.";
+    }
 
+    // Noxde's curated list is kept separate from the full Tomb Prospectors set.
+    private static readonly HashSet<string> NoxCategories =
+        new(StringComparer.OrdinalIgnoreCase) { "farming", "equipment", "bloodgems", "testing" };
+
+    private bool _showNox = true;
+    public bool ShowNox
+    {
+        get => _showNox;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _showNox, value);
+            this.RaisePropertyChanged(nameof(ShowAll));
+            RebuildCategories();
+        }
+    }
+
+    public bool ShowAll => !_showNox;
+
+    private void RebuildCategories()
+    {
         Categories.Clear();
         Categories.Add(AllCategories);
-        foreach (var category in all.Select(d => d.Category).Distinct().OrderBy(c => c))
+        foreach (var category in _all
+            .Where(d => NoxCategories.Contains(d.Category) == _showNox)
+            .Select(d => d.Category).Distinct().OrderBy(c => c))
             Categories.Add(category);
 
-        SelectedCategory = AllCategories;
-        StatusMessage = $"{_all.Count} dungeons ready.";
+        SelectedCategory = AllCategories; // also triggers ApplyFilter
     }
 
     private async Task UpdateDungeonsAsync()
@@ -271,7 +295,8 @@ public class MainViewModel : ViewModelBase
 
     private void ApplyFilter()
     {
-        IEnumerable<DungeonViewModel> query = _all;
+        IEnumerable<DungeonViewModel> query = _all
+            .Where(d => NoxCategories.Contains(d.Category) == _showNox);
 
         if (!string.IsNullOrEmpty(SelectedCategory) && SelectedCategory != AllCategories)
             query = query.Where(d => string.Equals(d.Category, SelectedCategory, StringComparison.OrdinalIgnoreCase));

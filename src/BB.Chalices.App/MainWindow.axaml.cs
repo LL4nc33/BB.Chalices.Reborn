@@ -80,6 +80,18 @@ public partial class MainWindow : Window
             viewModel.OpenSettings();
     }
 
+    private void OnShowNox(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.ShowNox = true;
+    }
+
+    private void OnShowAll(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.ShowNox = false;
+    }
+
     private void OnSaveSettings(object? sender, RoutedEventArgs e)
     {
         if (DataContext is MainViewModel viewModel)

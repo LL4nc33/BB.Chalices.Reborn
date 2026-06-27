@@ -100,5 +100,31 @@
             <Setter Property="Padding" Value="12,9" />
             <Setter Property="FontSize" Value="14" />
         </Style>
+
+        <!-- Altar slot selector: six segmented buttons, active one in blood -->
+        <Style Selector="ListBox.slots ListBoxItem">
+            <Setter Property="Padding" Value="0,7" />
+            <Setter Property="Margin" Value="0,0,4,0" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Edge}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="ListBox.slots ListBoxItem:selected">
+            <Setter Property="BorderBrush" Value="{DynamicResource BloodBright}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="ListBox.slots ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Blood}" />
+        </Style>
+
+        <!-- Segmented source toggle -->
+        <Style Selector="Button.toggle">
+            <Setter Property="Padding" Value="16,6" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Background" Value="{DynamicResource BgPanelAlt}" />
+        </Style>
+        <Style Selector="Button.toggle.active /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Blood}" />
+        </Style>
     </Application.Styles>
 </Application>
