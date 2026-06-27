@@ -68,10 +68,54 @@ public partial class MainWindow : Window
             await viewModel.LoadSaveCommand.Execute(files[0].Path.LocalPath);
     }
 
-    private async void OnSettingsClick(object? sender, RoutedEventArgs e)
+    private void OnShowCatalogue(object? sender, RoutedEventArgs e)
     {
-        if (Services is { } services)
-            await new SettingsWindow(services.GetRequiredService<ConfigService>()).ShowDialog(this);
+        if (DataContext is MainViewModel viewModel)
+            viewModel.CurrentView = AppView.Catalogue;
+    }
+
+    private void OnShowSettings(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.OpenSettings();
+    }
+
+    private void OnSaveSettings(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.SaveSettings();
+    }
+
+    private async void OnBrowseShad(object? sender, RoutedEventArgs e)
+    {
+        if (await PickFolderAsync() is { } path && DataContext is MainViewModel viewModel)
+            viewModel.ShadPs4Path = path;
+    }
+
+    private async void OnBrowseBackup(object? sender, RoutedEventArgs e)
+    {
+        if (await PickFolderAsync() is { } path && DataContext is MainViewModel viewModel)
+            viewModel.BackupPath = path;
+    }
+
+    private async Task<string?> PickFolderAsync()
+    {
+        var folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions { AllowMultiple = false });
+        return folders.Count > 0 ? folders[0].Path.LocalPath : null;
+    }
+
+    private async void OnOpenBackupFolder(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel
+            && !string.IsNullOrWhiteSpace(viewModel.BackupPath)
+            && Directory.Exists(viewModel.BackupPath))
+            await Launcher.LaunchDirectoryInfoAsync(new DirectoryInfo(viewModel.BackupPath));
+    }
+
+    private async void OnOpenLink(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string url })
+            await Launcher.LaunchUriAsync(new System.Uri(url));
     }
 
     private async void OnBuilderClick(object? sender, RoutedEventArgs e)

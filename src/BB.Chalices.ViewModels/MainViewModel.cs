@@ -6,6 +6,8 @@ using ReactiveUI;
 
 namespace BB.Chalices.ViewModels;
 
+public enum AppView { Catalogue, Settings }
+
 public class MainViewModel : ViewModelBase
 {
     private const string AllCategories = "All";
@@ -141,6 +143,62 @@ public class MainViewModel : ViewModelBase
     {
         get => _selectedSlotJoin;
         private set => this.RaiseAndSetIfChanged(ref _selectedSlotJoin, value);
+    }
+
+    // --- Centre view navigation (catalogue or the inline settings page) ---
+
+    private AppView _currentView = AppView.Catalogue;
+    public AppView CurrentView
+    {
+        get => _currentView;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _currentView, value);
+            this.RaisePropertyChanged(nameof(IsCatalogueView));
+            this.RaisePropertyChanged(nameof(IsSettingsView));
+        }
+    }
+
+    public bool IsCatalogueView => CurrentView == AppView.Catalogue;
+    public bool IsSettingsView => CurrentView == AppView.Settings;
+
+    private string _shadPs4Path = string.Empty;
+    public string ShadPs4Path
+    {
+        get => _shadPs4Path;
+        set => this.RaiseAndSetIfChanged(ref _shadPs4Path, value);
+    }
+
+    private string _backupPath = string.Empty;
+    public string BackupPath
+    {
+        get => _backupPath;
+        set => this.RaiseAndSetIfChanged(ref _backupPath, value);
+    }
+
+    private bool _autoBackup;
+    public bool AutoBackup
+    {
+        get => _autoBackup;
+        set => this.RaiseAndSetIfChanged(ref _autoBackup, value);
+    }
+
+    // Load the current settings into the form and switch to the settings page.
+    public void OpenSettings()
+    {
+        ShadPs4Path = _config.Settings.ShadPs4FolderPath ?? string.Empty;
+        BackupPath = _config.BackupDirectory;
+        AutoBackup = _config.Settings.AutoBackupEnabled;
+        CurrentView = AppView.Settings;
+    }
+
+    public void SaveSettings()
+    {
+        _config.Settings.ShadPs4FolderPath = string.IsNullOrWhiteSpace(ShadPs4Path) ? null : ShadPs4Path;
+        _config.Settings.BackupDirectory = string.IsNullOrWhiteSpace(BackupPath) ? null : BackupPath;
+        _config.Settings.AutoBackupEnabled = AutoBackup;
+        _config.Save();
+        CurrentView = AppView.Catalogue;
     }
 
     public bool PoisonPossible
