@@ -63,6 +63,7 @@ public class MainViewModel : ViewModelBase
         DetectSavesCommand = ReactiveCommand.Create(DetectSaves);
         UpdateDungeonsCommand = ReactiveCommand.CreateFromTask(UpdateDungeonsAsync);
         ClearSlotCommand = ReactiveCommand.Create(ClearSlot);
+        UndoSlotCommand = ReactiveCommand.Create(UndoSlot);
     }
 
     public ObservableCollection<DungeonViewModel> Dungeons { get; }
@@ -172,6 +173,14 @@ public class MainViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> DetectSavesCommand { get; }
     public ReactiveCommand<Unit, Unit> UpdateDungeonsCommand { get; }
     public ReactiveCommand<Unit, Unit> ClearSlotCommand { get; }
+    public ReactiveCommand<Unit, Unit> UndoSlotCommand { get; }
+
+    private bool _canUndo;
+    public bool CanUndo
+    {
+        get => _canUndo;
+        private set => this.RaiseAndSetIfChanged(ref _canUndo, value);
+    }
 
     private async Task LoadDungeonsAsync()
     {
@@ -223,6 +232,9 @@ public class MainViewModel : ViewModelBase
             _config.Settings.LastSavePath = path;
             _config.Save();
             RefreshSlots();
+            _undoSlot = null;
+            _undoBytes = null;
+            CanUndo = false;
             LoadSelectedSlot();
             StatusMessage = $"Loaded {System.IO.Path.GetFileName(path)} (Hunter {save.CharacterName}).";
         }
@@ -255,6 +267,7 @@ public class MainViewModel : ViewModelBase
         if (SelectedDungeon is null) { StatusMessage = "Pick a dungeon from the list first."; return; }
         if (SelectedSlot is null) { StatusMessage = "Pick a slot first."; return; }
 
+        CaptureUndo();
         _saves.SetSlot(SelectedSlot.Number, SelectedDungeon.Bytes);
         RefreshSlot(SelectedSlot);
         LoadSelectedSlot();
@@ -269,6 +282,7 @@ public class MainViewModel : ViewModelBase
             return;
         }
 
+        CaptureUndo();
         _saves.ClearSlot(SelectedSlot.Number);
         RefreshSlot(SelectedSlot);
         LoadSelectedSlot();
@@ -288,10 +302,43 @@ public class MainViewModel : ViewModelBase
             return;
         }
 
+        CaptureUndo();
         _saves.SetSlot(SelectedSlot.Number, record);
         RefreshSlot(SelectedSlot);
         LoadSelectedSlot();
         StatusMessage = $"Built dungeon placed in slot {SelectedSlot.Number}. Save to write it to disk.";
+    }
+
+    private int? _undoSlot;
+    private byte[]? _undoBytes;
+
+    // Snapshot the current slot before a destructive write so it can be reverted.
+    private void CaptureUndo()
+    {
+        if (SelectedSlot is null)
+            return;
+        _undoSlot = SelectedSlot.Number;
+        _undoBytes = _saves.GetSlotBytes(SelectedSlot.Number);
+        CanUndo = true;
+    }
+
+    private void UndoSlot()
+    {
+        if (_undoSlot is null || _undoBytes is null)
+            return;
+
+        _saves.SetSlot(_undoSlot.Value, _undoBytes);
+        SlotViewModel? slot = Slots.FirstOrDefault(s => s.Number == _undoSlot.Value);
+        if (slot is not null)
+        {
+            RefreshSlot(slot);
+            if (slot == SelectedSlot)
+                LoadSelectedSlot();
+        }
+        StatusMessage = $"Reverted slot {_undoSlot.Value}. Save to write it to disk.";
+        _undoSlot = null;
+        _undoBytes = null;
+        CanUndo = false;
     }
 
     private void DetectSaves()

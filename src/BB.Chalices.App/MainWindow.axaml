@@ -37,6 +37,8 @@
                             ToolTip.Tip="Browse, restore or delete your save backups" />
                     <Button Content="Settings" Click="OnSettingsClick"
                             ToolTip.Tip="Set the shadPS4 folder, backup folder and auto-backup" />
+                    <Button Content="Undo" Command="{Binding UndoSlotCommand}" IsEnabled="{Binding CanUndo}"
+                            ToolTip.Tip="Revert the last change to a slot (in memory, before saving)" />
                     <Button Classes="primary" Content="Save" Command="{Binding SaveCommand}"
                             IsEnabled="{Binding HasLoadedSave}" HotKey="Ctrl+S"
                             ToolTip.Tip="Write your changes back to the save (Ctrl+S). A backup is made first." />
