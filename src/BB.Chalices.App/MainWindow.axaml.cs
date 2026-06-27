@@ -1,6 +1,7 @@
 using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using BB.Chalices.Services;
@@ -14,6 +15,12 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+    }
+
+    private void OnCatalogueDoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.ApplyDungeonCommand.Execute().Subscribe();
     }
 
     private async void OnOpenSaveClick(object? sender, RoutedEventArgs e)
