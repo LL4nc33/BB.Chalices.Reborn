@@ -93,6 +93,19 @@ public class SaveFileService
     public void ClearSlot(int slot) =>
         Loaded.WriteSlotRaw(slot, DungeonStructure.Empty().Data);
 
+    // Write a single headstone field from a hex string. Returns false if the hex
+    // is invalid or the wrong length for that field.
+    public bool TrySetField(int slot, Headstone.HeadstoneField field, string hex)
+    {
+        if (!Headstone.TryParseField(hex, field, out var bytes))
+            return false;
+
+        var record = Loaded.GetSlotBytes(slot);
+        bytes.CopyTo(record, field.Offset);
+        Loaded.WriteSlotRaw(slot, record);
+        return true;
+    }
+
     public void Close()
     {
         _save = null;

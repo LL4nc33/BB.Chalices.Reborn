@@ -52,6 +52,8 @@ public class MainViewModel : ViewModelBase
         DetectedSaves = new ObservableCollection<DetectedSaveViewModel>();
         RiteSlots = new ObservableCollection<RiteSlotViewModel>(
             Enumerable.Range(0, 4).Select(i => new RiteSlotViewModel(i, ApplyRite)));
+        Fields = new ObservableCollection<HeadstoneFieldViewModel>(
+            Headstone.Fields.Select(f => new HeadstoneFieldViewModel(f, ApplyField)));
         _selectedSlot = Slots[0];
 
         LoadDungeonsCommand = ReactiveCommand.CreateFromTask(LoadDungeonsAsync);
@@ -68,6 +70,7 @@ public class MainViewModel : ViewModelBase
     public ObservableCollection<SlotViewModel> Slots { get; }
     public ObservableCollection<DetectedSaveViewModel> DetectedSaves { get; }
     public ObservableCollection<RiteSlotViewModel> RiteSlots { get; }
+    public ObservableCollection<HeadstoneFieldViewModel> Fields { get; }
 
     public string? CurrentSavePath => _saves.CurrentPath;
 
@@ -324,6 +327,18 @@ public class MainViewModel : ViewModelBase
         AfterEdit(open ? "4th layer opened." : "4th layer closed.");
     }
 
+    private void ApplyField(Headstone.HeadstoneField field, string hex)
+    {
+        if (_suppressEdits || !HasLoadedSave || SelectedSlot is null)
+            return;
+        if (!_saves.TrySetField(SelectedSlot.Number, field, hex))
+            return;
+
+        SlotHexDump = _saves.SlotHexDump(SelectedSlot.Number);
+        RefreshSlot(SelectedSlot);
+        StatusMessage = $"{field.Name} set. Save to write it to disk.";
+    }
+
     private void AfterEdit(string message)
     {
         if (SelectedSlot is null)
@@ -345,12 +360,15 @@ public class MainViewModel : ViewModelBase
                 foreach (var rite in RiteSlots) rite.Set(Headstone.Rite.None);
                 PoisonPossible = FourthLayerPossible = false;
                 PoisonEnabled = FourthLayerOpen = false;
+                foreach (var field in Fields) field.Set(string.Empty);
                 SlotHexDump = string.Empty;
                 return;
             }
 
             var record = _saves.GetSlotBytes(SelectedSlot.Number);
             SlotHexDump = _saves.SlotHexDump(SelectedSlot.Number);
+            for (int i = 0; i < Fields.Count; i++)
+                Fields[i].Set(Headstone.ReadFieldHex(record, Fields[i].Field));
 
             if (IsEmpty(record))
             {

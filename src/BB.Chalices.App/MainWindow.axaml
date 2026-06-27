@@ -145,9 +145,14 @@
                                   ToolTip.Tip="Open or close the optional 4th layer (only some dungeons have one)" />
                     </StackPanel>
 
-                    <Button Content="Clear slot" Command="{Binding ClearSlotCommand}"
-                            HorizontalAlignment="Stretch" Margin="0,20,0,0"
-                            ToolTip.Tip="Empty this altar slot" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8" Margin="0,20,0,0">
+                        <Button Grid.Column="0" Content="Advanced…" Click="OnAdvancedClick"
+                                HorizontalAlignment="Stretch" IsEnabled="{Binding HasLoadedSave}"
+                                ToolTip.Tip="Edit each headstone field directly as raw hex" />
+                        <Button Grid.Column="1" Content="Clear slot" Command="{Binding ClearSlotCommand}"
+                                HorizontalAlignment="Stretch"
+                                ToolTip.Tip="Empty this altar slot" />
+                    </Grid>
                 </StackPanel>
             </Border>
         </Grid>

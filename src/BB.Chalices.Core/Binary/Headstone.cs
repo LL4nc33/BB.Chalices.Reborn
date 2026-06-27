@@ -170,6 +170,52 @@ public static class Headstone
 
     public static byte[] FromHex(string hex) => Convert.FromHexString(hex);
 
+    // --- Advanced: the individual headstone fields ---
+
+    public sealed record HeadstoneField(string Name, int Offset, int Length);
+
+    public static readonly IReadOnlyList<HeadstoneField> Fields =
+    [
+        new("Map hex", 0x00, 4),
+        new("Dungeon id", 0x04, 8),
+        new("Map hex (2)", 0x0C, 4),
+        new("Join requirements", 0x10, 4),
+        new("Special enemy / shop", 0x14, 8),
+        new("Unique item", 0x1C, 8),
+        new("Gem effect", 0x24, 8),
+        new("4th layer", 0x2C, 8),
+        new("Poison", 0x34, 8),
+        new("Rite slot 1", 0x3C, 8),
+        new("Rite slot 2", 0x44, 8),
+        new("Rite slot 3", 0x4C, 8),
+        new("Rite slot 4", 0x54, 8),
+        new("Creator PSN", 0x5C, 16),
+        new("Character name", 0x6C, 16),
+    ];
+
+    public static string ReadFieldHex(ReadOnlySpan<byte> record, HeadstoneField field) =>
+        Convert.ToHexString(record.Slice(field.Offset, field.Length));
+
+    // Parse a hex string for a field. Whitespace is ignored, but it must be exactly
+    // the field's length. Returns false on bad hex or the wrong length.
+    public static bool TryParseField(string? hex, HeadstoneField field, out byte[] bytes)
+    {
+        bytes = [];
+        var clean = new string((hex ?? string.Empty).Where(c => !char.IsWhiteSpace(c)).ToArray());
+        if (clean.Length != field.Length * 2)
+            return false;
+
+        try
+        {
+            bytes = Convert.FromHexString(clean);
+            return true;
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
+    }
+
     // HxD-style dump of the record's bytes in their file context: bytes outside
     // the record show as "..", aligned to 16-byte rows. Used for the live view.
     public static string HexDump(ReadOnlySpan<byte> fileBytes, int recordStart, int recordLength)

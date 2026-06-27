@@ -61,4 +61,20 @@ public class HeadstoneTests
     {
         Assert.Equal(Convert.FromHexString("0097DF240000003C"), Headstone.FourthLayerBytes(0x3C));
     }
+
+    [Fact]
+    public void Field_ReadAndParseRoundTrips()
+    {
+        var field = Headstone.Fields.Single(f => f.Name == "Join requirements"); // 0x10, 4 bytes
+        var record = new byte[125];
+        Convert.FromHexString("0000196D").CopyTo(record, field.Offset);
+
+        Assert.Equal("0000196D", Headstone.ReadFieldHex(record, field));
+
+        Assert.True(Headstone.TryParseField("00 00 18 4B", field, out var bytes)); // whitespace ignored
+        Assert.Equal(new byte[] { 0x00, 0x00, 0x18, 0x4B }, bytes);
+
+        Assert.False(Headstone.TryParseField("00184B", field, out _));     // wrong length
+        Assert.False(Headstone.TryParseField("ZZZZZZZZ", field, out _));   // not hex
+    }
 }
