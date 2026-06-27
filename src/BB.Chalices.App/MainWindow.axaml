@@ -132,6 +132,8 @@
                                     <TextBlock Text="{Binding Type}" FontSize="13" VerticalAlignment="Center"
                                                Foreground="{DynamicResource BloodBright}" />
                                 </StackPanel>
+                                <TextBlock Text="{Binding JoinRequirement, StringFormat='Requires: {0} chalice'}"
+                                           FontSize="12" Foreground="{DynamicResource ParchmentDim}" />
                                 <WrapPanel>
                                     <TextBlock Text="{Binding Rites, StringFormat='Rites: {0}'}" FontSize="12"
                                                Foreground="{DynamicResource Parchment}" Margin="0,0,16,0" />

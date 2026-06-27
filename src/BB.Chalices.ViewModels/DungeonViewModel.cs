@@ -35,6 +35,9 @@ public class DungeonViewModel : ViewModelBase
     public bool IsPoisoned => Headstone.IsPoisoned(Bytes);
     public bool HasFourthLayer => Headstone.IsFourthLayerOpen(Bytes);
 
+    // The chalice required to enter, decoded from the join requirements.
+    public string JoinRequirement => Headstone.JoinRequirementsLabel(Headstone.JoinRequirementsHex(Bytes));
+
     public string DisplayName =>
         string.IsNullOrEmpty(Description) ? Glyph : $"{Glyph} - {Description}";
 }

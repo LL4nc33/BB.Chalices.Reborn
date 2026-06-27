@@ -164,6 +164,38 @@ public static class Headstone
         return record[PoisonOffset + 7] is 0x0A or 0x0D; // the two "on" bytes
     }
 
+    // The chalice an edited dungeon claims to require, decoded from its join hex
+    // (from the Tomb Prospectors Hex Research Central join-requirements table).
+    public static string JoinRequirementsLabel(string joinHex) => joinHex switch
+    {
+        "000017DD" => "Pthumeru 1",
+        "000017D4" => "Pthumeru 1 root",
+        "00001841" => "Pthumeru 2",
+        "00001838" => "Pthumeru 2 root",
+        "0000184B" => "Hintertomb 2",
+        "00001842" => "Hintertomb 2 root",
+        "000018A5" => "Pthumeru 3",
+        "0000189C" => "Pthumeru 3 root",
+        "0000189E" => "Pthumeru 3 sinister root",
+        "000018AF" => "Hintertomb 3",
+        "000018A6" => "Hintertomb 3 root",
+        "000018A8" => "Hintertomb 3 sinister root",
+        "00001909" => "Pthumeru 4",
+        "00001901" => "Pthumeru 4 root",
+        "0000191D" => "Loran 4",
+        "00001914" => "Loran 4 root",
+        "0000196D" => "Pthumeru 5",
+        "00001964" => "Pthumeru 5 root",
+        "00001966" => "Pthumeru 5 sinister root",
+        "00001981" => "Loran 5",
+        "00001978" => "Loran 5 root",
+        "0000197A" => "Loran 5 sinister root",
+        "0000198B" => "Isz 5",
+        "00001982" => "Isz 5 root",
+        "00001984" => "Isz 5 sinister root",
+        _ => "Unknown",
+    };
+
     // --- Helpers ------------------------------------------------------------
 
     public static string JoinRequirementsHex(ReadOnlySpan<byte> record)
