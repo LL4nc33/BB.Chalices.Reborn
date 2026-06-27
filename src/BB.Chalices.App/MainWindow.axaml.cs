@@ -74,12 +74,6 @@ public partial class MainWindow : Window
             await new SettingsWindow(services.GetRequiredService<ConfigService>()).ShowDialog(this);
     }
 
-    private async void OnAdvancedClick(object? sender, RoutedEventArgs e)
-    {
-        if (DataContext is MainViewModel viewModel)
-            await new AdvancedWindow { DataContext = viewModel }.ShowDialog(this);
-    }
-
     private async void OnBuilderClick(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not MainViewModel main || Services is not { } services)
