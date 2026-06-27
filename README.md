@@ -15,7 +15,7 @@ shoulders of the Bloodborne data-mining community, plus my own research on top o
 - **The Tomb Prospectors community** (notably DrAnger, with Trin and Kazin), for the
   reverse-engineering of the chalice save format that the rite, poison and 4th-layer
   byte logic builds on:
-  - [Hex Research Central](https://www.bloodborne-wiki.com/) ([data-mining notes](https://www.bloodborne-wiki.com/2017/12/data-mining.html))
+  - [Hex Research Central](https://docs.google.com/spreadsheets/d/1zFIzhnXHhYomlR-tFJcyk3cPywf1snqkDH900j6rtAI/edit?gid=935899711#gid=935899711) ([data-mining notes](https://www.bloodborne-wiki.com/2017/12/data-mining.html))
   - the glyph and hex research sheets
     ([one](https://docs.google.com/spreadsheets/d/1zFIzhnXHhYomlR-tFJcyk3cPywf1snqkDH900j6rtAI/edit?gid=1741467922#gid=1741467922),
     [two](https://docs.google.com/spreadsheets/d/1psfenhcQJ06EUQgcEHBIQcfLD5Iq-kyKGTZINvy6228/edit?gid=1625060027#gid=1625060027))

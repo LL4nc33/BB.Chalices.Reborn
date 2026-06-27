@@ -43,7 +43,7 @@ public partial class DungeonBuilderWindow : Window
 
     private async void OnLearnMore(object? sender, RoutedEventArgs e)
     {
-        await Launcher.LaunchUriAsync(new Uri("https://www.bloodborne-wiki.com/2017/12/data-mining.html"));
+        await Launcher.LaunchUriAsync(new Uri("https://docs.google.com/spreadsheets/d/1zFIzhnXHhYomlR-tFJcyk3cPywf1snqkDH900j6rtAI/edit?pli=1&gid=935899711#gid=935899711"));
     }
 
     private void OnClose(object? sender, RoutedEventArgs e) => Close();
