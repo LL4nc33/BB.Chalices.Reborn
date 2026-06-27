@@ -28,10 +28,14 @@
         </Border>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" Margin="0,12,0,0">
-            <Button Content="Back up now" Click="OnCreate" />
-            <Button Content="Restore selected" Click="OnRestore" />
-            <Button Content="Delete" Click="OnDelete" />
-            <Button Content="Open folder" Click="OnOpenFolder" />
+            <Button Content="Back up now" Click="OnCreate"
+                    ToolTip.Tip="Create a backup of the current save" />
+            <Button Content="Restore selected" Click="OnRestore"
+                    ToolTip.Tip="Replace the current save with the selected backup (the current state is backed up first)" />
+            <Button Content="Delete" Click="OnDelete"
+                    ToolTip.Tip="Delete the selected backup" />
+            <Button Content="Open folder" Click="OnOpenFolder"
+                    ToolTip.Tip="Open the backup folder" />
             <Button Content="Close" Click="OnClose" HorizontalAlignment="Right" />
         </StackPanel>
     </Grid>

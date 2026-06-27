@@ -90,6 +90,9 @@ public class SaveFileService
         Loaded.WriteSlotRaw(slot, record);
     }
 
+    public void ClearSlot(int slot) =>
+        Loaded.WriteSlotRaw(slot, DungeonStructure.Empty().Data);
+
     public void Close()
     {
         _save = null;

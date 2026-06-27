@@ -60,6 +60,7 @@ public class MainViewModel : ViewModelBase
         ApplyDungeonCommand = ReactiveCommand.Create(ApplyDungeon);
         DetectSavesCommand = ReactiveCommand.Create(DetectSaves);
         UpdateDungeonsCommand = ReactiveCommand.CreateFromTask(UpdateDungeonsAsync);
+        ClearSlotCommand = ReactiveCommand.Create(ClearSlot);
     }
 
     public ObservableCollection<DungeonViewModel> Dungeons { get; }
@@ -167,6 +168,7 @@ public class MainViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ApplyDungeonCommand { get; }
     public ReactiveCommand<Unit, Unit> DetectSavesCommand { get; }
     public ReactiveCommand<Unit, Unit> UpdateDungeonsCommand { get; }
+    public ReactiveCommand<Unit, Unit> ClearSlotCommand { get; }
 
     private async Task LoadDungeonsAsync()
     {
@@ -254,6 +256,20 @@ public class MainViewModel : ViewModelBase
         RefreshSlot(SelectedSlot);
         LoadSelectedSlot();
         StatusMessage = $"Placed {SelectedDungeon.Glyph} in slot {SelectedSlot.Number}. Save to write it to disk.";
+    }
+
+    private void ClearSlot()
+    {
+        if (!HasLoadedSave || SelectedSlot is null)
+        {
+            StatusMessage = "Open a save and pick a slot first.";
+            return;
+        }
+
+        _saves.ClearSlot(SelectedSlot.Number);
+        RefreshSlot(SelectedSlot);
+        LoadSelectedSlot();
+        StatusMessage = $"Cleared slot {SelectedSlot.Number}. Save to write it to disk.";
     }
 
     private void DetectSaves()

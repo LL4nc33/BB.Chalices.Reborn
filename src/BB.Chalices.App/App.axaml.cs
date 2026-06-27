@@ -51,6 +51,11 @@ public partial class App : Application
             var viewModel = Services!.GetRequiredService<MainViewModel>();
             window.DataContext = viewModel;
             await viewModel.LoadDungeonsCommand.Execute();
+
+            // Reopen the last save automatically if it's still there.
+            var lastSave = Services!.GetRequiredService<ConfigService>().Settings.LastSavePath;
+            if (!string.IsNullOrEmpty(lastSave) && File.Exists(lastSave))
+                await viewModel.LoadSaveCommand.Execute(lastSave);
         }
         catch (Exception ex)
         {

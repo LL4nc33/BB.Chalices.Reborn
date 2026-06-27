@@ -31,10 +31,15 @@
                                Text="No save loaded" IsVisible="{Binding !HasLoadedSave}" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                    <Button Content="Open Save…" Click="OnOpenSaveClick" />
-                    <Button Content="Backups" Click="OnBackupsClick" />
-                    <Button Content="Settings" Click="OnSettingsClick" />
-                    <Button Classes="primary" Content="Save" Command="{Binding SaveCommand}" IsEnabled="{Binding HasLoadedSave}" />
+                    <Button Content="Open Save…" Click="OnOpenSaveClick"
+                            ToolTip.Tip="Open a Bloodborne save file (userdata…) to edit" />
+                    <Button Content="Backups" Click="OnBackupsClick"
+                            ToolTip.Tip="Browse, restore or delete your save backups" />
+                    <Button Content="Settings" Click="OnSettingsClick"
+                            ToolTip.Tip="Set the shadPS4 folder, backup folder and auto-backup" />
+                    <Button Classes="primary" Content="Save" Command="{Binding SaveCommand}"
+                            IsEnabled="{Binding HasLoadedSave}" HotKey="Ctrl+S"
+                            ToolTip.Tip="Write your changes back to the save (Ctrl+S). A backup is made first." />
                 </StackPanel>
             </Grid>
         </Border>
@@ -48,9 +53,11 @@
                     <Grid ColumnDefinitions="Auto,Auto,*">
                         <TextBlock Grid.Column="0" Classes="section" Text="SHADPS4 SAVES"
                                    VerticalAlignment="Center" Margin="0,0,14,0" />
-                        <Button Grid.Column="1" Content="Detect" Command="{Binding DetectSavesCommand}" Margin="0,0,10,0" />
+                        <Button Grid.Column="1" Content="Detect" Command="{Binding DetectSavesCommand}" Margin="0,0,10,0"
+                                ToolTip.Tip="Find your shadPS4 characters automatically" />
                         <ComboBox Grid.Column="2" ItemsSource="{Binding DetectedSaves}" SelectedItem="{Binding SelectedDetectedSave}"
-                                  HorizontalAlignment="Stretch" PlaceholderText="detected characters…">
+                                  HorizontalAlignment="Stretch" PlaceholderText="detected characters…"
+                                  ToolTip.Tip="Pick a detected character to load it">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate x:DataType="vm:DetectedSaveViewModel">
                                     <TextBlock Text="{Binding FileName}" />
@@ -66,19 +73,22 @@
                         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
                             <TextBlock Grid.Column="0" Classes="section" Text="CATALOGUE" VerticalAlignment="Center" />
                             <Button Grid.Column="1" Content="Update online" Command="{Binding UpdateDungeonsCommand}"
-                                    Padding="10,4" FontSize="12" />
+                                    Padding="10,4" FontSize="12"
+                                    ToolTip.Tip="Fetch the latest dungeon list from Noxde's gist" />
                         </Grid>
                         <Grid Grid.Row="1" ColumnDefinitions="*,170" Margin="0,0,0,12">
                             <TextBox Grid.Column="0" Text="{Binding SearchText}"
-                                     PlaceholderText="Search glyphs or descriptions…" Margin="0,0,8,0" />
+                                     PlaceholderText="Search glyphs or descriptions…" Margin="0,0,8,0"
+                                     ToolTip.Tip="Filter the catalogue by glyph or description" />
                             <ComboBox Grid.Column="1" ItemsSource="{Binding Categories}"
-                                      SelectedItem="{Binding SelectedCategory}" HorizontalAlignment="Stretch" />
+                                      SelectedItem="{Binding SelectedCategory}" HorizontalAlignment="Stretch"
+                                      ToolTip.Tip="Show only one category of dungeon" />
                         </Grid>
                         <ListBox Grid.Row="2" ItemsSource="{Binding Dungeons}" SelectedItem="{Binding SelectedDungeon}"
                                  Background="Transparent" BorderThickness="0">
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="vm:DungeonViewModel">
-                                    <StackPanel Spacing="2">
+                                    <StackPanel Spacing="2" ToolTip.Tip="{Binding DisplayName}">
                                         <TextBlock Text="{Binding Glyph}" FontSize="15" FontWeight="SemiBold"
                                                    Foreground="{DynamicResource Parchment}" />
                                         <TextBlock Text="{Binding Category}" FontSize="11" Foreground="{DynamicResource BloodBright}" />
@@ -90,7 +100,8 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                         <Button Grid.Row="3" Classes="primary" Content="Place in selected slot"
-                                Command="{Binding ApplyDungeonCommand}" HorizontalAlignment="Stretch" Margin="0,12,0,0" />
+                                Command="{Binding ApplyDungeonCommand}" HorizontalAlignment="Stretch" Margin="0,12,0,0"
+                                ToolTip.Tip="Write the selected dungeon into the chosen altar slot" />
                     </Grid>
                 </Border>
             </Grid>
@@ -99,7 +110,8 @@
                     BorderBrush="{DynamicResource Edge}" BorderThickness="1" Padding="18">
                 <StackPanel Spacing="0">
                     <TextBlock Classes="section" Text="SLOT" Margin="0,0,0,6" />
-                    <ComboBox ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}" HorizontalAlignment="Stretch">
+                    <ComboBox ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}" HorizontalAlignment="Stretch"
+                              ToolTip.Tip="Choose which of the six altar slots to view and edit">
                         <ComboBox.ItemTemplate>
                             <DataTemplate x:DataType="vm:SlotViewModel">
                                 <TextBlock Text="{Binding Display}" />
@@ -113,7 +125,8 @@
                     <ItemsControl ItemsSource="{Binding RiteSlots}" Margin="0,0,0,16">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:RiteSlotViewModel">
-                                <Grid ColumnDefinitions="64,*" Margin="0,3">
+                                <Grid ColumnDefinitions="64,*" Margin="0,3"
+                                      ToolTip.Tip="Set a rite (Fetid, Rotted, Cursed or Sinister) for this slot, or None to remove it">
                                     <TextBlock Grid.Column="0" Text="{Binding Label}" VerticalAlignment="Center"
                                                Foreground="{DynamicResource ParchmentDim}" />
                                     <ComboBox Grid.Column="1" ItemsSource="{Binding Options}"
@@ -123,18 +136,26 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <TextBlock Classes="section" Text="MODIFIERS" Margin="0,0,0,6" />
+                    <TextBlock Classes="section" Text="MODIFIERS" Margin="0,0,0,6"
+                               ToolTip.Tip="Only certain dungeon types support poison or a 4th layer; the others stay greyed out." />
                     <StackPanel Spacing="8">
-                        <CheckBox Content="Poison" IsChecked="{Binding PoisonEnabled}" IsEnabled="{Binding PoisonPossible}" />
-                        <CheckBox Content="Open 4th layer" IsChecked="{Binding FourthLayerOpen}" IsEnabled="{Binding FourthLayerPossible}" />
+                        <CheckBox Content="Poison" IsChecked="{Binding PoisonEnabled}" IsEnabled="{Binding PoisonPossible}"
+                                  ToolTip.Tip="Toggle the poison mist (only some dungeon types can be poisoned)" />
+                        <CheckBox Content="Open 4th layer" IsChecked="{Binding FourthLayerOpen}" IsEnabled="{Binding FourthLayerPossible}"
+                                  ToolTip.Tip="Open or close the optional 4th layer (only some dungeons have one)" />
                     </StackPanel>
+
+                    <Button Content="Clear slot" Command="{Binding ClearSlotCommand}"
+                            HorizontalAlignment="Stretch" Margin="0,20,0,0"
+                            ToolTip.Tip="Empty this altar slot" />
                 </StackPanel>
             </Border>
         </Grid>
 
         <!-- Live bytes (HxD style, full width) -->
         <Border Grid.Row="2" Background="{DynamicResource BgPanel}"
-                BorderBrush="{DynamicResource Edge}" BorderThickness="1" Margin="16,0,16,10" Padding="16,12">
+                BorderBrush="{DynamicResource Edge}" BorderThickness="1" Margin="16,0,16,10" Padding="16,12"
+                ToolTip.Tip="The selected slot's 125 bytes in the save file. '..' marks bytes that belong to other slots.">
             <StackPanel Spacing="8">
                 <TextBlock Classes="section" Text="LIVE BYTES" />
                 <Border Background="{DynamicResource BgBase}" BorderBrush="{DynamicResource Edge}" BorderThickness="1" Padding="14,10">
