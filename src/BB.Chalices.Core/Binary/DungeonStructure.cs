@@ -33,21 +33,6 @@ public readonly struct DungeonStructure
     public ReadOnlySpan<byte> CreatorPSN => Data[0x5C..0x6C];
     public ReadOnlySpan<byte> CharacterName => Data[0x6C..0x7C];
 
-    public DungeonType GetDungeonType()
-    {
-        var joinReqs = JoinRequirements;
-        if (joinReqs.Length < 1) return DungeonType.Unknown;
-
-        return joinReqs[0] switch
-        {
-            0x0A => DungeonType.Hintertomb,
-            0x0D => DungeonType.Pthumeru,
-            0x0E => DungeonType.PthumeruLower,
-            0x0F => DungeonType.Isz,
-            _ => DungeonType.Unknown
-        };
-    }
-
     // An empty altar slot: 0xFFFFFFFF map plus a marker byte at offset 8.
     public static DungeonStructure Empty()
     {
@@ -62,13 +47,4 @@ public readonly struct DungeonStructure
 
     public bool IsEmpty() =>
         Data[0] == 0xFF && Data[1] == 0xFF && Data[2] == 0xFF && Data[3] == 0xFF;
-}
-
-public enum DungeonType
-{
-    Unknown = 0,
-    Hintertomb = 0x0A,
-    Pthumeru = 0x0D,
-    PthumeruLower = 0x0E,
-    Isz = 0x0F
 }

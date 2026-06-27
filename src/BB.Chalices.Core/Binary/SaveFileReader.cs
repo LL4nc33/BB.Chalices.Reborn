@@ -52,7 +52,8 @@ public static class SaveFileReader
         return System.Text.Encoding.ASCII.GetString(name[..end]);
     }
 
-    // We read up to the flags region, so reject anything that can't hold it.
+    // Writing a slot stamps a 125-byte discovery flag at GetFlagsOffset(inventory, slot);
+    // reject anything that cannot hold every byte SetSlot would write for slot 6.
     public static bool ValidateSaveFileSize(int fileSize, int inventory) =>
-        fileSize >= inventory + 103000;
+        fileSize >= GetFlagsOffset(inventory, MaxSlots) + Stride;
 }

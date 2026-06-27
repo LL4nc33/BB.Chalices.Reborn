@@ -149,8 +149,13 @@ public static class Headstone
         return PoisonBytes(ExpectedPoisonByte(type, poisonEnabled));
     }
 
-    public static bool PoisonPossible(ReadOnlySpan<byte> record) =>
-        PoisonDungeonType(JoinRequirementsHex(record)) != "Other";
+    public static bool PoisonPossible(ReadOnlySpan<byte> record)
+    {
+        string type = PoisonDungeonType(JoinRequirementsHex(record));
+        // Isz dungeons are always non-poison (the byte stays 0x0F), so the toggle
+        // would be a no-op; treat Isz5 like "Other" for the enable check.
+        return type is not "Other" and not "Isz5";
+    }
 
     public static bool IsPoisoned(ReadOnlySpan<byte> record)
     {
