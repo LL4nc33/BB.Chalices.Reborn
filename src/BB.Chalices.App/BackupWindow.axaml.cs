@@ -29,6 +29,7 @@ public partial class BackupWindow : Window
 
         BackupList.ItemsSource = _items;
         Refresh();
+        BackupNowButton.IsEnabled = _savePath is not null;
     }
 
     private void Refresh()
@@ -36,6 +37,7 @@ public partial class BackupWindow : Window
         _items.Clear();
         foreach (var backup in _backups.GetAll())
             _items.Add(backup);
+        EmptyHint.IsVisible = _items.Count == 0;
     }
 
     private void OnCreate(object? sender, RoutedEventArgs e)

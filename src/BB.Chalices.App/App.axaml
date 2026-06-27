@@ -69,6 +69,13 @@
             <Setter Property="BorderBrush" Value="{DynamicResource BloodBright}" />
             <Setter Property="FontWeight" Value="SemiBold" />
         </Style>
+        <!-- Primary buttons brighten on hover (the Fluent template would otherwise darken them) -->
+        <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource BloodBright}" />
+        </Style>
+        <Style Selector="Button.primary:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Blood}" />
+        </Style>
 
         <!-- Roomier list rows + a blood accent bar on the selected one -->
         <Style Selector="ListBoxItem">
