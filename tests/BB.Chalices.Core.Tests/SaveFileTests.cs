@@ -1,5 +1,5 @@
 using BB.Chalices.Core.Binary;
-using SaveData = BB.Chalices.Core.SaveFile.SaveFile;
+using BB.Chalices.Core.Saves;
 
 namespace BB.Chalices.Core.Tests;
 
@@ -7,14 +7,14 @@ public class SaveFileTests
 {
     // A synthetic save: the inventory marker at a 4-aligned offset, and enough
     // room for the headstone and flag regions that follow it.
-    private static SaveData MakeSave(out byte[] buffer)
+    private static SaveFile MakeSave(out byte[] buffer)
     {
         buffer = new byte[105000];
         buffer[1000] = 0x40;
         buffer[1001] = 0xF0;
         buffer[1002] = 0xFF;
         buffer[1003] = 0xFF;
-        return new SaveData(buffer);
+        return new SaveFile(buffer);
     }
 
     [Fact]

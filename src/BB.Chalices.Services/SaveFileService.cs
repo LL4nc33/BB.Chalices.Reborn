@@ -1,5 +1,5 @@
 using BB.Chalices.Core.Binary;
-using BB.Chalices.Core.SaveFile;
+using BB.Chalices.Core.Saves;
 
 namespace BB.Chalices.Services;
 

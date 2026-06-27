@@ -1,6 +1,6 @@
 using BB.Chalices.Core.Binary;
 
-namespace BB.Chalices.Core.SaveFile;
+namespace BB.Chalices.Core.Saves;
 
 // An in-memory Bloodborne save. The inventory marker is located once on
 // construction; slots, the character name and the discovery flags are all
