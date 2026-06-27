@@ -49,4 +49,42 @@ public class DungeonSeederTests
         var glyphs = await ctx.Dungeons.Select(d => d.Glyph).OrderBy(g => g).ToListAsync();
         Assert.Equal(new[] { "g2", "g3" }, glyphs);
     }
+
+    [Fact]
+    public async Task ImportAsync_BytesLongerThanOneRecord_ThrowsAndPersistsNothing()
+    {
+        string hexEntries = string.Join(", ", Enumerable.Repeat("\"00\"", 126)); // 126 > 125
+        string json = $$"""{ "a": [ { "glyph": "toolong", "bytes": [ {{hexEntries}} ] } ] }""";
+
+        using var ctx = NewContext();
+        await Assert.ThrowsAsync<InvalidOperationException>(() => DungeonSeeder.ImportAsync(ctx, json));
+
+        Assert.Equal(0, await ctx.Dungeons.CountAsync());
+    }
+
+    [Fact]
+    public async Task ImportAsync_Exactly125Bytes_StoredVerbatim()
+    {
+        var expected = new byte[125];
+        for (int i = 0; i < expected.Length; i++)
+            expected[i] = (byte)i; // 0x00..0x7C, all distinct
+
+        string hexEntries = string.Join(", ", expected.Select(b => $"\"{b:X2}\""));
+        string json = $$"""{ "a": [ { "glyph": "exact", "bytes": [ {{hexEntries}} ] } ] }""";
+
+        using var ctx = NewContext();
+        await DungeonSeeder.ImportAsync(ctx, json);
+
+        var stored = await ctx.Dungeons.SingleAsync();
+        Assert.Equal(expected, stored.Bytes); // no padding, no truncation
+    }
+
+    [Fact]
+    public async Task ImportAsync_InvalidHexByte_ThrowsFormatException()
+    {
+        const string json = """{ "a": [ { "glyph": "bad", "bytes": ["ZZ"] } ] }""";
+
+        using var ctx = NewContext();
+        await Assert.ThrowsAsync<FormatException>(() => DungeonSeeder.ImportAsync(ctx, json));
+    }
 }

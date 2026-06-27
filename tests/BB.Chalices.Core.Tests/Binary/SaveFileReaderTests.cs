@@ -107,4 +107,52 @@ public class SaveFileReaderTests
     {
         Assert.False(SaveFileReader.ValidateSaveFileSize(50000, 0));
     }
+
+    [Fact]
+    public void ValidateSaveFileSize_ExactBoundary_TrueAtMinimumFalseOneByteSmaller()
+    {
+        int inventory = 1000;
+
+        // The minimum is GetFlagsOffset(inventory, 6) + 125 == inventory + 103454.
+        Assert.True(SaveFileReader.ValidateSaveFileSize(1000 + 103454, inventory));
+        Assert.False(SaveFileReader.ValidateSaveFileSize(1000 + 103453, inventory));
+    }
+
+    [Fact]
+    public void GetCharacterName_ThirtyTwoNonZeroBytesNoTerminator_ReturnsFullName()
+    {
+        var buffer = new byte[2000];
+        int inventory = 1000;
+        int nameOffset = inventory - 469;
+        string fullName = new string('A', 32);
+        var nameBytes = System.Text.Encoding.ASCII.GetBytes(fullName);
+        Array.Copy(nameBytes, 0, buffer, nameOffset, nameBytes.Length);
+
+        string name = SaveFileReader.GetCharacterName(buffer, inventory);
+
+        Assert.Equal(fullName, name);
+        Assert.Equal(32, name.Length);
+    }
+
+    [Fact]
+    public void GetCharacterName_NameOffsetBeforeStart_ReturnsEmpty()
+    {
+        var buffer = new byte[2000];
+
+        // inventory 100 puts the name region at 100 - 469 == -369, which is invalid.
+        string name = SaveFileReader.GetCharacterName(buffer, 100);
+
+        Assert.Equal(string.Empty, name);
+    }
+
+    [Fact]
+    public void GetCharacterName_NameRegionPastEnd_ReturnsEmpty()
+    {
+        var buffer = new byte[40];
+
+        // inventory 480 puts the name region at offset 11, but 11 + 32 == 43 > 40.
+        string name = SaveFileReader.GetCharacterName(buffer, 480);
+
+        Assert.Equal(string.Empty, name);
+    }
 }

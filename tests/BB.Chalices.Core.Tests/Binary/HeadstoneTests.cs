@@ -77,4 +77,88 @@ public class HeadstoneTests
         Assert.False(Headstone.TryParseField("00184B", field, out _));     // wrong length
         Assert.False(Headstone.TryParseField("ZZZZZZZZ", field, out _));   // not hex
     }
+
+    [Theory]
+    [InlineData("00001909", true, 0x0D)]   // Pthumeru 4: 0D on
+    [InlineData("00001909", false, 0x0E)]  // Pthumeru 4: 0E off
+    [InlineData("0000184B", true, 0x0A)]   // Hintertomb 2: 0A on
+    [InlineData("0000184B", false, 0xFF)]  // Hintertomb 2: FF off
+    [InlineData("DEADBEEF", true, 0xFF)]   // unknown: FF either way
+    [InlineData("DEADBEEF", false, 0xFF)]
+    public void SmartPoison_LastByteFollowsJoinRequirements(string joinHex, bool enabled, int expectedLast)
+    {
+        var record = new byte[125];
+        Convert.FromHexString(joinHex).CopyTo(record, Headstone.JoinRequirementsOffset);
+
+        var poison = Headstone.SmartPoison(record, enabled);
+
+        Assert.Equal((byte)expectedLast, poison[Headstone.FieldLength - 1]);
+    }
+
+    [Theory]
+    [InlineData(0x0A, true)]
+    [InlineData(0x0D, true)]
+    [InlineData(0xFF, false)]
+    [InlineData(0x0E, false)]
+    public void IsPoisoned_ReadsTheLastPoisonByte(int lastByte, bool expected)
+    {
+        var record = new byte[125];
+        record[Headstone.PoisonOffset + Headstone.FieldLength - 1] = (byte)lastByte;
+
+        Assert.Equal(expected, Headstone.IsPoisoned(record));
+    }
+
+    [Fact]
+    public void PoisonBytes_BuildsTemplateWithControlByte()
+    {
+        Assert.Equal(Convert.FromHexString("FFFFFFFFFFFFFF0D"), Headstone.PoisonBytes(0x0D));
+    }
+
+    [Theory]
+    [InlineData(0x3C, true)]
+    [InlineData(0x3D, true)]
+    [InlineData(0x3F, true)]
+    [InlineData(0x41, true)]
+    [InlineData(0x43, true)]
+    [InlineData(0xFF, false)]
+    public void IsFourthLayerOpen_ChecksTheFunctionalByte(int functionalByte, bool expected)
+    {
+        var record = new byte[125];
+        record[Headstone.FourthLayerOffset + Headstone.FieldLength - 1] = (byte)functionalByte;
+
+        Assert.Equal(expected, Headstone.IsFourthLayerOpen(record));
+    }
+
+    [Theory]
+    [InlineData(0x3C)] // Hintertomb / Pthumeru 2 / Loran open byte
+    [InlineData(0x3D)] // Pthumeru 4 / 5 open byte
+    [InlineData(0x43)] // Isz 5 open byte
+    public void IsFourthLayerOpen_TrueForBytesEmittedByControl(byte openByte)
+    {
+        var record = new byte[125];
+        Headstone.FourthLayerBytes(openByte).CopyTo(record, Headstone.FourthLayerOffset);
+
+        Assert.True(Headstone.IsFourthLayerOpen(record));
+    }
+
+    [Theory]
+    [InlineData("00001909", true, true)]   // Pthumeru 4: both possible
+    [InlineData("DEADBEEF", false, false)] // unknown: neither possible
+    [InlineData("0000198B", false, true)]  // Isz 5: poison excluded, 4th layer possible
+    public void PoisonPossibleAndFourthLayerPossible_FollowJoinRequirements(
+        string joinHex, bool poisonPossible, bool fourthLayerPossible)
+    {
+        var record = new byte[125];
+        Convert.FromHexString(joinHex).CopyTo(record, Headstone.JoinRequirementsOffset);
+
+        Assert.Equal(poisonPossible, Headstone.PoisonPossible(record));
+        Assert.Equal(fourthLayerPossible, Headstone.FourthLayerPossible(record));
+    }
+
+    [Fact]
+    public void IsPoisonedAndIsFourthLayerOpen_ShortRecord_ReturnFalse()
+    {
+        Assert.False(Headstone.IsPoisoned(new byte[10]));
+        Assert.False(Headstone.IsFourthLayerOpen(new byte[10]));
+    }
 }
