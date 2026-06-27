@@ -98,7 +98,20 @@
                             </ListBox.KeyBindings>
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="vm:DungeonViewModel">
-                                    <StackPanel Spacing="2" ToolTip.Tip="{Binding DisplayName}">
+                                    <StackPanel Spacing="2">
+                                        <ToolTip.Tip>
+                                            <StackPanel Spacing="3" MaxWidth="340">
+                                                <TextBlock Text="{Binding Glyph}" FontWeight="Bold"
+                                                           Foreground="{DynamicResource Parchment}" />
+                                                <TextBlock Text="{Binding Type}" FontSize="12"
+                                                           Foreground="{DynamicResource BloodBright}" />
+                                                <TextBlock Text="{Binding Category}" FontSize="12"
+                                                           Foreground="{DynamicResource ParchmentDim}" />
+                                                <TextBlock Text="{Binding Description}" FontSize="12" TextWrapping="Wrap"
+                                                           Foreground="{DynamicResource Parchment}"
+                                                           IsVisible="{Binding Description, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                            </StackPanel>
+                                        </ToolTip.Tip>
                                         <TextBlock Text="{Binding Glyph}" FontSize="15" FontWeight="SemiBold"
                                                    Foreground="{DynamicResource Parchment}" />
                                         <TextBlock Text="{Binding Category}" FontSize="11" Foreground="{DynamicResource BloodBright}" />
