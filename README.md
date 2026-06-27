@@ -12,8 +12,9 @@ Built with Avalonia 12 and .NET 10, so it runs on Windows, Linux and macOS.
 Understanding the save format is the hard part, and that work stands on the
 shoulders of the Bloodborne data-mining community, plus my own research on top of it:
 
-- **The Tomb Prospectors community**, for the reverse-engineering of the chalice
-  save format that the rite, poison and 4th-layer byte logic builds on:
+- **The Tomb Prospectors community** (notably DrAnger, with Trin and Kazin), for the
+  reverse-engineering of the chalice save format that the rite, poison and 4th-layer
+  byte logic builds on:
   - [Hex Research Central](https://www.bloodborne-wiki.com/) ([data-mining notes](https://www.bloodborne-wiki.com/2017/12/data-mining.html))
   - the glyph and hex research sheets
     ([one](https://docs.google.com/spreadsheets/d/1zFIzhnXHhYomlR-tFJcyk3cPywf1snqkDH900j6rtAI/edit?gid=1741467922#gid=1741467922),

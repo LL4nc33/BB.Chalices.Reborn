@@ -22,3 +22,9 @@ artifacts/
 ## OS
 .DS_Store
 Thumbs.db
+
+## Local research dumps (scraped reference material, not build inputs)
+data/
+
+## Stray crash dumps
+*.stackdump
