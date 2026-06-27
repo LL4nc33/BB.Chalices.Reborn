@@ -19,4 +19,7 @@ public class AppSettings
     public int? WindowWidth { get; set; }
     public int? WindowHeight { get; set; }
     public bool WindowMaximized { get; set; }
+
+    // Bumped when the bundled catalogue changes, to trigger a one-time reseed.
+    public int CatalogueVersion { get; set; }
 }

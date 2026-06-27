@@ -38,16 +38,20 @@ public partial class App : Application
     {
         try
         {
+            const int catalogueVersion = 2;
+            var config = Services!.GetRequiredService<ConfigService>();
             var dbFactory = Services!.GetRequiredService<IDbContextFactory<ChaliceDbContext>>();
             await using (var db = await dbFactory.CreateDbContextAsync())
             {
                 await db.Database.EnsureCreatedAsync();
 
-                if (!db.Dungeons.Any())
+                var json = Path.Combine(AppContext.BaseDirectory, "dungeons.json");
+                bool seeded = await db.Dungeons.AnyAsync();
+                if (File.Exists(json) && (!seeded || config.Settings.CatalogueVersion != catalogueVersion))
                 {
-                    var json = Path.Combine(AppContext.BaseDirectory, "dungeons.json");
-                    if (File.Exists(json))
-                        await DungeonSeeder.SeedFromJsonAsync(db, json);
+                    await DungeonSeeder.ImportAsync(db, await File.ReadAllTextAsync(json), replaceExisting: true);
+                    config.Settings.CatalogueVersion = catalogueVersion;
+                    config.Save();
                 }
             }
 
@@ -57,7 +61,7 @@ public partial class App : Application
 
             // Reopen the last save if it's still there; otherwise pre-fill the
             // shadPS4 dropdown so a first-time user does not have to find Detect.
-            var lastSave = Services!.GetRequiredService<ConfigService>().Settings.LastSavePath;
+            var lastSave = config.Settings.LastSavePath;
             if (!string.IsNullOrEmpty(lastSave) && File.Exists(lastSave))
                 await viewModel.LoadSaveCommand.Execute(lastSave);
             else
