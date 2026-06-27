@@ -8,6 +8,7 @@
         RequestedThemeVariant="Dark"
         FontFamily="{DynamicResource GothicFont}"
         Background="{DynamicResource BgBase}"
+        Icon="/Assets/favicon.png"
         Title="Dungeon builder">
 
     <Grid Margin="22" RowDefinitions="Auto,Auto,*,Auto">

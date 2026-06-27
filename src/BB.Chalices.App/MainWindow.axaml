@@ -6,6 +6,7 @@
         Width="1280" Height="820" MinWidth="1160" MinHeight="740"
         RequestedThemeVariant="Dark"
         FontFamily="{DynamicResource GothicFont}"
+        Icon="/Assets/favicon.png"
         Title="BB Chalices">
 
     <Window.Background>
