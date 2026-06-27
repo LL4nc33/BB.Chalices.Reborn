@@ -10,9 +10,9 @@ public class OnlineImportService
     private const string GistApi = "https://api.github.com/gists/a29f699f4175bf315d9bd4baeebefb66";
     private const string DungeonFile = "dungeons.json";
 
-    private readonly ChaliceDbContext _db;
+    private readonly IDbContextFactory<ChaliceDbContext> _factory;
 
-    public OnlineImportService(ChaliceDbContext db) => _db = db;
+    public OnlineImportService(IDbContextFactory<ChaliceDbContext> factory) => _factory = factory;
 
     public async Task<string> UpdateAsync()
     {
@@ -33,9 +33,10 @@ public class OnlineImportService
             if (string.IsNullOrEmpty(content))
                 return "The gist has no dungeon data.";
 
-            await DungeonSeeder.ImportAsync(_db, content, replaceExisting: true);
+            await using var db = await _factory.CreateDbContextAsync();
+            await DungeonSeeder.ImportAsync(db, content, replaceExisting: true);
 
-            var count = await _db.Dungeons.CountAsync();
+            var count = await db.Dungeons.CountAsync();
             return $"Updated to {count} dungeons from Noxde's gist.";
         }
         catch (Exception ex)

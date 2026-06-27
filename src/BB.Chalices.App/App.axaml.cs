@@ -38,14 +38,17 @@ public partial class App : Application
     {
         try
         {
-            var db = Services!.GetRequiredService<ChaliceDbContext>();
-            await db.Database.EnsureCreatedAsync();
-
-            if (!db.Dungeons.Any())
+            var dbFactory = Services!.GetRequiredService<IDbContextFactory<ChaliceDbContext>>();
+            await using (var db = await dbFactory.CreateDbContextAsync())
             {
-                var json = Path.Combine(AppContext.BaseDirectory, "dungeons.json");
-                if (File.Exists(json))
-                    await DungeonSeeder.SeedFromJsonAsync(db, json);
+                await db.Database.EnsureCreatedAsync();
+
+                if (!db.Dungeons.Any())
+                {
+                    var json = Path.Combine(AppContext.BaseDirectory, "dungeons.json");
+                    if (File.Exists(json))
+                        await DungeonSeeder.SeedFromJsonAsync(db, json);
+                }
             }
 
             var viewModel = Services!.GetRequiredService<MainViewModel>();
@@ -70,7 +73,7 @@ public partial class App : Application
             "BBChalices", "chalices.db");
         Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
 
-        services.AddDbContext<ChaliceDbContext>(options => options.UseSqlite($"Data Source={dbPath}"));
+        services.AddDbContextFactory<ChaliceDbContext>(options => options.UseSqlite($"Data Source={dbPath}"));
 
         services.AddSingleton<ConfigService>();
         services.AddSingleton<BackupService>();
