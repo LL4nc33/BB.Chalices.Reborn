@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="BB.Chalices.App.SettingsWindow"
-        Width="560" Height="320"
+        Width="560" Height="500"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
         RequestedThemeVariant="Dark"
@@ -35,6 +35,23 @@
         <CheckBox x:Name="AutoBackupBox" Content="Back up automatically before every save"
                   Foreground="{DynamicResource Parchment}"
                   ToolTip.Tip="Keep a timestamped backup every time you save" />
+
+        <Border BorderBrush="{DynamicResource Edge}" BorderThickness="0,1,0,0" Padding="0,14,0,0">
+            <StackPanel Spacing="8">
+                <TextBlock Text="Credits and sources" Foreground="{DynamicResource ParchmentDim}" />
+                <TextBlock TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource ParchmentDim}"
+                           Text="The chalice byte format builds on the Tomb Prospectors community (DrAnger, Trin, Kazin). Dig into the research yourself:" />
+                <WrapPanel>
+                    <Button Content="Hex Research Central" Tag="https://www.bloodborne-wiki.com/2017/12/data-mining.html"
+                            Click="OnOpenLink" Margin="0,0,8,8" />
+                    <Button Content="Bloodborne Wiki" Tag="https://www.bloodborne-wiki.com/"
+                            Click="OnOpenLink" Margin="0,0,8,8" />
+                    <Button Content="Noxde's dungeon list" Tag="https://www.nexusmods.com/bloodborne/mods/121"
+                            Click="OnOpenLink" Margin="0,0,8,8" />
+                    <Button Content="shadPS4" Tag="https://shadps4.net" Click="OnOpenLink" Margin="0,0,8,8" />
+                </WrapPanel>
+            </StackPanel>
+        </Border>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
             <Button Content="Cancel" Click="OnCancel" />

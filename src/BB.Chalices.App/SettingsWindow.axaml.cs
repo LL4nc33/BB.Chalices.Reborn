@@ -54,5 +54,11 @@ public partial class SettingsWindow : Window
 
     private void OnCancel(object? sender, RoutedEventArgs e) => Close();
 
+    private async void OnOpenLink(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string url })
+            await Launcher.LaunchUriAsync(new System.Uri(url));
+    }
+
     private static string? Blank(string? value) => string.IsNullOrWhiteSpace(value) ? null : value;
 }
