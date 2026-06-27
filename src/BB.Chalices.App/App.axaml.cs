@@ -38,7 +38,7 @@ public partial class App : Application
     {
         try
         {
-            const int catalogueVersion = 2;
+            const int catalogueVersion = 3;
             var config = Services!.GetRequiredService<ConfigService>();
             var dbFactory = Services!.GetRequiredService<IDbContextFactory<ChaliceDbContext>>();
             await using (var db = await dbFactory.CreateDbContextAsync())
