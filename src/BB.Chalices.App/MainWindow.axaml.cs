@@ -174,6 +174,28 @@ public partial class MainWindow : Window
             viewModel.PasteAltarHex(await clipboard.TryGetTextAsync());
     }
 
+    private async void OnSaveCustom(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel viewModel)
+            return;
+
+        string? name = await new PromptWindow("Save this dungeon to your catalogue. Name it:", "My dungeon")
+            .ShowDialog<string?>(this);
+        if (!string.IsNullOrWhiteSpace(name))
+            await viewModel.SaveCurrentSlotAsCustomAsync(name);
+    }
+
+    private async void OnDeleteCustom(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel { SelectedDungeon: { IsCustom: true } dungeon } viewModel)
+            return;
+
+        bool confirmed = await new ConfirmWindow($"Remove \"{dungeon.Description ?? dungeon.Glyph}\" from your dungeons?")
+            .ShowDialog<bool>(this);
+        if (confirmed)
+            await viewModel.DeleteSelectedCustomAsync();
+    }
+
     private async void OnDeleteBackup(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not MainViewModel { SelectedBackup: { } backup } viewModel)

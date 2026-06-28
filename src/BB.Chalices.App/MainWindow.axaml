@@ -184,6 +184,9 @@
                                               IsVisible="{Binding Description, Converter={x:Static ObjectConverters.IsNotNull}}">
                                     <TextBlock Classes="caption" Text="{Binding Description}" TextWrapping="Wrap" />
                                 </ScrollViewer>
+                                <Button Classes="link" Content="remove from my dungeons" Click="OnDeleteCustom"
+                                        HorizontalAlignment="Left" IsVisible="{Binding IsCustom}"
+                                        ToolTip.Tip="Delete this saved dungeon from your catalogue" />
                             </StackPanel>
                         </Border>
                         <Grid Grid.Row="4" ColumnDefinitions="Auto,Auto,*" ColumnSpacing="8" Margin="0,16,0,0">
@@ -341,6 +344,8 @@
                                                 ToolTip.Tip="Copy this whole dungeon as a 125-byte hex string to the clipboard" />
                                         <Button Classes="link" Content="paste" Click="OnPasteSlotHex"
                                                 ToolTip.Tip="Replace this slot with a 125-byte hex string from the clipboard. Save to write it to disk." />
+                                        <Button Classes="link" Content="save" Click="OnSaveCustom"
+                                                ToolTip.Tip="Save this dungeon to your own catalogue (My dungeons) to reuse later" />
                                         <Button Classes="link" Content="colour legend" Click="OnLegendClick"
                                                 ToolTip.Tip="What the byte colours mean" />
                                     </StackPanel>

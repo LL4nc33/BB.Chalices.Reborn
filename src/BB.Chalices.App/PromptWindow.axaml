@@ -1,0 +1,20 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="BB.Chalices.App.PromptWindow"
+        Width="420" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        RequestedThemeVariant="Dark"
+        FontFamily="{DynamicResource GothicFont}"
+        Background="{DynamicResource WindowBg}"
+        Icon="/Assets/favicon.png"
+        Title="Name">
+
+    <StackPanel Margin="24" Spacing="16">
+        <TextBlock x:Name="MessageText" Classes="body" TextWrapping="Wrap" />
+        <TextBox x:Name="InputText" MaxLength="40" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Content="Cancel" Click="OnCancel" />
+            <Button Classes="primary" Content="Save" Click="OnConfirm" />
+        </StackPanel>
+    </StackPanel>
+</Window>

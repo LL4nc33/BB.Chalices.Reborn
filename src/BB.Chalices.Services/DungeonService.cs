@@ -15,6 +15,38 @@ public class DungeonService
         _factory = factory;
     }
 
+    // The category used for the player's own saved dungeons.
+    public const string CustomCategory = "Custom";
+
+    // Persist a player-made dungeon (current slot or a built one) into the catalogue.
+    public async Task<DungeonEntity> AddCustomAsync(string name, byte[] bytes)
+    {
+        await using var context = await _factory.CreateDbContextAsync();
+        var entity = new DungeonEntity
+        {
+            Glyph = "my-" + Guid.NewGuid().ToString("N")[..8],
+            Category = CustomCategory,
+            Description = name,
+            Bytes = bytes,
+        };
+        context.Dungeons.Add(entity);
+        await context.SaveChangesAsync();
+        return entity;
+    }
+
+    // Remove a player-made dungeon by its generated glyph (custom dungeons only).
+    public async Task DeleteCustomAsync(string glyph)
+    {
+        await using var context = await _factory.CreateDbContextAsync();
+        var entity = await context.Dungeons
+            .FirstOrDefaultAsync(d => d.Glyph == glyph && d.Category == CustomCategory);
+        if (entity is not null)
+        {
+            context.Dungeons.Remove(entity);
+            await context.SaveChangesAsync();
+        }
+    }
+
     public async Task<List<DungeonEntity>> GetAllAsync()
     {
         await using var context = await _factory.CreateDbContextAsync();

@@ -89,4 +89,24 @@ public class DungeonServiceTests
         Assert.Equal(all.Count, count);
         Assert.Equal(3, count);
     }
+
+    [Fact]
+    public async Task AddCustomAsync_ThenDelete_RoundTrips()
+    {
+        var factory = NewFactory();
+        var service = new DungeonService(factory);
+
+        var bytes = new byte[125];
+        bytes[1] = 0x35;
+        var saved = await service.AddCustomAsync("my gem farm", bytes);
+
+        Assert.Equal(DungeonService.CustomCategory, saved.Category);
+        Assert.StartsWith("my-", saved.Glyph);
+        Assert.Contains(await service.GetAllAsync(),
+            d => d.Glyph == saved.Glyph && d.Description == "my gem farm");
+
+        await service.DeleteCustomAsync(saved.Glyph);
+
+        Assert.Null(await service.GetByGlyphAsync(saved.Glyph));
+    }
 }

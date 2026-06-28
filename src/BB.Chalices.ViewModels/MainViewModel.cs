@@ -664,6 +664,38 @@ public class MainViewModel : ViewModelBase
         StatusMessage = "Pasted all 6 altar slots. Save to write them to disk.";
     }
 
+    // Save the selected slot's dungeon into the player's own catalogue under a name.
+    public async Task SaveCurrentSlotAsCustomAsync(string name)
+    {
+        if (SelectedSlotBytes is not { } bytes)
+        {
+            StatusMessage = "Pick a slot with a dungeon first.";
+            return;
+        }
+
+        var entity = await _dungeons.AddCustomAsync(name, bytes);
+        _all.Add(new DungeonViewModel(entity));
+        RebuildCategories();
+        ApplyFilter();
+        StatusMessage = $"Saved \"{name}\" to your dungeons. Find it in the catalogue (All tab, Custom).";
+    }
+
+    // Remove the selected dungeon from the player's catalogue (custom dungeons only).
+    public async Task DeleteSelectedCustomAsync()
+    {
+        if (SelectedDungeon is not { IsCustom: true } dungeon)
+        {
+            StatusMessage = "Pick one of your own saved dungeons to remove.";
+            return;
+        }
+
+        await _dungeons.DeleteCustomAsync(dungeon.Glyph);
+        _all.Remove(dungeon);
+        RebuildCategories();
+        ApplyFilter();
+        StatusMessage = $"Removed \"{dungeon.Description ?? dungeon.Glyph}\" from your dungeons.";
+    }
+
     private int? _undoSlot;
     private byte[]? _undoBytes;
 
