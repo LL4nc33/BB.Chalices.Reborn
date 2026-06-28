@@ -439,12 +439,24 @@ public class MainViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref _canUndo, value);
     }
 
+    private bool _isCatalogueEmpty;
+    // True until the ready-made catalogue has been downloaded; drives the catalogue
+    // prompt. The app stays fully usable offline without it (Build new, paste, custom).
+    public bool IsCatalogueEmpty
+    {
+        get => _isCatalogueEmpty;
+        private set => this.RaiseAndSetIfChanged(ref _isCatalogueEmpty, value);
+    }
+
     private async Task LoadDungeonsAsync()
     {
         var all = await _dungeons.GetAllAsync();
         _all = all.Select(d => new DungeonViewModel(d)).ToList();
         RebuildCategories();
-        StatusMessage = $"{_all.Count} dungeons ready.";
+        IsCatalogueEmpty = _all.Count == 0;
+        StatusMessage = _all.Count == 0
+            ? "Catalogue empty. The ready-made dungeons are Noxde's - download them when online; the app works offline without them."
+            : $"{_all.Count} dungeons ready.";
     }
 
     // Noxde's curated list is kept separate from the full Tomb Prospectors set.

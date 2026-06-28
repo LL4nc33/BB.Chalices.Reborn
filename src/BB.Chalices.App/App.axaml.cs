@@ -48,13 +48,12 @@ public partial class App : Application
                 bool seeded = await db.Dungeons.AnyAsync();
                 if (!seeded || config.Settings.CatalogueVersion != catalogueVersion)
                 {
-                    // dungeons.json is embedded in the executable so the build is a
-                    // single self-contained file (no data file to ship alongside).
-                    await using var seedStream = typeof(App).Assembly.GetManifestResourceStream("dungeons.json");
-                    if (seedStream is not null)
+                    // The catalogue is Noxde's work, so it is not bundled. Seed only from
+                    // the local copy the user consented to download (cached by ConfigService).
+                    var localJson = config.CatalogueCachePath;
+                    if (File.Exists(localJson))
                     {
-                        using var reader = new StreamReader(seedStream);
-                        await DungeonSeeder.ImportAsync(db, await reader.ReadToEndAsync(), replaceExisting: true);
+                        await DungeonSeeder.ImportAsync(db, await File.ReadAllTextAsync(localJson), replaceExisting: true);
                         config.Settings.CatalogueVersion = catalogueVersion;
                         config.Save();
                     }

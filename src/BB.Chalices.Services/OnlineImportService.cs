@@ -11,8 +11,13 @@ public class OnlineImportService
     private const string DungeonFile = "dungeons.json";
 
     private readonly IDbContextFactory<ChaliceDbContext> _factory;
+    private readonly ConfigService _config;
 
-    public OnlineImportService(IDbContextFactory<ChaliceDbContext> factory) => _factory = factory;
+    public OnlineImportService(IDbContextFactory<ChaliceDbContext> factory, ConfigService config)
+    {
+        _factory = factory;
+        _config = config;
+    }
 
     public async Task<string> UpdateAsync()
     {
@@ -33,11 +38,14 @@ public class OnlineImportService
             if (string.IsNullOrEmpty(content))
                 return "The gist has no dungeon data.";
 
+            // Cache the gist locally so later launches seed offline (no re-download).
+            await File.WriteAllTextAsync(_config.CatalogueCachePath, content);
+
             await using var db = await _factory.CreateDbContextAsync();
             await DungeonSeeder.ImportAsync(db, content, replaceExisting: true);
 
             var count = await db.Dungeons.CountAsync();
-            return $"Updated to {count} dungeons from Noxde's gist.";
+            return $"Catalogue downloaded: {count} dungeons from Noxde's gist (cached for offline use).";
         }
         catch (Exception ex)
         {

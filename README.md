@@ -1,9 +1,12 @@
 # BB Chalices
 
-A small cross-platform editor for Bloodborne chalice dungeons. Pick one of 200+
-ready-made dungeons and drop it into one of your save's six altar slots. Handy for
-farming runs, blood-gem setups, or just testing things without grinding the glyphs
-by hand.
+A small cross-platform editor for Bloodborne chalice dungeons. Drop a dungeon into
+any of your save's seven altar slots - the six stored slots plus the makeshift altar.
+Handy for farming runs, blood-gem setups, or just testing things without grinding the
+glyphs by hand.
+
+The 200+ ready-made dungeons are Noxde's work, fetched once from his gist (with your
+consent) and cached locally. Everything else runs fully offline.
 
 Built with Avalonia 12 and .NET 10, so it runs on Windows, Linux and macOS.
 
@@ -40,6 +43,23 @@ a `userdata` file directly with **Open Save**.
 Every time you save, the original file is copied to a `backup/` folder next to it
 first, so you can always roll back.
 
+## Download
+
+Grab a self-contained build for your OS from the
+[Releases](https://github.com/LL4nc33/BB.Chalices.Reborn/releases) page - no .NET
+install needed, it is one file:
+
+- **Windows**: `*-win-x64.zip` - unzip and run `BB.Chalices.App.exe`.
+- **Linux**: `*-linux-x64.tar.gz` - extract, `chmod +x`, run.
+- **macOS**: `*-osx-x64` (Intel) or `*-osx-arm64` (Apple Silicon). Unsigned, so the
+  first launch needs `xattr -dr com.apple.quarantine BB.Chalices.App` or a
+  right-click - Open.
+
+On first run, open **Settings** (or the catalogue prompt) and download the dungeon
+catalogue from Noxde's gist; after that it is cached and the app works offline.
+
+Or build it yourself (below).
+
 ## Building
 
 You need the .NET 10 SDK.
@@ -55,7 +75,7 @@ dotnet run --project src/BB.Chalices.App
 - **BB.Chalices.Core** is the save format itself: finding the inventory marker,
   reading and writing the 125-byte dungeon records, backups. No UI or framework dependencies.
 - **BB.Chalices.Data** holds the dungeon catalogue in SQLite (EF Core), seeded from
-  `dungeons.json` the first time you run it.
+  Noxde's gist (downloaded once with your consent, then cached locally for offline use).
 - **BB.Chalices.Services** does load/save, catalogue queries and shadPS4 save discovery.
 - **BB.Chalices.ViewModels** has the ReactiveUI view models.
 - **BB.Chalices.App** is the Avalonia UI and theme.

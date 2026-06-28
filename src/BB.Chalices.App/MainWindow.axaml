@@ -158,6 +158,17 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
+                        <Border Grid.Row="2" Classes="card" VerticalAlignment="Center" Padding="20"
+                                IsVisible="{Binding IsCatalogueEmpty}">
+                            <StackPanel Spacing="12" HorizontalAlignment="Center" MaxWidth="440">
+                                <TextBlock Classes="heading" Text="Get the dungeon catalogue" HorizontalAlignment="Center" />
+                                <TextBlock Classes="body" TextWrapping="Wrap" TextAlignment="Center"
+                                           Text="The 200+ ready-made dungeons are Noxde's work, hosted on his gist. The app fetches them once (with your OK) and caches them for offline use. Everything else works offline without them - open saves, edit slots, build or paste dungeons." />
+                                <Button Classes="primary" Content="Download from Noxde's gist" Command="{Binding UpdateDungeonsCommand}"
+                                        HorizontalAlignment="Center" HorizontalContentAlignment="Center"
+                                        ToolTip.Tip="One-time download from gist.github.com/Noxde, then cached locally for offline use" />
+                            </StackPanel>
+                        </Border>
                         <Border Grid.Row="3" Margin="0,16,0,0" Padding="0,12,0,0"
                                 BorderBrush="{DynamicResource Edge}" BorderThickness="0,1,0,0"
                                 IsVisible="{Binding SelectedDungeon, Converter={x:Static ObjectConverters.IsNotNull}}">
@@ -412,6 +423,14 @@
                                     ToolTip.Tip="Applies the shadPS4 sound-crash workaround: sets userdata0010 offset 0x204E to 01. A backup is made first." />
                             <TextBlock Classes="caption" TextWrapping="Wrap"
                                        Text="Patches the options file (userdata0010) to stop the shadPS4 audio crash, for any build. Credit: imbal4nc3d, with proteh." />
+                        </StackPanel>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Classes="section" Text="DUNGEON CATALOGUE" />
+                            <Button Content="Download / update from Noxde's gist" Command="{Binding UpdateDungeonsCommand}" HorizontalAlignment="Left"
+                                    ToolTip.Tip="Fetch the latest catalogue from gist.github.com/Noxde and cache it locally for offline use." />
+                            <TextBlock Classes="caption" TextWrapping="Wrap"
+                                       Text="The 200+ ready-made dungeons are Noxde's work, fetched from his gist with your consent and cached locally. The app works offline without them." />
                         </StackPanel>
 
                         <Border BorderBrush="{DynamicResource Edge}" BorderThickness="0,1,0,0" Padding="0,16,0,0">

@@ -29,10 +29,7 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- Embed the dungeon catalog in the executable (read on first-run seeding),
-         so a self-contained single-file build is one file with no data alongside. -->
-    <EmbeddedResource Include="..\..\dungeons.json" Link="dungeons.json" LogicalName="dungeons.json" />
-  </ItemGroup>
+  <!-- dungeons.json (Noxde's catalogue) is intentionally NOT bundled: it is his work
+       and is only fetched/imported into the local DB with the user's consent. -->
 
 </Project>

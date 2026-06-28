@@ -26,6 +26,9 @@ public class ConfigService
             ? Path.Combine(_appDir, "Backups")
             : Settings.BackupDirectory!;
 
+    // Where the downloaded catalogue (Noxde's gist) is cached after first fetch.
+    public string CatalogueCachePath => Path.Combine(_appDir, "dungeons.json");
+
     public void Save()
     {
         try
