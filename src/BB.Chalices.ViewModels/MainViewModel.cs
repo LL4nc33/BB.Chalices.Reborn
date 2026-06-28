@@ -66,7 +66,6 @@ public class MainViewModel : ViewModelBase
         UpdateDungeonsCommand = ReactiveCommand.CreateFromTask(UpdateDungeonsAsync);
         ClearSlotCommand = ReactiveCommand.Create(ClearSlot);
         UndoSlotCommand = ReactiveCommand.Create(UndoSlot);
-        RenameCommand = ReactiveCommand.Create(Rename);
         CreateBackupCommand = ReactiveCommand.Create(CreateBackup);
         RestoreBackupCommand = ReactiveCommand.Create(RestoreSelectedBackup);
     }
@@ -328,7 +327,6 @@ public class MainViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> UpdateDungeonsCommand { get; }
     public ReactiveCommand<Unit, Unit> ClearSlotCommand { get; }
     public ReactiveCommand<Unit, Unit> UndoSlotCommand { get; }
-    public ReactiveCommand<Unit, Unit> RenameCommand { get; }
     public ReactiveCommand<Unit, Unit> CreateBackupCommand { get; }
     public ReactiveCommand<Unit, Unit> RestoreBackupCommand { get; }
 
@@ -527,23 +525,6 @@ public class MainViewModel : ViewModelBase
         _undoSlot = null;
         _undoBytes = null;
         CanUndo = false;
-    }
-
-    private void Rename()
-    {
-        if (!HasLoadedSave)
-            return;
-
-        string name = (EditableName ?? string.Empty).Trim();
-        if (name.Length is < 1 or > 16)
-        {
-            StatusMessage = "The hunter name must be 1 to 16 characters.";
-            return;
-        }
-
-        ApplyPendingRename();
-        EditableName = name;
-        StatusMessage = $"Hunter name set to {name}. Click Save changes to write it.";
     }
 
     // Applies the name typed in the box to the in-memory save; written on Save.
