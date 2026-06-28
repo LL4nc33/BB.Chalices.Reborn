@@ -49,11 +49,21 @@ public class HeadstoneTests
     }
 
     [Fact]
-    public void FourthLayerControl_PerDungeonType()
+    public void FourthLayerControl_PerArea()
     {
-        Assert.Equal((true, (byte)0x3D, (byte)0x3E), Headstone.FourthLayerControl("00001909")); // Pthumeru 4
-        Assert.Equal((true, (byte)0x43, (byte)0x44), Headstone.FourthLayerControl("0000198B")); // Isz 5
-        Assert.Equal((false, (byte)0x00, (byte)0x00), Headstone.FourthLayerControl("DEADBEEF"));
+        Assert.Equal((true, (byte)0x3D, (byte)0x3E), Headstone.FourthLayerControl(AreaRecord(0x28)));        // Pthumeru 4
+        Assert.Equal((true, (byte)0x3C, (byte)0xFF), Headstone.FourthLayerControl(AreaRecord(0x14)));        // Pthumeru 2
+        Assert.Equal((true, (byte)0x43, (byte)0x44), Headstone.FourthLayerControl(AreaRecord(0x35)));        // Isz 5
+        Assert.Equal((false, (byte)0x00, (byte)0x00), Headstone.FourthLayerControl(AreaRecord(0x0A)));       // Pthumeru 1
+        Assert.Equal((false, (byte)0x00, (byte)0x00), Headstone.FourthLayerControl(AreaRecord(0x35, true))); // Sinister Isz 5
+    }
+
+    private static byte[] AreaRecord(byte areaByte, bool sinister = false)
+    {
+        var record = new byte[125];
+        record[1] = areaByte;
+        record[2] = sinister ? (byte)0x14 : (byte)0x00;
+        return record;
     }
 
     [Fact]
@@ -79,16 +89,16 @@ public class HeadstoneTests
     }
 
     [Theory]
-    [InlineData("00001909", true, 0x0D)]   // Pthumeru 4: 0D on
-    [InlineData("00001909", false, 0x0E)]  // Pthumeru 4: 0E off
-    [InlineData("0000184B", true, 0x0A)]   // Hintertomb 2: 0A on
-    [InlineData("0000184B", false, 0xFF)]  // Hintertomb 2: FF off
-    [InlineData("DEADBEEF", true, 0xFF)]   // unknown: FF either way
-    [InlineData("DEADBEEF", false, 0xFF)]
-    public void SmartPoison_LastByteFollowsJoinRequirements(string joinHex, bool enabled, int expectedLast)
+    [InlineData(0x28, true, 0x0D)]   // Pthumeru 4: 0D on
+    [InlineData(0x28, false, 0x0E)]  // Pthumeru 4: 0E off
+    [InlineData(0x15, true, 0x0A)]   // Hintertomb 2: 0A on
+    [InlineData(0x15, false, 0xFF)]  // Hintertomb 2: FF off
+    [InlineData(0x0A, true, 0xFF)]   // Pthumeru 1: FF either way (no poison)
+    [InlineData(0x0A, false, 0xFF)]
+    public void SmartPoison_LastByteFollowsArea(int areaByte, bool enabled, int expectedLast)
     {
         var record = new byte[125];
-        Convert.FromHexString(joinHex).CopyTo(record, Headstone.JoinRequirementsOffset);
+        record[1] = (byte)areaByte;
 
         var poison = Headstone.SmartPoison(record, enabled);
 
@@ -142,14 +152,18 @@ public class HeadstoneTests
     }
 
     [Theory]
-    [InlineData("00001909", true, true)]   // Pthumeru 4: both possible
-    [InlineData("DEADBEEF", false, false)] // unknown: neither possible
-    [InlineData("0000198B", false, true)]  // Isz 5: poison excluded, 4th layer possible
-    public void PoisonPossibleAndFourthLayerPossible_FollowJoinRequirements(
-        string joinHex, bool poisonPossible, bool fourthLayerPossible)
+    [InlineData(0x28, false, true, true)]    // Pthumeru 4: poison + 4th
+    [InlineData(0x0A, false, false, false)]  // Pthumeru 1: neither
+    [InlineData(0x35, false, false, true)]   // Isz 5: 4th only, poison excluded
+    [InlineData(0x2A, false, false, true)]   // Loran 4: 4th only (was wrongly excluded before)
+    [InlineData(0x35, true, false, false)]   // Sinister Isz 5: 4th excluded
+    public void PoisonAndFourthLayerPossible_FollowAreaAndSinister(
+        int areaByte, bool sinister, bool poisonPossible, bool fourthLayerPossible)
     {
         var record = new byte[125];
-        Convert.FromHexString(joinHex).CopyTo(record, Headstone.JoinRequirementsOffset);
+        record[1] = (byte)areaByte;
+        if (sinister)
+            record[2] = 0x14;
 
         Assert.Equal(poisonPossible, Headstone.PoisonPossible(record));
         Assert.Equal(fourthLayerPossible, Headstone.FourthLayerPossible(record));

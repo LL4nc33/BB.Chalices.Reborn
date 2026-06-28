@@ -132,7 +132,7 @@ public class SaveFileService
     public void SetFourthLayer(int slot, bool open)
     {
         var record = Loaded.GetSlotBytes(slot);
-        var (possible, openByte, closedByte) = Headstone.FourthLayerControl(Headstone.JoinRequirementsHex(record));
+        var (possible, openByte, closedByte) = Headstone.FourthLayerControl(record);
         if (!possible)
             return;
 

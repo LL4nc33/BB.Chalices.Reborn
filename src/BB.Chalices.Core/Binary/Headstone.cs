@@ -86,19 +86,23 @@ public static class Headstone
 
     public static byte[] NoFourthLayer() => FromHex("FFFFFFFFFFFFFFFF");
 
-    // open/closed control byte per dungeon type, keyed by Join Requirements hex.
-    public static (bool possible, byte open, byte closed) FourthLayerControl(string joinHex) => joinHex switch
+    // A dungeon's 4th-layer ability follows its actual area (byte 0x01) and whether
+    // it is Sinister (layout seed 0x02 in 14/15), never the editable join req, so
+    // false-depth dungeons keep their real layout's behaviour. Sinister chalices and
+    // Pthumeru 1 never have a 4th layer. (Tomb Prospectors random-effects report.)
+    public static (bool possible, byte open, byte closed) FourthLayerControl(ReadOnlySpan<byte> record)
     {
-        "0000184B" or "00001842"               => (true, 0x3C, 0xFF), // Hintertomb 2
-        "000018AF" or "000018A6" or "000018A8" => (true, 0x3C, 0xFF), // Hintertomb 3
-        "00001787" or "0000177E"               => (true, 0x3C, 0xFF), // Pthumeru 2
-        "00001909" or "00001901"               => (true, 0x3D, 0x3E), // Pthumeru 4
-        "0000196D" or "00001964" or "00001966" => (true, 0x3D, 0x3E), // Pthumeru 5 (Sinister: 0x5C)
-        "000018C3" or "000018BA" or "000018BC" => (true, 0x3C, 0xFF), // Loran 4
-        "00001927" or "0000191E" or "00001920" => (true, 0x3C, 0xFF), // Loran 5
-        "0000198B" or "00001982" or "00001984" => (true, 0x43, 0x44), // Isz 5
-        _                                       => (false, 0x00, 0x00),
-    };
+        if (record.Length < 3 || record[2] is 0x14 or 0x15) // too short, or Sinister
+            return (false, 0x00, 0x00);
+
+        return record[1] switch
+        {
+            0x14 or 0x15 or 0x1F or 0x2A or 0x34 => (true, 0x3C, 0xFF), // Pthumeru 2, Hintertomb 2/3, Loran 4/5
+            0x1E or 0x28 or 0x32                  => (true, 0x3D, 0x3E), // Pthumeru 3/4/5
+            0x35                                   => (true, 0x43, 0x44), // Isz 5
+            _                                      => (false, 0x00, 0x00), // Pthumeru 1 and unknown
+        };
+    }
 
     private static readonly byte[] FourthLayerOpenBytes = [0x3C, 0x3D, 0x3F, 0x41, 0x43];
 
@@ -110,7 +114,7 @@ public static class Headstone
     }
 
     public static bool FourthLayerPossible(ReadOnlySpan<byte> record) =>
-        FourthLayerControl(JoinRequirementsHex(record)).possible;
+        FourthLayerControl(record).possible;
 
     // --- Poison -------------------------------------------------------------
     // Same shape: a fixed template with the poison byte in the last position.
@@ -124,15 +128,17 @@ public static class Headstone
 
     public static byte[] NoPoison() => FromHex("FFFFFFFFFFFFFFFF");
 
-    // Which dungeon types can be poisoned, and the on/off byte per type.
-    public static string PoisonDungeonType(string joinHex) => joinHex switch
+    // Which dungeon types can be poisoned, by area byte: Hintertomb 2/3 and Pthumeru
+    // 4/5 can, Isz is always non-poison, Pthumeru 1-3 and Loran never are. Sinister
+    // shares the same bytes. (Tomb Prospectors random-effects report.)
+    public static string PoisonDungeonType(ReadOnlySpan<byte> record) => record.Length < 2 ? "Other" : record[1] switch
     {
-        "0000184B" or "00001842"               => "Hintertomb2",
-        "000018AF" or "000018A6" or "000018A8" => "Hintertomb3",
-        "00001909" or "00001901"               => "Pthumeru4",
-        "0000196D" or "00001964" or "00001966" => "Pthumeru5",
-        "0000198B" or "00001982" or "00001984" => "Isz5",
-        _                                       => "Other",
+        0x15 => "Hintertomb2",
+        0x1F => "Hintertomb3",
+        0x28 => "Pthumeru4",
+        0x32 => "Pthumeru5",
+        0x35 => "Isz5",
+        _    => "Other",
     };
 
     public static byte ExpectedPoisonByte(string dungeonType, bool poisonEnabled) => dungeonType switch
@@ -145,13 +151,13 @@ public static class Headstone
 
     public static byte[] SmartPoison(ReadOnlySpan<byte> record, bool poisonEnabled)
     {
-        var type = PoisonDungeonType(JoinRequirementsHex(record));
+        var type = PoisonDungeonType(record);
         return PoisonBytes(ExpectedPoisonByte(type, poisonEnabled));
     }
 
     public static bool PoisonPossible(ReadOnlySpan<byte> record)
     {
-        string type = PoisonDungeonType(JoinRequirementsHex(record));
+        string type = PoisonDungeonType(record);
         // Isz dungeons are always non-poison (the byte stays 0x0F), so the toggle
         // would be a no-op; treat Isz5 like "Other" for the enable check.
         return type is not "Other" and not "Isz5";
