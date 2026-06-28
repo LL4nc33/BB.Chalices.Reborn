@@ -24,6 +24,9 @@ public class SaveFile
 
     public string CharacterName => SaveFileReader.GetCharacterName(_data, _inventoryOffset);
 
+    // Renames the hunter in place; the change is written on the next Save.
+    public void SetCharacterName(string name) => SaveFileReader.SetCharacterName(_data, _inventoryOffset, name);
+
     public int InventoryOffset => _inventoryOffset;
 
     public DungeonStructure GetSlot(int slot)

@@ -33,6 +33,21 @@ public class SaveFileTests
     }
 
     [Fact]
+    public void CharacterName_RoundTripsAsUtf16()
+    {
+        var save = MakeSave(out var buffer);
+
+        save.SetCharacterName("Gehrman");
+
+        Assert.Equal("Gehrman", save.CharacterName);
+        // stored UTF-16LE, one byte past the username field (marker - 468)
+        int nameStart = save.InventoryOffset - 468;
+        Assert.Equal((byte)'G', buffer[nameStart]);
+        Assert.Equal(0, buffer[nameStart + 1]);
+        Assert.Equal((byte)'e', buffer[nameStart + 2]);
+    }
+
+    [Fact]
     public void WriteSlotRaw_RoundTripsThroughGetSlotBytes()
     {
         var save = MakeSave(out _);

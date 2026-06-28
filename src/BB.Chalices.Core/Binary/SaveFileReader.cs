@@ -8,7 +8,9 @@ public static class SaveFileReader
     private const int HeadstoneBase = 88328;
     private const int FlagsBase = 102704;
     private const int Stride = 0x7D;      // 125 bytes per chalice headstone
-    private const int NameOffset = -469;  // character name, relative to the marker
+    private const int NameOffset = -469;  // username field, relative to the marker
+    private const int NameStringOffset = NameOffset + 1; // the UTF-16 string begins one byte in
+    private const int NameMaxChars = 16;  // up to 16 characters, stored as UTF-16LE
     private const int MaxSlots = 6;
 
     // The inventory block opens with the bytes 40 F0 FF FF. Returns the marker's
@@ -39,17 +41,33 @@ public static class SaveFileReader
         return inventory + FlagsBase + (slot - 1) * Stride;
     }
 
+    // The hunter's name is stored as UTF-16LE (two bytes per character), so the
+    // old ASCII read stopped at the first character's null high byte. Matches
+    // Noxde's Bloodborne-save-editor (username field at marker - 468, 16 chars).
     public static string GetCharacterName(ReadOnlySpan<byte> data, int inventory)
     {
-        int offset = inventory + NameOffset;
-        if (offset < 0 || offset + 32 > data.Length)
+        int offset = inventory + NameStringOffset;
+        if (offset < 0 || offset + NameMaxChars * 2 > data.Length)
             return string.Empty;
 
-        var name = data.Slice(offset, 32);
-        int end = name.IndexOf((byte)0);
-        if (end == -1) end = 32;
+        string raw = System.Text.Encoding.Unicode.GetString(data.Slice(offset, NameMaxChars * 2));
+        int end = raw.IndexOf('\0');
+        return (end >= 0 ? raw[..end] : raw).Trim();
+    }
 
-        return System.Text.Encoding.ASCII.GetString(name[..end]);
+    // Overwrites the hunter's name in place (ASCII characters, padded with zeros).
+    public static void SetCharacterName(Span<byte> data, int inventory, string name)
+    {
+        int offset = inventory + NameStringOffset;
+        if (offset < 0 || offset + NameMaxChars * 2 > data.Length)
+            return;
+
+        byte[] ascii = System.Text.Encoding.ASCII.GetBytes(name);
+        for (int i = 0; i < NameMaxChars; i++)
+        {
+            data[offset + i * 2] = i < ascii.Length ? ascii[i] : (byte)0;
+            data[offset + i * 2 + 1] = 0; // high byte of the UTF-16 character
+        }
     }
 
     // Writing a slot stamps a 125-byte discovery flag at GetFlagsOffset(inventory, slot);

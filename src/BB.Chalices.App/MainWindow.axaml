@@ -46,16 +46,18 @@
                             <ComboBox.ItemTemplate>
                                 <DataTemplate x:DataType="vm:DetectedSaveViewModel">
                                     <StackPanel Spacing="1">
-                                        <TextBlock Text="{Binding FileName}" />
-                                        <TextBlock Text="{Binding Location}" FontSize="11"
+                                        <TextBlock Text="{Binding Title}" />
+                                        <TextBlock Text="{Binding Subtitle}" FontSize="11"
                                                    Foreground="{DynamicResource ParchmentDim}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <TextBlock Text="{Binding CharacterName, StringFormat='Hunter: {0}'}" FontSize="14" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource BloodBright}" TextWrapping="Wrap" Margin="0,2,0,0"
-                                   IsVisible="{Binding HasLoadedSave}" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6" Margin="0,2,0,0" IsVisible="{Binding HasLoadedSave}"
+                              ToolTip.Tip="The hunter's name. Edit it, click Rename, then Save changes to write it.">
+                            <TextBox Grid.Column="0" Text="{Binding EditableName}" MaxLength="16" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Content="Rename" Command="{Binding RenameCommand}" />
+                        </Grid>
                         <TextBlock Text="No save loaded" FontSize="13" Foreground="{DynamicResource ParchmentDim}" Margin="0,2,0,0"
                                    IsVisible="{Binding !HasLoadedSave}" />
                     </StackPanel>

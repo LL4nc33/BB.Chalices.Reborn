@@ -39,6 +39,32 @@ public class SaveFileService
         _path = path;
     }
 
+    // Reads just the hunter's name from a save file without making it the current
+    // save. Returns null if the file can't be read or isn't a valid save.
+    public static string? PeekCharacterName(string path)
+    {
+        try
+        {
+            byte[] data = System.IO.File.ReadAllBytes(path);
+            int inventory = SaveFileReader.FindInventoryMarker(data);
+            if (inventory < 0)
+                return null;
+            string name = SaveFileReader.GetCharacterName(data, inventory);
+            return string.IsNullOrWhiteSpace(name) ? null : name;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    // Renames the loaded hunter; the change is written on the next Save.
+    public void SetCharacterName(string name)
+    {
+        if (_save is null) throw new InvalidOperationException("No save file loaded");
+        _save.SetCharacterName(name);
+    }
+
     public DungeonStructure GetSlot(int slot)
     {
         if (_save is null) throw new InvalidOperationException("No save file loaded");

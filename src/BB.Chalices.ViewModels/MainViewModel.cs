@@ -66,6 +66,7 @@ public class MainViewModel : ViewModelBase
         UpdateDungeonsCommand = ReactiveCommand.CreateFromTask(UpdateDungeonsAsync);
         ClearSlotCommand = ReactiveCommand.Create(ClearSlot);
         UndoSlotCommand = ReactiveCommand.Create(UndoSlot);
+        RenameCommand = ReactiveCommand.Create(Rename);
     }
 
     public ObservableCollection<DungeonViewModel> Dungeons { get; }
@@ -81,6 +82,14 @@ public class MainViewModel : ViewModelBase
     {
         get => _characterName;
         private set => this.RaiseAndSetIfChanged(ref _characterName, value);
+    }
+
+    // The editable copy shown in the rename box; applied to the save on Rename.
+    private string? _editableName;
+    public string? EditableName
+    {
+        get => _editableName;
+        set => this.RaiseAndSetIfChanged(ref _editableName, value);
     }
 
     public bool HasLoadedSave
@@ -239,6 +248,7 @@ public class MainViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> UpdateDungeonsCommand { get; }
     public ReactiveCommand<Unit, Unit> ClearSlotCommand { get; }
     public ReactiveCommand<Unit, Unit> UndoSlotCommand { get; }
+    public ReactiveCommand<Unit, Unit> RenameCommand { get; }
 
     private bool _canUndo;
     public bool CanUndo
@@ -318,6 +328,7 @@ public class MainViewModel : ViewModelBase
         {
             var save = _saves.Load(path);
             CharacterName = save.CharacterName;
+            EditableName = save.CharacterName;
             HasLoadedSave = true;
             _config.Settings.LastSavePath = path;
             _config.Save();
@@ -431,6 +442,24 @@ public class MainViewModel : ViewModelBase
         CanUndo = false;
     }
 
+    private void Rename()
+    {
+        if (!HasLoadedSave)
+            return;
+
+        string name = (EditableName ?? string.Empty).Trim();
+        if (name.Length is < 1 or > 16)
+        {
+            StatusMessage = "The hunter name must be 1 to 16 characters.";
+            return;
+        }
+
+        _saves.SetCharacterName(name);
+        CharacterName = name;
+        EditableName = name;
+        StatusMessage = $"Renamed to {name}. Click Save changes to write it.";
+    }
+
     private void DetectSaves()
     {
         DetectedSaves.Clear();
@@ -447,7 +476,7 @@ public class MainViewModel : ViewModelBase
 
         foreach (var folder in _locator.FindSaveFolders(root))
             foreach (var file in _locator.FindSaveFiles(folder))
-                DetectedSaves.Add(new DetectedSaveViewModel(file));
+                DetectedSaves.Add(new DetectedSaveViewModel(file, SaveFileService.PeekCharacterName(file)));
 
         StatusMessage = DetectedSaves.Count == 0
             ? $"No Bloodborne saves found under {root}. Use Open Save, or set the folder in Settings."

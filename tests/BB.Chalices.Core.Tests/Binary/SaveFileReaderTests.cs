@@ -73,8 +73,8 @@ public class SaveFileReaderTests
     {
         var buffer = new byte[2000];
         int inventory = 1000;
-        int nameOffset = inventory - 469;
-        var nameBytes = System.Text.Encoding.ASCII.GetBytes("TestHunter");
+        int nameOffset = inventory - 468; // UTF-16LE string start
+        var nameBytes = System.Text.Encoding.Unicode.GetBytes("TestHunter");
         Array.Copy(nameBytes, 0, buffer, nameOffset, nameBytes.Length);
 
         string name = SaveFileReader.GetCharacterName(buffer, inventory);
@@ -87,8 +87,8 @@ public class SaveFileReaderTests
     {
         var buffer = new byte[2000];
         int inventory = 1000;
-        int nameOffset = inventory - 469;
-        var nameBytes = System.Text.Encoding.ASCII.GetBytes("Hunter\0ExtraGarbage");
+        int nameOffset = inventory - 468;
+        var nameBytes = System.Text.Encoding.Unicode.GetBytes("Hunter\0ExtraGarbage");
         Array.Copy(nameBytes, 0, buffer, nameOffset, nameBytes.Length);
 
         string name = SaveFileReader.GetCharacterName(buffer, inventory);
@@ -119,19 +119,19 @@ public class SaveFileReaderTests
     }
 
     [Fact]
-    public void GetCharacterName_ThirtyTwoNonZeroBytesNoTerminator_ReturnsFullName()
+    public void GetCharacterName_SixteenCharsNoTerminator_ReturnsFullName()
     {
         var buffer = new byte[2000];
         int inventory = 1000;
-        int nameOffset = inventory - 469;
-        string fullName = new string('A', 32);
-        var nameBytes = System.Text.Encoding.ASCII.GetBytes(fullName);
+        int nameOffset = inventory - 468;
+        string fullName = new string('A', 16);
+        var nameBytes = System.Text.Encoding.Unicode.GetBytes(fullName);
         Array.Copy(nameBytes, 0, buffer, nameOffset, nameBytes.Length);
 
         string name = SaveFileReader.GetCharacterName(buffer, inventory);
 
         Assert.Equal(fullName, name);
-        Assert.Equal(32, name.Length);
+        Assert.Equal(16, name.Length);
     }
 
     [Fact]
