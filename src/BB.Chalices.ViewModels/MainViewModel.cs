@@ -63,6 +63,7 @@ public class MainViewModel : ViewModelBase
         LoadSaveCommand = ReactiveCommand.Create<string>(LoadSave);
         SaveCommand = ReactiveCommand.Create(Save);
         ApplyDungeonCommand = ReactiveCommand.Create(ApplyDungeon);
+        FillAllSlotsCommand = ReactiveCommand.Create(FillAllSlots);
         DetectSavesCommand = ReactiveCommand.Create(DetectSaves);
         UpdateDungeonsCommand = ReactiveCommand.CreateFromTask(UpdateDungeonsAsync);
         ClearSlotCommand = ReactiveCommand.Create(ClearSlot);
@@ -379,6 +380,7 @@ public class MainViewModel : ViewModelBase
     public ReactiveCommand<string, Unit> LoadSaveCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
     public ReactiveCommand<Unit, Unit> ApplyDungeonCommand { get; }
+    public ReactiveCommand<Unit, Unit> FillAllSlotsCommand { get; }
     public ReactiveCommand<Unit, Unit> DetectSavesCommand { get; }
     public ReactiveCommand<Unit, Unit> UpdateDungeonsCommand { get; }
     public ReactiveCommand<Unit, Unit> ClearSlotCommand { get; }
@@ -529,6 +531,23 @@ public class MainViewModel : ViewModelBase
         RefreshSlot(SelectedSlot);
         LoadSelectedSlot();
         StatusMessage = $"Placed {SelectedDungeon.Glyph} in slot {SelectedSlot.Number}. Save to write it to disk.";
+    }
+
+    // Place the selected catalogue dungeon into all six slots at once (farming).
+    private void FillAllSlots()
+    {
+        if (!HasLoadedSave) { StatusMessage = "Open a save first."; return; }
+        if (SelectedDungeon is null) { StatusMessage = "Pick a dungeon from the list first."; return; }
+
+        for (int slot = 1; slot <= 6; slot++)
+        {
+            _saves.SetSlot(slot, SelectedDungeon.Bytes);
+            SlotViewModel? target = Slots.FirstOrDefault(s => s.Number == slot);
+            if (target is not null)
+                RefreshSlot(target);
+        }
+        LoadSelectedSlot();
+        StatusMessage = $"Filled all 6 slots with {SelectedDungeon.Glyph}. Save to write to disk.";
     }
 
     private void ClearSlot()
