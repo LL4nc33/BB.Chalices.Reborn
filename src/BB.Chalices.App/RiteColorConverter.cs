@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
+using BB.Chalices.Core.Binary;
 
 namespace BB.Chalices.App;
 
@@ -24,6 +25,29 @@ public sealed class OffsetColorConverter : IValueConverter
 
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         => value is int offset ? ByteFieldPalette.OffsetBrush(offset) : ByteFieldPalette.Neutral;
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+// Friendly labels for the special-enemy / shop dropdown.
+public sealed class SpecialEnemyLabelConverter : IValueConverter
+{
+    public static readonly SpecialEnemyLabelConverter Instance = new();
+
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is Headstone.SpecialEnemy option
+            ? option switch
+            {
+                Headstone.SpecialEnemy.Default => "Default (none)",
+                Headstone.SpecialEnemy.Bath => "Bath messenger",
+                Headstone.SpecialEnemy.AllBps => "All Beast-Possessed Souls",
+                Headstone.SpecialEnemy.Patches => "Patches the Spider",
+                Headstone.SpecialEnemy.BathBps => "Bath + BPS",
+                Headstone.SpecialEnemy.PatchesBps => "Patches + BPS",
+                _ => option.ToString(),
+            }
+            : "";
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotSupportedException();

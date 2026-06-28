@@ -252,17 +252,32 @@
                                         </ItemsControl>
 
                                         <TextBlock Classes="section" Text="MODIFIERS"
-                                                   ToolTip.Tip="Only certain dungeon types support poison or a 4th layer." />
-                                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="16">
+                                                   ToolTip.Tip="Only certain dungeon types support poison, a 4th layer or a difficulty buff." />
+                                        <Grid ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="16">
                                             <CheckBox Grid.Column="0" Content="Poison" IsChecked="{Binding PoisonEnabled}"
                                                       IsEnabled="{Binding PoisonPossible}" VerticalAlignment="Center"
                                                       ToolTip.Tip="Toggle the poison mist (only some dungeon types)" />
                                             <CheckBox Grid.Column="1" Content="Open 4th layer" IsChecked="{Binding FourthLayerOpen}"
                                                       IsEnabled="{Binding FourthLayerPossible}" VerticalAlignment="Center"
                                                       ToolTip.Tip="Open or close the optional 4th layer (only some dungeons)" />
-                                            <Button Grid.Column="2" Classes="danger" Content="Clear slot" Command="{Binding ClearSlotCommand}"
+                                            <CheckBox Grid.Column="2" Content="Difficulty up" IsChecked="{Binding DifficultyUp}"
+                                                      IsEnabled="{Binding DifficultyPossible}" VerticalAlignment="Center"
+                                                      ToolTip.Tip="Pthumeru 5 only: buffs enemy HP, damage and defence (byte 36)." />
+                                            <Button Grid.Column="3" Classes="danger" Content="Clear slot" Command="{Binding ClearSlotCommand}"
                                                     HorizontalAlignment="Right"
                                                     ToolTip.Tip="Empty this altar slot. Click Save changes to write it to disk." />
+                                        </Grid>
+                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" Margin="0,8,0,0">
+                                            <TextBlock Grid.Column="0" Classes="caption" Text="Special enemy" VerticalAlignment="Center" />
+                                            <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
+                                                      ItemsSource="{Binding SpecialEnemyOptions}" SelectedItem="{Binding SelectedSpecialEnemy}"
+                                                      ToolTip.Tip="Bath messengers, Patches the Spider or Beast-Possessed Souls. Sinister chalices can't spawn BPS.">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate x:CompileBindings="False">
+                                                        <TextBlock Text="{Binding Converter={x:Static app:SpecialEnemyLabelConverter.Instance}}" />
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
                                         </Grid>
                                     </StackPanel>
                                 </TabItem>

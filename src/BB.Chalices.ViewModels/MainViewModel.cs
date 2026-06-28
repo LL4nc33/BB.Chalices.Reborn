@@ -319,6 +319,29 @@ public class MainViewModel : ViewModelBase
         set { this.RaiseAndSetIfChanged(ref _fourthLayerOpen, value); ApplyFourthLayer(value); }
     }
 
+    private bool _difficultyPossible;
+    public bool DifficultyPossible
+    {
+        get => _difficultyPossible;
+        private set => this.RaiseAndSetIfChanged(ref _difficultyPossible, value);
+    }
+
+    private bool _difficultyUp;
+    public bool DifficultyUp
+    {
+        get => _difficultyUp;
+        set { this.RaiseAndSetIfChanged(ref _difficultyUp, value); ApplyDifficulty(value); }
+    }
+
+    public ObservableCollection<Headstone.SpecialEnemy> SpecialEnemyOptions { get; } = new();
+
+    private Headstone.SpecialEnemy _selectedSpecialEnemy;
+    public Headstone.SpecialEnemy SelectedSpecialEnemy
+    {
+        get => _selectedSpecialEnemy;
+        set { this.RaiseAndSetIfChanged(ref _selectedSpecialEnemy, value); ApplySpecialEnemy(value); }
+    }
+
     public string SlotHexDump
     {
         get => _slotHexDump;
@@ -679,6 +702,24 @@ public class MainViewModel : ViewModelBase
         AfterEdit(open ? "4th layer opened." : "4th layer closed.");
     }
 
+    private void ApplyDifficulty(bool up)
+    {
+        if (_suppressEdits || !HasLoadedSave || SelectedSlot is null || !DifficultyPossible)
+            return;
+
+        _saves.SetDifficulty(SelectedSlot.Number, up);
+        AfterEdit(up ? "Difficulty up." : "Difficulty normal.");
+    }
+
+    private void ApplySpecialEnemy(Headstone.SpecialEnemy option)
+    {
+        if (_suppressEdits || !HasLoadedSave || SelectedSlot is null)
+            return;
+
+        _saves.SetSpecialEnemy(SelectedSlot.Number, option);
+        AfterEdit("Special enemy set.");
+    }
+
     private void ApplyField(Headstone.HeadstoneField field, string hex)
     {
         if (_suppressEdits || !HasLoadedSave || SelectedSlot is null)
@@ -725,8 +766,9 @@ public class MainViewModel : ViewModelBase
                 SelectedSlotType = "";
                 SelectedSlotJoin = "";
                 foreach (var rite in RiteSlots) rite.Set(Headstone.Rite.None);
-                PoisonPossible = FourthLayerPossible = false;
-                PoisonEnabled = FourthLayerOpen = false;
+                PoisonPossible = FourthLayerPossible = DifficultyPossible = false;
+                PoisonEnabled = FourthLayerOpen = DifficultyUp = false;
+                SpecialEnemyOptions.Clear();
                 foreach (var field in Fields) field.Set(string.Empty);
                 SlotHexDump = string.Empty;
                 SelectedSlotBytes = null;
@@ -746,8 +788,9 @@ public class MainViewModel : ViewModelBase
                 SelectedSlotType = "empty";
                 SelectedSlotJoin = "";
                 foreach (var rite in RiteSlots) rite.Set(Headstone.Rite.None);
-                PoisonPossible = FourthLayerPossible = false;
-                PoisonEnabled = FourthLayerOpen = false;
+                PoisonPossible = FourthLayerPossible = DifficultyPossible = false;
+                PoisonEnabled = FourthLayerOpen = DifficultyUp = false;
+                SpecialEnemyOptions.Clear();
                 return;
             }
 
@@ -760,6 +803,12 @@ public class MainViewModel : ViewModelBase
             PoisonEnabled = Headstone.IsPoisoned(record);
             FourthLayerPossible = Headstone.FourthLayerPossible(record);
             FourthLayerOpen = Headstone.IsFourthLayerOpen(record);
+            DifficultyPossible = Headstone.DifficultyPossible(record);
+            DifficultyUp = Headstone.IsDifficultyUp(record);
+            SpecialEnemyOptions.Clear();
+            foreach (var option in Headstone.SpecialEnemyOptions(record))
+                SpecialEnemyOptions.Add(option);
+            SelectedSpecialEnemy = Headstone.ReadSpecialEnemy(record);
         }
         finally
         {

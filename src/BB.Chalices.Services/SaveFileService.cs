@@ -140,6 +140,22 @@ public class SaveFileService
         Loaded.WriteSlotRaw(slot, record);
     }
 
+    public void SetSpecialEnemy(int slot, Headstone.SpecialEnemy option)
+    {
+        var record = Loaded.GetSlotBytes(slot);
+        Headstone.SmartSpecialEnemy(record, option).CopyTo(record, Headstone.SpecialEnemyOffset);
+        Loaded.WriteSlotRaw(slot, record);
+    }
+
+    public void SetDifficulty(int slot, bool difficultyUp)
+    {
+        var record = Loaded.GetSlotBytes(slot);
+        if (!Headstone.DifficultyPossible(record))
+            return;
+        Headstone.DifficultyBytes(difficultyUp).CopyTo(record, Headstone.GemEffectOffset);
+        Loaded.WriteSlotRaw(slot, record);
+    }
+
     public void ClearSlot(int slot) =>
         Loaded.WriteSlotRaw(slot, DungeonStructure.Empty().Data);
 

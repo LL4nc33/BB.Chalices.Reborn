@@ -173,6 +173,65 @@ public static class Headstone
         return record[PoisonOffset + 7] is 0x0A or 0x0D; // the two "on" bytes
     }
 
+    // --- Special enemy / shop (string 5) ------------------------------------
+    // Bath messengers, Patches the Spider and Beast-Possessed Souls (BPS).
+    public enum SpecialEnemy { Default, Bath, AllBps, Patches, BathBps, PatchesBps }
+
+    private static bool IsIsz(ReadOnlySpan<byte> record) => record.Length >= 2 && record[1] == 0x35;
+    private static bool IsSinister(ReadOnlySpan<byte> record) => record.Length >= 3 && record[2] is 0x14 or 0x15;
+
+    // Isz uses 4F-54, the other areas FF/1E-22 for the same six options.
+    public static byte SpecialEnemyByte(SpecialEnemy option, bool isz) => (isz, option) switch
+    {
+        (true, SpecialEnemy.Default)    => 0x4F, (false, SpecialEnemy.Default)    => 0xFF,
+        (true, SpecialEnemy.Bath)       => 0x50, (false, SpecialEnemy.Bath)       => 0x1E,
+        (true, SpecialEnemy.AllBps)     => 0x51, (false, SpecialEnemy.AllBps)     => 0x1F,
+        (true, SpecialEnemy.Patches)    => 0x52, (false, SpecialEnemy.Patches)    => 0x20,
+        (true, SpecialEnemy.BathBps)    => 0x53, (false, SpecialEnemy.BathBps)    => 0x21,
+        (true, SpecialEnemy.PatchesBps) => 0x54, (false, SpecialEnemy.PatchesBps) => 0x22,
+        _ => isz ? (byte)0x4F : (byte)0xFF,
+    };
+
+    public static SpecialEnemy ReadSpecialEnemy(ReadOnlySpan<byte> record)
+    {
+        if (record.Length < SpecialEnemyOffset + FieldLength)
+            return SpecialEnemy.Default;
+        bool isz = IsIsz(record);
+        byte functional = record[SpecialEnemyOffset + 7];
+        foreach (SpecialEnemy option in Enum.GetValues<SpecialEnemy>())
+            if (SpecialEnemyByte(option, isz) == functional)
+                return option;
+        return SpecialEnemy.Default;
+    }
+
+    // Sinister chalices can't spawn Beast-Possessed Souls, so those options drop.
+    public static IReadOnlyList<SpecialEnemy> SpecialEnemyOptions(ReadOnlySpan<byte> record) =>
+        IsSinister(record)
+            ? [SpecialEnemy.Default, SpecialEnemy.Bath, SpecialEnemy.Patches]
+            : Enum.GetValues<SpecialEnemy>();
+
+    public static byte[] SmartSpecialEnemy(ReadOnlySpan<byte> record, SpecialEnemy option)
+    {
+        var result = FromHex("FFFFFFFFFFFFFFFF");
+        result[7] = SpecialEnemyByte(option, IsIsz(record));
+        return result;
+    }
+
+    // --- Difficulty (Pthumeru 5 only) ---------------------------------------
+    // Pthumeru 5's gem byte 36 adds an enemy buff; 32 is the same gem pool (cat 11)
+    // without it. Toggling between them keeps the gem effects and flips the buff.
+    public static bool DifficultyPossible(ReadOnlySpan<byte> record) => record.Length >= 2 && record[1] == 0x32;
+
+    public static bool IsDifficultyUp(ReadOnlySpan<byte> record) =>
+        record.Length >= GemEffectOffset + FieldLength && record[GemEffectOffset + 7] == 0x36;
+
+    public static byte[] DifficultyBytes(bool difficultyUp)
+    {
+        var result = FromHex("FFFFFFFFFFFFFFFF");
+        result[7] = difficultyUp ? (byte)0x36 : (byte)0x32;
+        return result;
+    }
+
     // The chalice an edited dungeon claims to require, decoded from its join hex
     // (from the Tomb Prospectors Hex Research Central join-requirements table).
     public static string JoinRequirementsLabel(string joinHex) => joinHex switch
