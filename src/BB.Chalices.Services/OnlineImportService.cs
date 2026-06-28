@@ -42,7 +42,8 @@ public class OnlineImportService
             await File.WriteAllTextAsync(_config.CatalogueCachePath, content);
 
             await using var db = await _factory.CreateDbContextAsync();
-            await DungeonSeeder.ImportAsync(db, content, replaceExisting: true);
+            await DungeonSeeder.ImportAsync(db, content, replaceExisting: true,
+                preserveCategory: DungeonService.CustomCategory);
 
             var count = await db.Dungeons.CountAsync();
             return $"Catalogue downloaded: {count} dungeons from Noxde's gist (cached for offline use).";

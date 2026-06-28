@@ -53,7 +53,8 @@ public partial class App : Application
                     var localJson = config.CatalogueCachePath;
                     if (File.Exists(localJson))
                     {
-                        await DungeonSeeder.ImportAsync(db, await File.ReadAllTextAsync(localJson), replaceExisting: true);
+                        await DungeonSeeder.ImportAsync(db, await File.ReadAllTextAsync(localJson),
+                            replaceExisting: true, preserveCategory: DungeonService.CustomCategory);
                         config.Settings.CatalogueVersion = catalogueVersion;
                         config.Save();
                     }

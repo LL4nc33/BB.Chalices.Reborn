@@ -19,8 +19,10 @@ public static class DungeonSeeder
     }
 
     // Parse a catalogue JSON string and load it. With replaceExisting the current
-    // catalogue is cleared first, which is what the online updater uses.
-    public static async Task ImportAsync(ChaliceDbContext context, string json, bool replaceExisting = false)
+    // catalogue is cleared first, which is what the online updater uses. Dungeons in
+    // preserveCategory (e.g. the player's own saved ones) are kept across the swap.
+    public static async Task ImportAsync(ChaliceDbContext context, string json,
+        bool replaceExisting = false, string? preserveCategory = null)
     {
         if (context.Dungeons.Any() && !replaceExisting)
             return;
@@ -63,9 +65,15 @@ public static class DungeonSeeder
             }
         }
 
-        // Parsing succeeded, so it's now safe to swap the catalogue out.
+        // Parsing succeeded, so it's now safe to swap the catalogue out - but keep
+        // any preserved category (the player's own saved dungeons).
         if (context.Dungeons.Any())
-            context.Dungeons.RemoveRange(context.Dungeons);
+        {
+            var stale = preserveCategory is null
+                ? context.Dungeons.ToList()
+                : context.Dungeons.Where(d => d.Category != preserveCategory).ToList();
+            context.Dungeons.RemoveRange(stale);
+        }
 
         context.Dungeons.AddRange(dungeons);
         await context.SaveChangesAsync();

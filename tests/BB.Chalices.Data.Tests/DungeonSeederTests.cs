@@ -51,6 +51,27 @@ public class DungeonSeederTests
     }
 
     [Fact]
+    public async Task ImportAsync_ReplaceWithPreserveCategory_KeepsThePlayersOwnDungeons()
+    {
+        using var ctx = NewContext();
+
+        // Noxde catalogue plus one of the player's own (Custom) saved dungeons.
+        await DungeonSeeder.ImportAsync(ctx, """
+        { "farming": [ { "glyph": "nox1", "bytes": ["01"] } ],
+          "Custom":  [ { "glyph": "my-aaaa", "bytes": ["02"] } ] }
+        """);
+        Assert.Equal(2, await ctx.Dungeons.CountAsync());
+
+        // A catalogue update swaps the gist data but must keep the Custom category.
+        await DungeonSeeder.ImportAsync(ctx,
+            """{ "farming": [ { "glyph": "nox2", "bytes": ["03"] } ] }""",
+            replaceExisting: true, preserveCategory: "Custom");
+
+        var glyphs = await ctx.Dungeons.Select(d => d.Glyph).OrderBy(g => g).ToListAsync();
+        Assert.Equal(new[] { "my-aaaa", "nox2" }, glyphs); // nox1 replaced, my-aaaa kept
+    }
+
+    [Fact]
     public async Task ImportAsync_BytesLongerThanOneRecord_ThrowsAndPersistsNothing()
     {
         string hexEntries = string.Join(", ", Enumerable.Repeat("\"00\"", 126)); // 126 > 125
