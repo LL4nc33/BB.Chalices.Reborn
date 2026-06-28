@@ -225,7 +225,7 @@
                             </StackPanel>
 
                             <TabControl Grid.Row="1" Margin="0,16,0,0">
-                                <TabItem Header="Edit">
+                                <TabItem Header="Rites">
                                     <StackPanel Spacing="0" Margin="0,12,0,0">
                                         <TextBlock Classes="section" Text="RITES" />
                                         <ItemsControl ItemsSource="{Binding RiteSlots}" Margin="0,0,0,16">
@@ -264,20 +264,15 @@
                                         </Grid>
                                     </StackPanel>
                                 </TabItem>
-                                <TabItem Header="Fields">
+                                <TabItem Header="Strings">
                                     <ScrollViewer Margin="0,12,0,0" VerticalScrollBarVisibility="Auto"
-                                                  ToolTip.Tip="Edit each headstone field as raw hex. A change applies once it is the right length.">
+                                                  ToolTip.Tip="Edit each headstone string as raw hex. A change applies once it is the right length.">
                                         <ItemsControl ItemsSource="{Binding Fields}">
-                                            <ItemsControl.ItemsPanel>
-                                                <ItemsPanelTemplate>
-                                                    <UniformGrid Columns="2" />
-                                                </ItemsPanelTemplate>
-                                            </ItemsControl.ItemsPanel>
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate x:DataType="vm:HeadstoneFieldViewModel">
-                                                    <Grid ColumnDefinitions="76,*" Margin="0,0,12,6" ToolTip.Tip="{Binding OffsetLabel}">
-                                                        <TextBlock Grid.Column="0" Classes="caption" Text="{Binding Label}" VerticalAlignment="Center"
-                                                                   TextTrimming="CharacterEllipsis" />
+                                                    <Grid ColumnDefinitions="128,*" Margin="0,0,0,5" ToolTip.Tip="{Binding OffsetLabel}">
+                                                        <TextBlock Grid.Column="0" Text="{Binding Label}" VerticalAlignment="Center" FontSize="13"
+                                                                   Foreground="{Binding Offset, Converter={x:Static app:OffsetColorConverter.Instance}}" />
                                                         <TextBox Grid.Column="1" Text="{Binding Hex}" FontSize="13"
                                                                  FontFamily="Cascadia Mono,Consolas,Menlo,monospace" />
                                                     </Grid>
@@ -296,8 +291,9 @@
                                 </Grid>
                                 <Border Classes="hexPanel">
                                     <Panel>
-                                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" MaxHeight="240">
+                                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" MaxHeight="170">
                                             <SelectableTextBlock app:HexView.Bytes="{Binding SelectedSlotBytes}"
+                                                                 app:HexView.Baseline="{Binding SelectedSlotBaseline}"
                                                                  FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="11"
                                                                  IsVisible="{Binding SlotHexDump, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                                         </ScrollViewer>

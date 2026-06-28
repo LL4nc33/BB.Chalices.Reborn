@@ -19,6 +19,7 @@ public class HeadstoneFieldViewModel : ViewModelBase
 
     public Headstone.HeadstoneField Field { get; }
     public string Label => Field.Name;
+    public int Offset => Field.Offset;
     public string OffsetLabel => $"0x{Field.Offset:X2} · {Field.Length}b";
 
     public string Hex

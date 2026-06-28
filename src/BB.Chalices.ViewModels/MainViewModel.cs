@@ -327,6 +327,16 @@ public class MainViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref _selectedSlotBytes, value);
     }
 
+    // The last-saved bytes per slot; the live view colours only what differs from these.
+    private readonly byte[]?[] _slotBaselines = new byte[6][];
+
+    private byte[]? _selectedSlotBaseline;
+    public byte[]? SelectedSlotBaseline
+    {
+        get => _selectedSlotBaseline;
+        private set => this.RaiseAndSetIfChanged(ref _selectedSlotBaseline, value);
+    }
+
     public ReactiveCommand<Unit, Unit> LoadDungeonsCommand { get; }
     public ReactiveCommand<string, Unit> LoadSaveCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
@@ -424,6 +434,7 @@ public class MainViewModel : ViewModelBase
             _config.Settings.LastSavePath = path;
             _config.Save();
             RefreshSlots();
+            SnapshotBaselines();
             _undoSlot = null;
             _undoBytes = null;
             CanUndo = false;
@@ -447,6 +458,7 @@ public class MainViewModel : ViewModelBase
                 _backups.Create(path, "before save");
 
             _saves.Save();
+            SnapshotBaselines();
             StatusMessage = $"Saved as {CharacterName}. A backup was written first.";
         }
         catch (Exception ex)
@@ -639,6 +651,18 @@ public class MainViewModel : ViewModelBase
         StatusMessage = $"{message} Save to write it to disk.";
     }
 
+    // Remember each slot's bytes as they are on disk, so the live view can colour
+    // only the bytes changed since (reset on load and after every save).
+    private void SnapshotBaselines()
+    {
+        for (int slot = 1; slot <= _slotBaselines.Length; slot++)
+            _slotBaselines[slot - 1] = HasLoadedSave ? _saves.GetSlotBytes(slot) : null;
+        UpdateSelectedSlotBaseline();
+    }
+
+    private void UpdateSelectedSlotBaseline()
+        => SelectedSlotBaseline = SelectedSlot is { } slot ? _slotBaselines[slot.Number - 1] : null;
+
     private void LoadSelectedSlot()
     {
         _suppressEdits = true;
@@ -660,6 +684,7 @@ public class MainViewModel : ViewModelBase
             var record = _saves.GetSlotBytes(SelectedSlot.Number);
             SlotHexDump = _saves.SlotHexDump(SelectedSlot.Number);
             SelectedSlotBytes = record;
+            UpdateSelectedSlotBaseline();
             for (int i = 0; i < Fields.Count; i++)
                 Fields[i].Set(Headstone.ReadFieldHex(record, Fields[i].Field));
 

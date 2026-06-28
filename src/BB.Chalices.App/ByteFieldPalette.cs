@@ -13,6 +13,7 @@ public static class ByteFieldPalette
     private static SolidColorBrush B(string hex) => new(Color.Parse(hex));
 
     public static readonly IBrush Gutter      = B("#6E6E78"); // offsets + ascii
+    public static readonly IBrush Neutral     = B("#D2C9B0"); // unchanged bytes
     public static readonly IBrush Start       = B("#9A9AA4"); // the 1D start byte
     public static readonly IBrush AreaDepth   = B("#C0392B");
     public static readonly IBrush LayoutSeed  = B("#8E2A22");

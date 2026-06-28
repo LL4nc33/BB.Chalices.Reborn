@@ -16,3 +16,15 @@ public sealed class RiteColorConverter : IValueConverter
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotSupportedException();
 }
+
+// Maps a byte offset to its legend colour, for the string-field labels.
+public sealed class OffsetColorConverter : IValueConverter
+{
+    public static readonly OffsetColorConverter Instance = new();
+
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is int offset ? ByteFieldPalette.OffsetBrush(offset) : ByteFieldPalette.Neutral;
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
