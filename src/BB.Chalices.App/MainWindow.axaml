@@ -180,9 +180,9 @@
                                     <TextBlock Classes="caption accent" Text="4th layer"
                                                IsVisible="{Binding HasFourthLayer}" />
                                 </WrapPanel>
-                                <ScrollViewer MaxHeight="104" VerticalScrollBarVisibility="Auto"
+                                <ScrollViewer MaxHeight="150" VerticalScrollBarVisibility="Auto"
                                               IsVisible="{Binding Description, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                    <TextBlock Classes="caption" Text="{Binding Description}" TextWrapping="Wrap" />
+                                    <TextBlock Classes="body" Text="{Binding Description}" TextWrapping="Wrap" />
                                 </ScrollViewer>
                                 <Button Classes="link" Content="remove from my dungeons" Click="OnDeleteCustom"
                                         HorizontalAlignment="Left" IsVisible="{Binding IsCustom}"

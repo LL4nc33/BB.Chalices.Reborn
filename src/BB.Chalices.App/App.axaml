@@ -15,10 +15,10 @@
         <SolidColorBrush x:Key="BloodDim" Color="#3C0707" />
         <SolidColorBrush x:Key="BloodDeep" Color="#4E0909" />
         <SolidColorBrush x:Key="BloodBright" Color="#C01717" />
-        <SolidColorBrush x:Key="Parchment" Color="#D2C9B0" />
-        <SolidColorBrush x:Key="ParchmentHi" Color="#F2E9D0" />
-        <SolidColorBrush x:Key="ParchmentBright" Color="#F7F0DC" />
-        <SolidColorBrush x:Key="ParchmentDim" Color="#8C8470" />
+        <SolidColorBrush x:Key="Parchment" Color="#E2DBCA" />
+        <SolidColorBrush x:Key="ParchmentHi" Color="#F4ECD6" />
+        <SolidColorBrush x:Key="ParchmentBright" Color="#F9F2E0" />
+        <SolidColorBrush x:Key="ParchmentDim" Color="#C2BAA6" />
         <SolidColorBrush x:Key="Edge" Color="#2A2A31" />
 
         <!-- One shared window backdrop for every window -->
@@ -43,7 +43,7 @@
         <SolidColorBrush x:Key="ButtonBackground" Color="#1B1A22" />
         <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#3C0707" />
         <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#8A0303" />
-        <SolidColorBrush x:Key="ButtonForeground" Color="#D2C9B0" />
+        <SolidColorBrush x:Key="ButtonForeground" Color="#E2DBCA" />
         <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#F2E9D0" />
         <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#F7F0DC" />
         <SolidColorBrush x:Key="ButtonBorderBrush" Color="#3C0707" />
