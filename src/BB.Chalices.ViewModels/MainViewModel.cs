@@ -337,6 +337,14 @@ public class MainViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref _selectedSlotBaseline, value);
     }
 
+    // The selected slot's absolute file offset, so the live view shows real offsets.
+    private int _selectedSlotOffset;
+    public int SelectedSlotOffset
+    {
+        get => _selectedSlotOffset;
+        private set => this.RaiseAndSetIfChanged(ref _selectedSlotOffset, value);
+    }
+
     public ReactiveCommand<Unit, Unit> LoadDungeonsCommand { get; }
     public ReactiveCommand<string, Unit> LoadSaveCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
@@ -684,6 +692,7 @@ public class MainViewModel : ViewModelBase
             var record = _saves.GetSlotBytes(SelectedSlot.Number);
             SlotHexDump = _saves.SlotHexDump(SelectedSlot.Number);
             SelectedSlotBytes = record;
+            SelectedSlotOffset = _saves.SlotOffset(SelectedSlot.Number);
             UpdateSelectedSlotBaseline();
             for (int i = 0; i < Fields.Count; i++)
                 Fields[i].Set(Headstone.ReadFieldHex(record, Fields[i].Field));

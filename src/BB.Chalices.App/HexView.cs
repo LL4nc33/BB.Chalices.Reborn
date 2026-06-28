@@ -18,15 +18,23 @@ public class HexView
     public static readonly AttachedProperty<byte[]?> BaselineProperty =
         AvaloniaProperty.RegisterAttached<HexView, SelectableTextBlock, byte[]?>("Baseline");
 
+    // The record's absolute offset in the save file, so the dump shows real offsets
+    // (and the leading/trailing ".." padding) just like the original hex view.
+    public static readonly AttachedProperty<int> RecordStartProperty =
+        AvaloniaProperty.RegisterAttached<HexView, SelectableTextBlock, int>("RecordStart");
+
     public static void SetBytes(SelectableTextBlock o, byte[]? v) => o.SetValue(BytesProperty, v);
     public static byte[]? GetBytes(SelectableTextBlock o) => o.GetValue(BytesProperty);
     public static void SetBaseline(SelectableTextBlock o, byte[]? v) => o.SetValue(BaselineProperty, v);
     public static byte[]? GetBaseline(SelectableTextBlock o) => o.GetValue(BaselineProperty);
+    public static void SetRecordStart(SelectableTextBlock o, int v) => o.SetValue(RecordStartProperty, v);
+    public static int GetRecordStart(SelectableTextBlock o) => o.GetValue(RecordStartProperty);
 
     static HexView()
     {
         BytesProperty.Changed.Subscribe(e => { if (e.Sender is SelectableTextBlock t) Render(t); });
         BaselineProperty.Changed.Subscribe(e => { if (e.Sender is SelectableTextBlock t) Render(t); });
+        RecordStartProperty.Changed.Subscribe(e => { if (e.Sender is SelectableTextBlock t) Render(t); });
     }
 
     private static void Render(SelectableTextBlock target)
@@ -41,20 +49,23 @@ public class HexView
         if (bytes is null || bytes.Length == 0)
             return;
 
+        int recordStart = GetRecordStart(target);
+        int dumpStart = recordStart & ~0xF;
+        int dumpEnd = (recordStart + bytes.Length + 0xF) & ~0xF;
+
         var gutter = ByteFieldPalette.Gutter;
         inlines.Add(new Run("Offset(h)  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n") { Foreground = gutter });
         inlines.Add(new Run("-----------------------------------------------------------\n") { Foreground = gutter });
 
-        int end = (bytes.Length + 15) & ~15;
-        for (int row = 0; row < end; row += 16)
+        for (int line = dumpStart; line < dumpEnd; line += 16)
         {
-            inlines.Add(new Run($"{row:X8}   ") { Foreground = gutter });
+            inlines.Add(new Run($"{line:X8}   ") { Foreground = gutter });
 
             for (int i = 0; i < 16; i++)
             {
-                int off = row + i;
-                if (off < bytes.Length)
-                    inlines.Add(new Run($"{bytes[off]:X2} ") { Foreground = BrushFor(off, bytes, baseline) });
+                int rel = line + i - recordStart;
+                if (rel >= 0 && rel < bytes.Length)
+                    inlines.Add(new Run($"{bytes[rel]:X2} ") { Foreground = BrushFor(rel, bytes, baseline) });
                 else
                     inlines.Add(new Run(".. ") { Foreground = gutter });
             }
@@ -62,18 +73,18 @@ public class HexView
             inlines.Add(new Run(" ") { Foreground = gutter });
             for (int i = 0; i < 16; i++)
             {
-                int off = row + i;
-                if (off >= bytes.Length)
+                int rel = line + i - recordStart;
+                if (rel < 0 || rel >= bytes.Length)
                 {
                     inlines.Add(new Run(".") { Foreground = gutter });
                     continue;
                 }
-                byte b = bytes[off];
+                byte b = bytes[rel];
                 char c = b is >= 32 and <= 126 ? (char)b : '.';
-                inlines.Add(new Run(c.ToString()) { Foreground = BrushFor(off, bytes, baseline) });
+                inlines.Add(new Run(c.ToString()) { Foreground = BrushFor(rel, bytes, baseline) });
             }
 
-            if (row + 16 < end)
+            if (line + 16 < dumpEnd)
                 inlines.Add(new Run("\n"));
         }
     }

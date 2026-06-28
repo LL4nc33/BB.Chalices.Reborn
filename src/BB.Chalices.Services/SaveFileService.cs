@@ -111,6 +111,8 @@ public class SaveFileService
 
     public byte[] GetSlotBytes(int slot) => Loaded.GetSlotBytes(slot);
 
+    public int SlotOffset(int slot) => _save?.GetSlotOffset(slot) ?? 0;
+
     public string SlotHexDump(int slot) => Loaded.HexDumpSlot(slot);
 
     public void SetRite(int slot, int riteIndex, Headstone.Rite rite)
