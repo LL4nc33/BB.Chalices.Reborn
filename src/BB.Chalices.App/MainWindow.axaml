@@ -135,8 +135,8 @@
                         </StackPanel>
                         <Grid Grid.Row="1" ColumnDefinitions="*,200" Margin="0,0,0,12">
                             <TextBox Grid.Column="0" Text="{Binding SearchText}"
-                                     PlaceholderText="Search glyph, boss or loot" Margin="0,0,8,0"
-                                     ToolTip.Tip="Filter by glyph, description, boss or note" />
+                                     PlaceholderText="Search glyph, loot, gems or area" Margin="0,0,8,0"
+                                     ToolTip.Tip="Filter by glyph, description, dungeon area, coffin item (e.g. Blood Rock) or gem pool (e.g. Physical)" />
                             <ComboBox Grid.Column="1" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}"
                                       HorizontalAlignment="Stretch" ToolTip.Tip="Show only one category" />
                         </Grid>
@@ -201,7 +201,7 @@
                             BorderBrush="{DynamicResource Edge}" BorderThickness="1,0,0,0">
                         <Grid Margin="20" RowDefinitions="Auto,*,Auto,Auto" IsEnabled="{Binding HasLoadedSave}">
                             <StackPanel Grid.Row="0" Spacing="8">
-                                <Grid ColumnDefinitions="Auto,*">
+                                <Grid ColumnDefinitions="Auto,*,Auto">
                                 <TextBlock Grid.Column="0" Classes="section" Text="ALTAR SLOT"
                                            VerticalAlignment="Center" Margin="0,0,12,0" />
                                 <ListBox Grid.Column="1" Classes="slots plain" ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}"
@@ -224,6 +224,12 @@
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="12,0,0,0">
+                                    <Button Classes="link" Content="export" Click="OnCopyAltar"
+                                            ToolTip.Tip="Copy all 6 altar slots as one code, to share or back up the whole loadout" />
+                                    <Button Classes="link" Content="import" Click="OnPasteAltar"
+                                            ToolTip.Tip="Replace all 6 altar slots from a loadout code on the clipboard. Save to write to disk." />
+                                </StackPanel>
                                 </Grid>
                                 <TextBlock Classes="heading accent" Text="{Binding SelectedSlotType}" Margin="0,8,0,0"
                                            IsVisible="{Binding SelectedSlotType, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />

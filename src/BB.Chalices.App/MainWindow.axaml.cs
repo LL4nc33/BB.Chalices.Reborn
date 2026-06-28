@@ -162,6 +162,18 @@ public partial class MainWindow : Window
             viewModel.PasteSlotHex(await clipboard.TryGetTextAsync());
     }
 
+    private async void OnCopyAltar(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel && viewModel.CopyAltarHex() is { } hex && Clipboard is { } clipboard)
+            await clipboard.SetTextAsync(hex);
+    }
+
+    private async void OnPasteAltar(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel && Clipboard is { } clipboard)
+            viewModel.PasteAltarHex(await clipboard.TryGetTextAsync());
+    }
+
     private async void OnDeleteBackup(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not MainViewModel { SelectedBackup: { } backup } viewModel)

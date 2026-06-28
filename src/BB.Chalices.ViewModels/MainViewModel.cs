@@ -461,7 +461,10 @@ public class MainViewModel : ViewModelBase
         if (!string.IsNullOrEmpty(search))
             query = query.Where(d =>
                 d.Glyph.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                (d.Description?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false));
+                (d.Description?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                d.Type.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                (d.UniqueItem?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (d.FavouredGems?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false));
 
         Dungeons.Clear();
         foreach (var dungeon in query)
@@ -595,6 +598,51 @@ public class MainViewModel : ViewModelBase
         int slot = SelectedSlot.Number;
         PlaceBuiltDungeon(Convert.FromHexString(compact));
         StatusMessage = $"Pasted dungeon into slot {slot}. Save to write it to disk.";
+    }
+
+    // Copy all six altar slots (6 x 125 bytes) as one hex string for sharing a loadout.
+    public string? CopyAltarHex()
+    {
+        if (!HasLoadedSave)
+        {
+            StatusMessage = "Open a save first.";
+            return null;
+        }
+        var all = new byte[DungeonStructure.Size * 6];
+        for (int slot = 1; slot <= 6; slot++)
+            _saves.GetSlotBytes(slot).CopyTo(all, (slot - 1) * DungeonStructure.Size);
+        StatusMessage = "All 6 altar slots copied to the clipboard.";
+        return Convert.ToHexString(all);
+    }
+
+    // Replace all six altar slots from one hex string (6 x 125 bytes).
+    public void PasteAltarHex(string? hex)
+    {
+        if (!HasLoadedSave)
+        {
+            StatusMessage = "Open a save first.";
+            return;
+        }
+
+        string compact = hex is null ? "" : new string(hex.Where(Uri.IsHexDigit).ToArray());
+        int needed = DungeonStructure.Size * 6;
+        if (compact.Length != needed * 2)
+        {
+            StatusMessage = $"Altar paste needs all 6 slots ({needed} bytes); the clipboard had {compact.Length / 2}.";
+            return;
+        }
+
+        byte[] all = Convert.FromHexString(compact);
+        for (int slot = 1; slot <= 6; slot++)
+        {
+            byte[] record = all[((slot - 1) * DungeonStructure.Size)..(slot * DungeonStructure.Size)];
+            _saves.SetSlot(slot, record);
+            SlotViewModel? target = Slots.FirstOrDefault(s => s.Number == slot);
+            if (target is not null)
+                RefreshSlot(target);
+        }
+        LoadSelectedSlot();
+        StatusMessage = "Pasted all 6 altar slots. Save to write them to disk.";
     }
 
     private int? _undoSlot;
