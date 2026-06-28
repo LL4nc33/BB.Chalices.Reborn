@@ -297,7 +297,7 @@
                                                             <TextBlock Grid.Column="0" Text="{Binding Label}" VerticalAlignment="Center" FontSize="14"
                                                                        TextTrimming="CharacterEllipsis"
                                                                        Foreground="{Binding Offset, Converter={x:Static app:OffsetColorConverter.Instance}}" />
-                                                            <TextBox Grid.Column="1" Text="{Binding Hex}" FontSize="14"
+                                                            <TextBox Grid.Column="1" Text="{Binding Hex}" FontSize="12"
                                                                      FontFamily="Cascadia Mono,Consolas,Menlo,monospace" />
                                                         </Grid>
                                                     </DataTemplate>
@@ -309,7 +309,7 @@
                                                         <Grid ColumnDefinitions="100,*" Margin="0,0,12,6" ToolTip.Tip="{Binding OffsetLabel}">
                                                             <TextBlock Grid.Column="0" Text="{Binding Label}" VerticalAlignment="Center" FontSize="14"
                                                                        Foreground="{Binding Offset, Converter={x:Static app:OffsetColorConverter.Instance}}" />
-                                                            <TextBox Grid.Column="1" Text="{Binding Hex}" FontSize="14"
+                                                            <TextBox Grid.Column="1" Text="{Binding Hex}" FontSize="12"
                                                                      FontFamily="Cascadia Mono,Consolas,Menlo,monospace" />
                                                         </Grid>
                                                     </DataTemplate>
