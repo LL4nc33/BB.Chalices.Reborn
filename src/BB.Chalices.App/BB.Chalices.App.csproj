@@ -30,8 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Ship the dungeon catalog next to the exe; seeded into SQLite on first run. -->
-    <None Include="..\..\dungeons.json" Link="dungeons.json" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Embed the dungeon catalog in the executable (read on first-run seeding),
+         so a self-contained single-file build is one file with no data alongside. -->
+    <EmbeddedResource Include="..\..\dungeons.json" Link="dungeons.json" LogicalName="dungeons.json" />
   </ItemGroup>
 
 </Project>

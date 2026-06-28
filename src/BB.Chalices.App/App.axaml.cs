@@ -45,13 +45,19 @@ public partial class App : Application
             {
                 await db.Database.EnsureCreatedAsync();
 
-                var json = Path.Combine(AppContext.BaseDirectory, "dungeons.json");
                 bool seeded = await db.Dungeons.AnyAsync();
-                if (File.Exists(json) && (!seeded || config.Settings.CatalogueVersion != catalogueVersion))
+                if (!seeded || config.Settings.CatalogueVersion != catalogueVersion)
                 {
-                    await DungeonSeeder.ImportAsync(db, await File.ReadAllTextAsync(json), replaceExisting: true);
-                    config.Settings.CatalogueVersion = catalogueVersion;
-                    config.Save();
+                    // dungeons.json is embedded in the executable so the build is a
+                    // single self-contained file (no data file to ship alongside).
+                    await using var seedStream = typeof(App).Assembly.GetManifestResourceStream("dungeons.json");
+                    if (seedStream is not null)
+                    {
+                        using var reader = new StreamReader(seedStream);
+                        await DungeonSeeder.ImportAsync(db, await reader.ReadToEndAsync(), replaceExisting: true);
+                        config.Settings.CatalogueVersion = catalogueVersion;
+                        config.Save();
+                    }
                 }
             }
 
