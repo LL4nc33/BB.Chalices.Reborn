@@ -77,6 +77,11 @@ public class MainViewModel : ViewModelBase
     public ObservableCollection<RiteSlotViewModel> RiteSlots { get; }
     public ObservableCollection<HeadstoneFieldViewModel> Fields { get; }
 
+    // The 8-byte-and-shorter fields go in two columns; the 16-byte creator and
+    // character-name fields each get a full-width row of their own.
+    public IReadOnlyList<HeadstoneFieldViewModel> ShortFields => Fields.Where(f => f.Field.Length <= 8).ToList();
+    public IReadOnlyList<HeadstoneFieldViewModel> LongFields => Fields.Where(f => f.Field.Length > 8).ToList();
+
     public string? CurrentSavePath => _saves.CurrentPath;
 
     public string? CharacterName
