@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:BB.Chalices.ViewModels"
         xmlns:services="using:BB.Chalices.Services"
+        xmlns:app="using:BB.Chalices.App"
         x:Class="BB.Chalices.App.MainWindow"
         x:DataType="vm:MainViewModel"
         Width="1366" Height="850" MinWidth="1240" MinHeight="780"
@@ -235,12 +236,15 @@
                                             </ItemsControl.ItemsPanel>
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate x:DataType="vm:RiteSlotViewModel">
-                                                    <Grid ColumnDefinitions="52,*" Margin="0,0,12,8"
-                                                          ToolTip.Tip="Set a rite (Fetid, Rotted, Cursed or Sinister), or None to remove it">
-                                                        <TextBlock Grid.Column="0" Classes="caption" Text="{Binding Label}" VerticalAlignment="Center" />
-                                                        <ComboBox Grid.Column="1" ItemsSource="{Binding Options}"
-                                                                  SelectedItem="{Binding Rite}" HorizontalAlignment="Stretch" />
-                                                    </Grid>
+                                                    <Border BorderThickness="3,0,0,0" Margin="0,0,12,8" Padding="8,0,0,0"
+                                                            BorderBrush="{Binding Index, Converter={x:Static app:RiteColorConverter.Instance}}"
+                                                            ToolTip.Tip="Set a rite (Fetid, Rotted, Cursed or Sinister), or None to remove it">
+                                                        <Grid ColumnDefinitions="44,*">
+                                                            <TextBlock Grid.Column="0" Classes="caption" Text="{Binding Label}" VerticalAlignment="Center" />
+                                                            <ComboBox Grid.Column="1" ItemsSource="{Binding Options}"
+                                                                      SelectedItem="{Binding Rite}" HorizontalAlignment="Stretch" />
+                                                        </Grid>
+                                                    </Border>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
@@ -285,13 +289,16 @@
                             </TabControl>
 
                             <StackPanel Grid.Row="2" Spacing="8" Margin="0,16,0,0">
-                                <TextBlock Classes="section" Text="LIVE BYTES" />
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0" Classes="section" Text="LIVE BYTES" Margin="0" VerticalAlignment="Center" />
+                                    <Button Grid.Column="1" Classes="link" Content="colour legend" Click="OnLegendClick"
+                                            ToolTip.Tip="What the byte colours mean" />
+                                </Grid>
                                 <Border Classes="hexPanel">
                                     <Panel>
                                         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" MaxHeight="240">
-                                            <SelectableTextBlock Text="{Binding SlotHexDump}"
+                                            <SelectableTextBlock app:HexView.Bytes="{Binding SelectedSlotBytes}"
                                                                  FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="11"
-                                                                 Foreground="{DynamicResource Parchment}"
                                                                  IsVisible="{Binding SlotHexDump, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                                         </ScrollViewer>
                                         <TextBlock Classes="caption" Text="Open a save to inspect the slot's 125 bytes" VerticalAlignment="Center"

@@ -1,0 +1,32 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:app="using:BB.Chalices.App"
+        x:Class="BB.Chalices.App.LegendWindow"
+        Width="440" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        RequestedThemeVariant="Dark"
+        FontFamily="{DynamicResource GothicFont}"
+        Background="{DynamicResource WindowBg}"
+        Icon="/Assets/favicon.png"
+        Title="Byte legend">
+
+    <StackPanel Margin="24" Spacing="16">
+        <TextBlock Classes="title" Text="Live bytes legend" />
+        <TextBlock Classes="caption" TextWrapping="Wrap"
+                   Text="Each headstone field is shown in its own colour in the live bytes, after the Tomb Prospectors (DrAnger) byte map. For the effect strings, only the last byte controls the effect." />
+        <ItemsControl x:Name="LegendList">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="app:ByteLegendEntry">
+                    <Grid ColumnDefinitions="18,*,Auto" ColumnSpacing="12" Margin="0,3">
+                        <Border Grid.Column="0" Width="14" Height="14" VerticalAlignment="Center"
+                                Background="{Binding Brush}" />
+                        <TextBlock Grid.Column="1" Classes="body" Text="{Binding Name}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Classes="caption" Text="{Binding Range}" VerticalAlignment="Center"
+                                   FontFamily="Cascadia Mono,Consolas,Menlo,monospace" />
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Button Classes="primary" Content="Close" Click="OnClose" HorizontalAlignment="Right" />
+    </StackPanel>
+</Window>

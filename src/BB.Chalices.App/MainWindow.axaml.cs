@@ -146,6 +146,9 @@ public partial class MainWindow : Window
             viewModel.OpenBackups();
     }
 
+    private async void OnLegendClick(object? sender, RoutedEventArgs e)
+        => await new LegendWindow().ShowDialog(this);
+
     private async void OnDeleteBackup(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not MainViewModel { SelectedBackup: { } backup } viewModel)

@@ -319,6 +319,14 @@ public class MainViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref _slotHexDump, value);
     }
 
+    // The selected slot's 125 bytes, for the colour-coded live-bytes view.
+    private byte[]? _selectedSlotBytes;
+    public byte[]? SelectedSlotBytes
+    {
+        get => _selectedSlotBytes;
+        private set => this.RaiseAndSetIfChanged(ref _selectedSlotBytes, value);
+    }
+
     public ReactiveCommand<Unit, Unit> LoadDungeonsCommand { get; }
     public ReactiveCommand<string, Unit> LoadSaveCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
@@ -615,6 +623,7 @@ public class MainViewModel : ViewModelBase
             return;
 
         SlotHexDump = _saves.SlotHexDump(SelectedSlot.Number);
+        SelectedSlotBytes = _saves.GetSlotBytes(SelectedSlot.Number);
         RefreshSlot(SelectedSlot);
         StatusMessage = $"{field.Name} set. Save to write it to disk.";
     }
@@ -625,6 +634,7 @@ public class MainViewModel : ViewModelBase
             return;
 
         SlotHexDump = _saves.SlotHexDump(SelectedSlot.Number);
+        SelectedSlotBytes = _saves.GetSlotBytes(SelectedSlot.Number);
         RefreshSlot(SelectedSlot);
         StatusMessage = $"{message} Save to write it to disk.";
     }
@@ -643,11 +653,13 @@ public class MainViewModel : ViewModelBase
                 PoisonEnabled = FourthLayerOpen = false;
                 foreach (var field in Fields) field.Set(string.Empty);
                 SlotHexDump = string.Empty;
+                SelectedSlotBytes = null;
                 return;
             }
 
             var record = _saves.GetSlotBytes(SelectedSlot.Number);
             SlotHexDump = _saves.SlotHexDump(SelectedSlot.Number);
+            SelectedSlotBytes = record;
             for (int i = 0; i < Fields.Count; i++)
                 Fields[i].Set(Headstone.ReadFieldHex(record, Fields[i].Field));
 
