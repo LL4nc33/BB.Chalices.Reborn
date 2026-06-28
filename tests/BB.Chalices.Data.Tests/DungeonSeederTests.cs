@@ -51,24 +51,26 @@ public class DungeonSeederTests
     }
 
     [Fact]
-    public async Task ImportAsync_ReplaceWithPreserveCategory_KeepsThePlayersOwnDungeons()
+    public async Task ImportAsync_ReplaceOnlySwapsTheImportedCategories()
     {
         using var ctx = NewContext();
 
-        // Noxde catalogue plus one of the player's own (Custom) saved dungeons.
+        // A by-area set, Noxde's "farming", and one of the player's own (Custom) dungeons.
         await DungeonSeeder.ImportAsync(ctx, """
-        { "farming": [ { "glyph": "nox1", "bytes": ["01"] } ],
-          "Custom":  [ { "glyph": "my-aaaa", "bytes": ["02"] } ] }
+        { "Pthumeru 5": [ { "glyph": "area1", "bytes": ["01"] } ],
+          "farming":    [ { "glyph": "nox1",  "bytes": ["02"] } ],
+          "Custom":     [ { "glyph": "my-aaaa", "bytes": ["03"] } ] }
         """);
-        Assert.Equal(2, await ctx.Dungeons.CountAsync());
+        Assert.Equal(3, await ctx.Dungeons.CountAsync());
 
-        // A catalogue update swaps the gist data but must keep the Custom category.
+        // A gist update brings only "farming" - it must replace farming and leave the
+        // by-area set and the custom dungeon alone.
         await DungeonSeeder.ImportAsync(ctx,
-            """{ "farming": [ { "glyph": "nox2", "bytes": ["03"] } ] }""",
-            replaceExisting: true, preserveCategory: "Custom");
+            """{ "farming": [ { "glyph": "nox2", "bytes": ["04"] } ] }""",
+            replaceExisting: true);
 
         var glyphs = await ctx.Dungeons.Select(d => d.Glyph).OrderBy(g => g).ToListAsync();
-        Assert.Equal(new[] { "my-aaaa", "nox2" }, glyphs); // nox1 replaced, my-aaaa kept
+        Assert.Equal(new[] { "area1", "my-aaaa", "nox2" }, glyphs); // nox1 replaced; area1 + my-aaaa kept
     }
 
     [Fact]

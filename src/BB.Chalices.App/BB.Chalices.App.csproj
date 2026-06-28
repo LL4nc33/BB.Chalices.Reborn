@@ -29,7 +29,11 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
-  <!-- dungeons.json (Noxde's catalogue) is intentionally NOT bundled: it is his work
-       and is only fetched/imported into the local DB with the user's consent. -->
+  <ItemGroup>
+    <!-- Our own by-area dungeon set (the "All" view), compiled from the public Tomb
+         Prospectors research. Bundled so the catalogue works fully offline. Noxde's
+         curated categories are NOT bundled: those are fetched from his gist on consent. -->
+    <EmbeddedResource Include="..\..\catalogue.json" Link="catalogue.json" LogicalName="catalogue.json" />
+  </ItemGroup>
 
 </Project>

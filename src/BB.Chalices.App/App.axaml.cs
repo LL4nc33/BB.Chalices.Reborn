@@ -38,7 +38,7 @@ public partial class App : Application
     {
         try
         {
-            const int catalogueVersion = 3;
+            const int catalogueVersion = 4;
             var config = Services!.GetRequiredService<ConfigService>();
             var dbFactory = Services!.GetRequiredService<IDbContextFactory<ChaliceDbContext>>();
             await using (var db = await dbFactory.CreateDbContextAsync())
@@ -48,16 +48,24 @@ public partial class App : Application
                 bool seeded = await db.Dungeons.AnyAsync();
                 if (!seeded || config.Settings.CatalogueVersion != catalogueVersion)
                 {
-                    // The catalogue is Noxde's work, so it is not bundled. Seed only from
-                    // the local copy the user consented to download (cached by ConfigService).
-                    var localJson = config.CatalogueCachePath;
-                    if (File.Exists(localJson))
+                    // 1) Our bundled by-area catalogue (the "All" view) - always available,
+                    //    works fully offline. Embedded in the executable.
+                    await using (var bundled = typeof(App).Assembly.GetManifestResourceStream("catalogue.json"))
                     {
-                        await DungeonSeeder.ImportAsync(db, await File.ReadAllTextAsync(localJson),
-                            replaceExisting: true, preserveCategory: DungeonService.CustomCategory);
-                        config.Settings.CatalogueVersion = catalogueVersion;
-                        config.Save();
+                        if (bundled is not null)
+                        {
+                            using var reader = new StreamReader(bundled);
+                            await DungeonSeeder.ImportAsync(db, await reader.ReadToEndAsync(), replaceExisting: true);
+                        }
                     }
+
+                    // 2) Noxde's curated categories, only if a consented copy was downloaded.
+                    //    Per-category replace keeps the bundled set and any custom dungeons.
+                    if (File.Exists(config.CatalogueCachePath))
+                        await DungeonSeeder.ImportAsync(db, await File.ReadAllTextAsync(config.CatalogueCachePath), replaceExisting: true);
+
+                    config.Settings.CatalogueVersion = catalogueVersion;
+                    config.Save();
                 }
             }
 

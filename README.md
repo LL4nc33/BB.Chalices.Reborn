@@ -5,8 +5,11 @@ any of your save's seven altar slots - the six stored slots plus the makeshift a
 Handy for farming runs, blood-gem setups, or just testing things without grinding the
 glyphs by hand.
 
-The 200+ ready-made dungeons are Noxde's work, fetched once from his gist (with your
-consent) and cached locally. Everything else runs fully offline.
+The catalogue has two parts. A large by-area set (compiled from the public Tomb
+Prospectors research) is bundled and works fully offline - that is the **All** view.
+Noxde's 200+ curated dungeons (the **Noxde** view) are his work, so they are fetched
+once from his gist with your consent and cached locally. The app is fully usable
+offline either way.
 
 Built with Avalonia 12 and .NET 10, so it runs on Windows, Linux and macOS.
 
@@ -74,8 +77,8 @@ dotnet run --project src/BB.Chalices.App
 
 - **BB.Chalices.Core** is the save format itself: finding the inventory marker,
   reading and writing the 125-byte dungeon records, backups. No UI or framework dependencies.
-- **BB.Chalices.Data** holds the dungeon catalogue in SQLite (EF Core), seeded from
-  Noxde's gist (downloaded once with your consent, then cached locally for offline use).
+- **BB.Chalices.Data** holds the dungeon catalogue in SQLite (EF Core), seeded from the
+  bundled by-area set and, with your consent, Noxde's gist (downloaded once, then cached).
 - **BB.Chalices.Services** does load/save, catalogue queries and shadPS4 save discovery.
 - **BB.Chalices.ViewModels** has the ReactiveUI view models.
 - **BB.Chalices.App** is the Avalonia UI and theme.
