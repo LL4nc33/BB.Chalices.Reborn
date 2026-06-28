@@ -59,13 +59,13 @@ public partial class App : Application
             window.DataContext = viewModel;
             await viewModel.LoadDungeonsCommand.Execute();
 
-            // Reopen the last save if it's still there; otherwise pre-fill the
-            // shadPS4 dropdown so a first-time user does not have to find Detect.
+            // Always fill the character dropdown so nobody has to hunt for Detect,
+            // then reopen the last save if it's still there.
+            await viewModel.DetectSavesCommand.Execute();
+
             var lastSave = config.Settings.LastSavePath;
             if (!string.IsNullOrEmpty(lastSave) && File.Exists(lastSave))
                 await viewModel.LoadSaveCommand.Execute(lastSave);
-            else
-                await viewModel.DetectSavesCommand.Execute();
         }
         catch (Exception ex)
         {

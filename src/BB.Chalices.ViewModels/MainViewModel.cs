@@ -411,11 +411,13 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
+            ApplyPendingRename();
+
             if (_config.Settings.AutoBackupEnabled && _saves.CurrentPath is { } path)
                 _backups.Create(path, "before save");
 
             _saves.Save();
-            StatusMessage = "Saved. A backup was written first.";
+            StatusMessage = $"Saved as {CharacterName}. A backup was written first.";
         }
         catch (Exception ex)
         {
@@ -515,10 +517,23 @@ public class MainViewModel : ViewModelBase
             return;
         }
 
-        _saves.SetCharacterName(name);
-        CharacterName = name;
+        ApplyPendingRename();
         EditableName = name;
-        StatusMessage = $"Renamed to {name}. Click Save changes to write it.";
+        StatusMessage = $"Hunter name set to {name}. Click Save changes to write it.";
+    }
+
+    // Applies the name typed in the box to the in-memory save; written on Save.
+    private void ApplyPendingRename()
+    {
+        if (!HasLoadedSave)
+            return;
+
+        string name = (EditableName ?? string.Empty).Trim();
+        if (name.Length is >= 1 and <= 16 && name != CharacterName)
+        {
+            _saves.SetCharacterName(name);
+            CharacterName = name;
+        }
     }
 
     private void DetectSaves()
