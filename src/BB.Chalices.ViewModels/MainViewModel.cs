@@ -386,6 +386,15 @@ public class MainViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> RestoreBackupCommand { get; }
     public ReactiveCommand<Unit, Unit> ApplySoundFixCommand { get; }
 
+    private bool _soundFixNeeded;
+    // True when a shadPS4 save folder still needs the sound-crash workaround,
+    // which drives the auto-shown fix button in the sidebar.
+    public bool SoundFixNeeded
+    {
+        get => _soundFixNeeded;
+        private set => this.RaiseAndSetIfChanged(ref _soundFixNeeded, value);
+    }
+
     private bool _canUndo;
     public bool CanUndo
     {
@@ -617,10 +626,7 @@ public class MainViewModel : ViewModelBase
     // folder's options file (userdata0010), backing each up first.
     private void ApplySoundFix()
     {
-        string? root = !string.IsNullOrWhiteSpace(_config.Settings.ShadPs4FolderPath)
-                       && System.IO.Directory.Exists(_config.Settings.ShadPs4FolderPath)
-            ? _config.Settings.ShadPs4FolderPath
-            : _locator.GuessShadPs4Root();
+        string? root = ResolveShadRoot();
         if (root is null)
         {
             StatusMessage = "Couldn't find a shadPS4 folder. Set it in Settings.";
@@ -648,16 +654,44 @@ public class MainViewModel : ViewModelBase
             : already > 0
                 ? "Sound crash fix was already applied."
                 : "No options file (userdata0010) found to fix.";
+
+        RefreshSoundFixStatus();
+    }
+
+    // The configured shadPS4 folder, or the best guess if none is set.
+    private string? ResolveShadRoot()
+    {
+        string? configured = _config.Settings.ShadPs4FolderPath;
+        return !string.IsNullOrWhiteSpace(configured) && System.IO.Directory.Exists(configured)
+            ? configured
+            : _locator.GuessShadPs4Root();
+    }
+
+    // Flags the sidebar fix button when any save folder's options file is unpatched.
+    private void RefreshSoundFixStatus()
+    {
+        string? root = ResolveShadRoot();
+        bool needed = false;
+        if (root is not null)
+        {
+            foreach (var folder in _locator.FindSaveFolders(root))
+            {
+                string? system = _locator.FindSystemFile(folder);
+                if (system is not null && !_locator.IsSoundFixApplied(system))
+                {
+                    needed = true;
+                    break;
+                }
+            }
+        }
+        SoundFixNeeded = needed;
     }
 
     private void DetectSaves()
     {
         DetectedSaves.Clear();
 
-        var configured = _config.Settings.ShadPs4FolderPath;
-        var root = !string.IsNullOrWhiteSpace(configured) && System.IO.Directory.Exists(configured)
-            ? configured
-            : _locator.GuessShadPs4Root();
+        var root = ResolveShadRoot();
         if (root is null)
         {
             StatusMessage = "Couldn't find a shadPS4 folder. Set it in Settings or use Open Save.";
@@ -671,6 +705,8 @@ public class MainViewModel : ViewModelBase
         StatusMessage = DetectedSaves.Count == 0
             ? $"No Bloodborne saves found under {root}. Use Open Save, or set the folder in Settings."
             : $"Found {DetectedSaves.Count} character save(s). Pick one above to start editing.";
+
+        RefreshSoundFixStatus();
     }
 
     // --- Editing the selected slot's headstone fields ---

@@ -66,6 +66,10 @@
                         </Grid>
                         <TextBlock Classes="caption" Text="No save loaded"
                                    IsVisible="{Binding !HasLoadedSave}" />
+                        <Button Classes="primary" Content="⚠ Fix sound crash" Command="{Binding ApplySoundFixCommand}"
+                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,4,0,0"
+                                IsVisible="{Binding SoundFixNeeded}"
+                                ToolTip.Tip="Your shadPS4 options file (userdata0010) isn't patched for the sound-crash fix yet. Click to apply it - a backup is made first." />
                     </StackPanel>
 
                     <!-- navigation between the centre views -->
