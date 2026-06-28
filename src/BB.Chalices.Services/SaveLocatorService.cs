@@ -45,6 +45,50 @@ public class SaveLocatorService
             .ToList();
     }
 
+    // shadPS4 sound-crash workaround: the options file (userdata0010) has its byte
+    // at offset 0x204E flipped from 00 to 01. (Nexus mod 165, credit proteh.)
+    public const int SoundFixOffset = 0x204E;
+
+    // The options file (userdata...10) in a save folder, if it is there.
+    public string? FindSystemFile(string saveFolder)
+    {
+        if (!Directory.Exists(saveFolder))
+            return null;
+
+        return Directory.EnumerateFiles(saveFolder).FirstOrDefault(p =>
+        {
+            string name = Path.GetFileName(p);
+            return name.StartsWith("userdata", StringComparison.OrdinalIgnoreCase)
+                && !name.Contains(".bak", StringComparison.OrdinalIgnoreCase)
+                && name.EndsWith("10", StringComparison.OrdinalIgnoreCase);
+        });
+    }
+
+    public bool IsSoundFixApplied(string systemFile)
+    {
+        try
+        {
+            using var stream = File.OpenRead(systemFile);
+            if (stream.Length <= SoundFixOffset)
+                return false;
+            stream.Seek(SoundFixOffset, SeekOrigin.Begin);
+            return stream.ReadByte() == 0x01;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public void ApplySoundFix(string systemFile)
+    {
+        byte[] bytes = File.ReadAllBytes(systemFile);
+        if (bytes.Length <= SoundFixOffset)
+            return;
+        bytes[SoundFixOffset] = 0x01;
+        File.WriteAllBytes(systemFile, bytes);
+    }
+
     // The usual places shadPS4 ends up, across Windows, Linux and macOS.
     // Returns null if none look right (the user can still browse manually).
     public string? GuessShadPs4Root()

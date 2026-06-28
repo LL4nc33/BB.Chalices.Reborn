@@ -68,6 +68,7 @@ public class MainViewModel : ViewModelBase
         UndoSlotCommand = ReactiveCommand.Create(UndoSlot);
         CreateBackupCommand = ReactiveCommand.Create(CreateBackup);
         RestoreBackupCommand = ReactiveCommand.Create(RestoreSelectedBackup);
+        ApplySoundFixCommand = ReactiveCommand.Create(ApplySoundFix);
     }
 
     public ObservableCollection<DungeonViewModel> Dungeons { get; }
@@ -360,6 +361,7 @@ public class MainViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> UndoSlotCommand { get; }
     public ReactiveCommand<Unit, Unit> CreateBackupCommand { get; }
     public ReactiveCommand<Unit, Unit> RestoreBackupCommand { get; }
+    public ReactiveCommand<Unit, Unit> ApplySoundFixCommand { get; }
 
     private bool _canUndo;
     public bool CanUndo
@@ -586,6 +588,43 @@ public class MainViewModel : ViewModelBase
             _saves.SetEchoes(echoes);
         if (uint.TryParse(EditableLevel, out uint level) && level != _saves.Level)
             _saves.SetLevel(level);
+    }
+
+    // Applies the shadPS4 sound-crash workaround (Nexus mod 165) to every save
+    // folder's options file (userdata0010), backing each up first.
+    private void ApplySoundFix()
+    {
+        string? root = !string.IsNullOrWhiteSpace(_config.Settings.ShadPs4FolderPath)
+                       && System.IO.Directory.Exists(_config.Settings.ShadPs4FolderPath)
+            ? _config.Settings.ShadPs4FolderPath
+            : _locator.GuessShadPs4Root();
+        if (root is null)
+        {
+            StatusMessage = "Couldn't find a shadPS4 folder. Set it in Settings.";
+            return;
+        }
+
+        int applied = 0, already = 0;
+        foreach (var folder in _locator.FindSaveFolders(root))
+        {
+            var system = _locator.FindSystemFile(folder);
+            if (system is null)
+                continue;
+            if (_locator.IsSoundFixApplied(system))
+            {
+                already++;
+                continue;
+            }
+            _backups.Create(system, "before sound fix");
+            _locator.ApplySoundFix(system);
+            applied++;
+        }
+
+        StatusMessage = applied > 0
+            ? $"Sound crash fix applied to {applied} folder(s). A backup was made first."
+            : already > 0
+                ? "Sound crash fix was already applied."
+                : "No options file (userdata0010) found to fix.";
     }
 
     private void DetectSaves()

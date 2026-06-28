@@ -363,6 +363,14 @@
                                   IsChecked="{Binding AutoBackup}"
                                   ToolTip.Tip="Keep a timestamped backup every time you save" />
 
+                        <StackPanel Spacing="8">
+                            <TextBlock Classes="caption" Text="shadPS4 fixes" />
+                            <Button Content="Fix sound crash" Command="{Binding ApplySoundFixCommand}" HorizontalAlignment="Left"
+                                    ToolTip.Tip="Applies the shadPS4 sound-crash workaround: sets userdata0010 offset 0x204E to 01. A backup is made first." />
+                            <TextBlock Classes="caption" TextWrapping="Wrap"
+                                       Text="Patches the options file (userdata0010) to stop the shadPS4 audio crash, for any build. Credit: imbal4nc3d, with proteh." />
+                        </StackPanel>
+
                         <Border BorderBrush="{DynamicResource Edge}" BorderThickness="0,1,0,0" Padding="0,16,0,0">
                             <StackPanel Spacing="8">
                                 <TextBlock Classes="caption" Text="Credits and sources" />
