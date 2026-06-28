@@ -41,25 +41,39 @@ public class HexView
         if (bytes is null || bytes.Length == 0)
             return;
 
-        for (int row = 0; row < bytes.Length; row += 16)
+        var gutter = ByteFieldPalette.Gutter;
+        inlines.Add(new Run("Offset(h)  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n") { Foreground = gutter });
+        inlines.Add(new Run("-----------------------------------------------------------\n") { Foreground = gutter });
+
+        int end = (bytes.Length + 15) & ~15;
+        for (int row = 0; row < end; row += 16)
         {
-            inlines.Add(new Run($"{row:X4}  ") { Foreground = ByteFieldPalette.Gutter });
+            inlines.Add(new Run($"{row:X8}   ") { Foreground = gutter });
 
-            int count = Math.Min(16, bytes.Length - row);
-            for (int i = 0; i < count; i++)
-                inlines.Add(new Run($"{bytes[row + i]:X2} ") { Foreground = BrushFor(row + i, bytes, baseline) });
-            for (int i = count; i < 16; i++)
-                inlines.Add(new Run("   "));
-
-            inlines.Add(new Run(" "));
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < 16; i++)
             {
-                byte b = bytes[row + i];
-                char c = b is >= 32 and < 127 ? (char)b : '.';
-                inlines.Add(new Run(c.ToString()) { Foreground = BrushFor(row + i, bytes, baseline) });
+                int off = row + i;
+                if (off < bytes.Length)
+                    inlines.Add(new Run($"{bytes[off]:X2} ") { Foreground = BrushFor(off, bytes, baseline) });
+                else
+                    inlines.Add(new Run(".. ") { Foreground = gutter });
             }
 
-            if (row + 16 < bytes.Length)
+            inlines.Add(new Run(" ") { Foreground = gutter });
+            for (int i = 0; i < 16; i++)
+            {
+                int off = row + i;
+                if (off >= bytes.Length)
+                {
+                    inlines.Add(new Run(".") { Foreground = gutter });
+                    continue;
+                }
+                byte b = bytes[off];
+                char c = b is >= 32 and <= 126 ? (char)b : '.';
+                inlines.Add(new Run(c.ToString()) { Foreground = BrushFor(off, bytes, baseline) });
+            }
+
+            if (row + 16 < end)
                 inlines.Add(new Run("\n"));
         }
     }
