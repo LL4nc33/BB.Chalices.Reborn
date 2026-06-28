@@ -382,17 +382,18 @@
                         <TextBlock Classes="title" Text="Settings" />
 
                         <StackPanel Spacing="8">
-                            <TextBlock Classes="caption" Text="shadPS4 folder" />
+                            <TextBlock Classes="section" Text="SHADPS4 FOLDER" />
                             <Grid ColumnDefinitions="*,Auto">
                                 <TextBox Grid.Column="0" Text="{Binding ShadPs4Path}" Margin="0,0,8,0"
                                          PlaceholderText="leave empty to auto-detect"
                                          ToolTip.Tip="Your shadPS4 folder. Leave empty to auto-detect it." />
                                 <Button Grid.Column="1" Content="Browse" Click="OnBrowseShad" />
                             </Grid>
+                            <TextBlock Classes="caption" Text="{Binding DetectedShadInfo}" TextWrapping="Wrap" />
                         </StackPanel>
 
                         <StackPanel Spacing="8">
-                            <TextBlock Classes="caption" Text="Backup folder" />
+                            <TextBlock Classes="section" Text="BACKUP FOLDER" />
                             <Grid ColumnDefinitions="*,Auto,Auto">
                                 <TextBox Grid.Column="0" Text="{Binding BackupPath}" Margin="0,0,8,0"
                                          ToolTip.Tip="Folder where your backups are kept" />
@@ -406,7 +407,7 @@
                                   ToolTip.Tip="Keep a timestamped backup every time you save" />
 
                         <StackPanel Spacing="8">
-                            <TextBlock Classes="caption" Text="shadPS4 fixes" />
+                            <TextBlock Classes="section" Text="SHADPS4 FIXES" />
                             <Button Content="Fix sound crash" Command="{Binding ApplySoundFixCommand}" HorizontalAlignment="Left"
                                     ToolTip.Tip="Applies the shadPS4 sound-crash workaround: sets userdata0010 offset 0x204E to 01. A backup is made first." />
                             <TextBlock Classes="caption" TextWrapping="Wrap"
@@ -415,7 +416,7 @@
 
                         <Border BorderBrush="{DynamicResource Edge}" BorderThickness="0,1,0,0" Padding="0,16,0,0">
                             <StackPanel Spacing="8">
-                                <TextBlock Classes="caption" Text="Credits and sources" />
+                                <TextBlock Classes="section" Text="CREDITS AND SOURCES" />
                                 <TextBlock Classes="caption" TextWrapping="Wrap"
                                            Text="The chalice byte format builds on the Tomb Prospectors community (DrAnger, Trin, Kazin). Dig into the research yourself:" />
                                 <WrapPanel>
@@ -440,10 +441,14 @@
                 <!-- Backups page -->
                 <Grid IsVisible="{Binding IsBackupsView}" Margin="20" RowDefinitions="Auto,*,Auto"
                       MaxWidth="900" HorizontalAlignment="Left">
-                    <TextBlock Grid.Row="0" Classes="title" Text="Backups" Margin="0,0,0,16" />
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,16">
+                        <TextBlock Classes="title" Text="Backups" />
+                        <TextBlock Classes="caption" Text="{Binding BackupSummary}" VerticalAlignment="Bottom" Margin="0,0,0,4" />
+                    </StackPanel>
                     <Border Grid.Row="1" Classes="card">
                         <Grid>
-                            <ListBox Classes="plain" ItemsSource="{Binding BackupItems}" SelectedItem="{Binding SelectedBackup}">
+                            <ListBox Classes="plain" ItemsSource="{Binding BackupItems}" SelectedItem="{Binding SelectedBackup}"
+                                     DoubleTapped="OnBackupDoubleTapped">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate x:DataType="services:BackupInfo">
                                         <StackPanel Margin="0,4">

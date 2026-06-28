@@ -207,7 +207,23 @@ public class MainViewModel : ViewModelBase
     public string ShadPs4Path
     {
         get => _shadPs4Path;
-        set => this.RaiseAndSetIfChanged(ref _shadPs4Path, value);
+        set { this.RaiseAndSetIfChanged(ref _shadPs4Path, value); this.RaisePropertyChanged(nameof(DetectedShadInfo)); }
+    }
+
+    // A hint under the shadPS4 path field: what auto-detect would use.
+    public string DetectedShadInfo
+    {
+        get
+        {
+            if (!string.IsNullOrWhiteSpace(ShadPs4Path))
+                return System.IO.Directory.Exists(ShadPs4Path)
+                    ? "Using the folder above."
+                    : "That folder does not exist - fix the path, or clear it to auto-detect.";
+            string? guess = _locator.GuessShadPs4Root();
+            return guess is null
+                ? "No shadPS4 folder found automatically. Set it above, or just use Open save."
+                : $"Auto-detected: {guess}";
+        }
     }
 
     private string _backupPath = string.Empty;
@@ -255,6 +271,21 @@ public class MainViewModel : ViewModelBase
 
     public bool HasBackups => BackupItems.Count > 0;
 
+    // Count and total size of the kept backups, for the Backups header.
+    public string BackupSummary
+    {
+        get
+        {
+            if (BackupItems.Count == 0)
+                return "";
+            long total = 0;
+            foreach (var backup in BackupItems)
+                try { total += new System.IO.FileInfo(backup.FilePath).Length; }
+                catch { /* a backup file may have been removed under us */ }
+            return $"{BackupItems.Count} backup(s)  ·  {total / 1024.0 / 1024.0:0.0} MB";
+        }
+    }
+
     public void OpenBackups()
     {
         BackupPath = _config.BackupDirectory;
@@ -268,6 +299,7 @@ public class MainViewModel : ViewModelBase
         foreach (var backup in _backups.GetAll())
             BackupItems.Add(backup);
         this.RaisePropertyChanged(nameof(HasBackups));
+        this.RaisePropertyChanged(nameof(BackupSummary));
     }
 
     private void CreateBackup()

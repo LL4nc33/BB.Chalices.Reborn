@@ -54,6 +54,17 @@ public partial class MainWindow : Window
             viewModel.ApplyDungeonCommand.Execute().Subscribe();
     }
 
+    private async void OnBackupDoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (DataContext is not MainViewModel { SelectedBackup: { } backup } viewModel)
+            return;
+
+        bool confirmed = await new ConfirmWindow($"Restore this backup?\n\n{backup.DisplayName}\n\nYour current save is backed up first.")
+            .ShowDialog<bool>(this);
+        if (confirmed)
+            viewModel.RestoreBackupCommand.Execute().Subscribe();
+    }
+
     private async void OnOpenSaveClick(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not MainViewModel viewModel)
