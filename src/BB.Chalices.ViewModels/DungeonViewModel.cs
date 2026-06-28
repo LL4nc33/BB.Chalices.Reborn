@@ -43,6 +43,10 @@ public class DungeonViewModel : ViewModelBase
         ? DungeonGroups.UniqueItem(Bytes[1], Bytes[2], Bytes[3])
         : null;
 
+    // The gem effects this dungeon's gem pool favours (for farmers).
+    public string? FavouredGems =>
+        GemPool.Favoured(Bytes) is { Length: > 0 } gems ? gems : null;
+
     public string DisplayName =>
         string.IsNullOrEmpty(Description) ? Glyph : $"{Glyph} - {Description}";
 }

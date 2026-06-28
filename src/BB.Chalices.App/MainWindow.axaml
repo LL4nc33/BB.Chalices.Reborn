@@ -165,6 +165,9 @@
                                 <TextBlock Classes="body accent" Text="{Binding UniqueItem, StringFormat='Coffin: {0}'}"
                                            FontWeight="SemiBold" TextWrapping="Wrap"
                                            IsVisible="{Binding UniqueItem, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                <TextBlock Classes="caption" Text="{Binding FavouredGems, StringFormat='Gem pool: {0}'}"
+                                           TextWrapping="Wrap"
+                                           IsVisible="{Binding FavouredGems, Converter={x:Static ObjectConverters.IsNotNull}}" />
                                 <TextBlock Classes="caption" Text="{Binding JoinRequirement, StringFormat='Requires: {0} chalice'}" />
                                 <WrapPanel>
                                     <TextBlock Classes="caption" Text="{Binding Rites, StringFormat='Rites: {0}'}" Margin="0,0,16,0" />

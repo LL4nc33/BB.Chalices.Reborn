@@ -10,6 +10,9 @@ namespace BB.Chalices.Core.Binary;
 public static class Headstone
 {
     public const int JoinRequirementsOffset = 0x10;
+    public const int SpecialEnemyOffset = 0x14;
+    public const int UniqueItemOffset = 0x1C;
+    public const int GemEffectOffset = 0x24;
     public const int FourthLayerOffset = 0x2C;
     public const int PoisonOffset = 0x34;
     public const int RiteSlot1Offset = 0x3C;
