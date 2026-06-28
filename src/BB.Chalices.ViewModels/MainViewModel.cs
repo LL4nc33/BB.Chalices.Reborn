@@ -6,7 +6,7 @@ using ReactiveUI;
 
 namespace BB.Chalices.ViewModels;
 
-public enum AppView { Catalogue, Settings }
+public enum AppView { Catalogue, Settings, Backups }
 
 public class MainViewModel : ViewModelBase
 {
@@ -67,6 +67,8 @@ public class MainViewModel : ViewModelBase
         ClearSlotCommand = ReactiveCommand.Create(ClearSlot);
         UndoSlotCommand = ReactiveCommand.Create(UndoSlot);
         RenameCommand = ReactiveCommand.Create(Rename);
+        CreateBackupCommand = ReactiveCommand.Create(CreateBackup);
+        RestoreBackupCommand = ReactiveCommand.Create(RestoreSelectedBackup);
     }
 
     public ObservableCollection<DungeonViewModel> Dungeons { get; }
@@ -165,11 +167,13 @@ public class MainViewModel : ViewModelBase
             this.RaiseAndSetIfChanged(ref _currentView, value);
             this.RaisePropertyChanged(nameof(IsCatalogueView));
             this.RaisePropertyChanged(nameof(IsSettingsView));
+            this.RaisePropertyChanged(nameof(IsBackupsView));
         }
     }
 
     public bool IsCatalogueView => CurrentView == AppView.Catalogue;
     public bool IsSettingsView => CurrentView == AppView.Settings;
+    public bool IsBackupsView => CurrentView == AppView.Backups;
 
     private string _shadPs4Path = string.Empty;
     public string ShadPs4Path
@@ -208,6 +212,61 @@ public class MainViewModel : ViewModelBase
         _config.Settings.AutoBackupEnabled = AutoBackup;
         _config.Save();
         CurrentView = AppView.Catalogue;
+    }
+
+    // --- Backups (inline view, recycled from the old BackupWindow) ---
+
+    public ObservableCollection<BackupInfo> BackupItems { get; } = new();
+
+    private BackupInfo? _selectedBackup;
+    public BackupInfo? SelectedBackup
+    {
+        get => _selectedBackup;
+        set => this.RaiseAndSetIfChanged(ref _selectedBackup, value);
+    }
+
+    public bool HasBackups => BackupItems.Count > 0;
+
+    public void OpenBackups()
+    {
+        BackupPath = _config.BackupDirectory;
+        RefreshBackups();
+        CurrentView = AppView.Backups;
+    }
+
+    private void RefreshBackups()
+    {
+        BackupItems.Clear();
+        foreach (var backup in _backups.GetAll())
+            BackupItems.Add(backup);
+        this.RaisePropertyChanged(nameof(HasBackups));
+    }
+
+    private void CreateBackup()
+    {
+        if (_saves.CurrentPath is { } path)
+            StatusMessage = _backups.Create(path, "manual");
+        RefreshBackups();
+    }
+
+    private void RestoreSelectedBackup()
+    {
+        if (_saves.CurrentPath is not { } path || SelectedBackup is null)
+            return;
+
+        StatusMessage = _backups.Restore(path, SelectedBackup);
+        LoadSave(path); // the file on disk changed, reload it into the editor
+        RefreshBackups();
+    }
+
+    // Deletion is confirmed in the view; this just removes the selected backup.
+    public void DeleteSelectedBackup()
+    {
+        if (SelectedBackup is null)
+            return;
+
+        StatusMessage = _backups.Delete(SelectedBackup);
+        RefreshBackups();
     }
 
     public bool PoisonPossible
@@ -249,6 +308,8 @@ public class MainViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ClearSlotCommand { get; }
     public ReactiveCommand<Unit, Unit> UndoSlotCommand { get; }
     public ReactiveCommand<Unit, Unit> RenameCommand { get; }
+    public ReactiveCommand<Unit, Unit> CreateBackupCommand { get; }
+    public ReactiveCommand<Unit, Unit> RestoreBackupCommand { get; }
 
     private bool _canUndo;
     public bool CanUndo

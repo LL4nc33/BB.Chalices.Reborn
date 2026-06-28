@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:BB.Chalices.ViewModels"
+        xmlns:services="using:BB.Chalices.Services"
         x:Class="BB.Chalices.App.MainWindow"
         x:DataType="vm:MainViewModel"
         Width="1366" Height="850" MinWidth="1240" MinHeight="780"
@@ -69,8 +70,12 @@
                             <Button Classes="nav" Content="Settings" Click="OnShowSettings"
                                     ToolTip.Tip="shadPS4 folder, auto-backup, credits and sources" />
                         </Grid>
-                        <Button Classes="nav" Content="Backups" Click="OnBackupsClick"
-                                ToolTip.Tip="Browse, restore or delete backups" />
+                        <Grid>
+                            <Border Width="3" HorizontalAlignment="Left" Background="{DynamicResource Blood}"
+                                    IsVisible="{Binding IsBackupsView}" />
+                            <Button Classes="nav" Content="Backups" Click="OnShowBackups"
+                                    ToolTip.Tip="Browse, restore or delete backups" />
+                        </Grid>
                     </StackPanel>
                 </DockPanel>
             </Border>
@@ -329,6 +334,43 @@
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
+
+                <!-- Backups page -->
+                <Grid IsVisible="{Binding IsBackupsView}" Margin="20" RowDefinitions="Auto,*,Auto"
+                      MaxWidth="900" HorizontalAlignment="Left">
+                    <TextBlock Grid.Row="0" Classes="title" Text="Backups" Margin="0,0,0,16" />
+                    <Border Grid.Row="1" Classes="card">
+                        <Grid>
+                            <ListBox Classes="plain" ItemsSource="{Binding BackupItems}" SelectedItem="{Binding SelectedBackup}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate x:DataType="services:BackupInfo">
+                                        <StackPanel Margin="0,4">
+                                            <TextBlock Classes="body" Text="{Binding DisplayName}" />
+                                            <TextBlock Classes="caption" Text="{Binding Notes}"
+                                                       IsVisible="{Binding Notes, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <TextBlock Classes="caption" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                       TextWrapping="Wrap" TextAlignment="Center" Margin="24"
+                                       Text="No backups yet. Use Back up now, or enable auto-backup in Settings."
+                                       IsVisible="{Binding !HasBackups}" />
+                        </Grid>
+                    </Border>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="0,16,0,0">
+                        <Button Content="Back up now" Command="{Binding CreateBackupCommand}" IsEnabled="{Binding HasLoadedSave}"
+                                ToolTip.Tip="Create a backup of the current save" />
+                        <Button Content="Restore selected" Command="{Binding RestoreBackupCommand}"
+                                IsEnabled="{Binding SelectedBackup, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                ToolTip.Tip="Replace the current save with the selected backup (the current state is backed up first)" />
+                        <Button Classes="danger" Content="Delete" Click="OnDeleteBackup"
+                                IsEnabled="{Binding SelectedBackup, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                ToolTip.Tip="Delete the selected backup" />
+                        <Button Content="Open folder" Click="OnOpenBackupFolder"
+                                ToolTip.Tip="Open the backup folder" />
+                    </StackPanel>
+                </Grid>
             </Panel>
         </Grid>
 

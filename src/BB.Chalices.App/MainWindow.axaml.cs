@@ -140,18 +140,21 @@ public partial class MainWindow : Window
         await new DungeonBuilderWindow(main) { DataContext = viewModel }.ShowDialog(this);
     }
 
-    private async void OnBackupsClick(object? sender, RoutedEventArgs e)
+    private void OnShowBackups(object? sender, RoutedEventArgs e)
     {
-        if (Services is not { } services)
+        if (DataContext is MainViewModel viewModel)
+            viewModel.OpenBackups();
+    }
+
+    private async void OnDeleteBackup(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel { SelectedBackup: { } backup } viewModel)
             return;
 
-        var viewModel = DataContext as MainViewModel;
-        var window = new BackupWindow(services.GetRequiredService<BackupService>(), viewModel?.CurrentSavePath);
-        var restored = await window.ShowDialog<bool>(this);
-
-        // A restore overwrites the file on disk, so reload it into the editor.
-        if (restored && viewModel is not null && viewModel.CurrentSavePath is { } path)
-            await viewModel.LoadSaveCommand.Execute(path);
+        bool confirmed = await new ConfirmWindow($"Delete this backup?\n\n{backup.DisplayName}\n\nThis cannot be undone.")
+            .ShowDialog<bool>(this);
+        if (confirmed)
+            viewModel.DeleteSelectedBackup();
     }
 
     private static IServiceProvider? Services => (Application.Current as App)?.Services;
