@@ -33,15 +33,17 @@ public readonly struct DungeonStructure
     public ReadOnlySpan<byte> CreatorPSN => Data[0x5C..0x6C];
     public ReadOnlySpan<byte> CharacterName => Data[0x6C..0x7C];
 
-    // An empty altar slot: 0xFFFFFFFF map plus a marker byte at offset 8.
+    // An empty altar slot, exactly as the game writes one: 0xFFFFFFFF map, a 0x80
+    // marker at offset 8, every effect/rite field defaulted to 0xFF (0x0C-0x5B), a
+    // zeroed creator/name block (0x5C-0x7B) and a 0x02 terminator at offset 0x7C.
     public static DungeonStructure Empty()
     {
         var data = new byte[Size];
-        data[0] = 0xFF;
-        data[1] = 0xFF;
-        data[2] = 0xFF;
-        data[3] = 0xFF;
+        data[0] = data[1] = data[2] = data[3] = 0xFF;
         data[8] = 0x80;
+        for (int i = 0x0C; i <= 0x5B; i++)
+            data[i] = 0xFF;
+        data[0x7C] = 0x02;
         return new DungeonStructure(data);
     }
 
