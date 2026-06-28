@@ -327,8 +327,14 @@
                             <StackPanel Grid.Row="2" Spacing="8" Margin="0,16,0,0">
                                 <Grid ColumnDefinitions="*,Auto">
                                     <TextBlock Grid.Column="0" Classes="section" Text="LIVE BYTES" Margin="0" VerticalAlignment="Center" />
-                                    <Button Grid.Column="1" Classes="link" Content="colour legend" Click="OnLegendClick"
-                                            ToolTip.Tip="What the byte colours mean" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="14">
+                                        <Button Classes="link" Content="copy" Click="OnCopySlotHex"
+                                                ToolTip.Tip="Copy this whole dungeon as a 125-byte hex string to the clipboard" />
+                                        <Button Classes="link" Content="paste" Click="OnPasteSlotHex"
+                                                ToolTip.Tip="Replace this slot with a 125-byte hex string from the clipboard. Save to write it to disk." />
+                                        <Button Classes="link" Content="colour legend" Click="OnLegendClick"
+                                                ToolTip.Tip="What the byte colours mean" />
+                                    </StackPanel>
                                 </Grid>
                                 <Border Classes="hexPanel">
                                     <Panel>

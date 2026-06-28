@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Reactive;
 using BB.Chalices.Core.Binary;
+using BB.Chalices.Core.Saves;
 using BB.Chalices.Services;
 using ReactiveUI;
 
@@ -560,6 +561,40 @@ public class MainViewModel : ViewModelBase
         RefreshSlot(SelectedSlot);
         LoadSelectedSlot();
         StatusMessage = $"Built dungeon placed in slot {SelectedSlot.Number}. Save to write it to disk.";
+    }
+
+    // Copy the selected slot's 125-byte record as a hex string for the clipboard.
+    public string? CopySelectedSlotHex()
+    {
+        if (SelectedSlotBytes is not { } bytes)
+        {
+            StatusMessage = "Pick a slot with a dungeon first.";
+            return null;
+        }
+        StatusMessage = "Dungeon copied to the clipboard as a 125-byte hex string.";
+        return Convert.ToHexString(bytes);
+    }
+
+    // Paste a 125-byte hex string from the clipboard into the selected slot.
+    public void PasteSlotHex(string? hex)
+    {
+        if (!HasLoadedSave || SelectedSlot is null)
+        {
+            StatusMessage = "Open a save and pick a slot first.";
+            return;
+        }
+
+        string compact = hex is null ? "" : new string(hex.Where(Uri.IsHexDigit).ToArray());
+        if (compact.Length != DungeonStructure.Size * 2)
+        {
+            StatusMessage = $"Paste needs a {DungeonStructure.Size}-byte hex string " +
+                            $"({DungeonStructure.Size * 2} hex chars); the clipboard had {compact.Length / 2}.";
+            return;
+        }
+
+        int slot = SelectedSlot.Number;
+        PlaceBuiltDungeon(Convert.FromHexString(compact));
+        StatusMessage = $"Pasted dungeon into slot {slot}. Save to write it to disk.";
     }
 
     private int? _undoSlot;

@@ -2,6 +2,7 @@ using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using BB.Chalices.Services;
@@ -148,6 +149,18 @@ public partial class MainWindow : Window
 
     private async void OnLegendClick(object? sender, RoutedEventArgs e)
         => await new LegendWindow().ShowDialog(this);
+
+    private async void OnCopySlotHex(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel && viewModel.CopySelectedSlotHex() is { } hex && Clipboard is { } clipboard)
+            await clipboard.SetTextAsync(hex);
+    }
+
+    private async void OnPasteSlotHex(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel && Clipboard is { } clipboard)
+            viewModel.PasteSlotHex(await clipboard.TryGetTextAsync());
+    }
 
     private async void OnDeleteBackup(object? sender, RoutedEventArgs e)
     {
