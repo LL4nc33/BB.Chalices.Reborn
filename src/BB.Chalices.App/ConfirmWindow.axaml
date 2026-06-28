@@ -5,13 +5,13 @@
         WindowStartupLocation="CenterOwner"
         RequestedThemeVariant="Dark"
         FontFamily="{DynamicResource GothicFont}"
-        Background="{DynamicResource BgBase}"
+        Background="{DynamicResource WindowBg}"
         Icon="/Assets/favicon.png"
         Title="Confirm">
 
-    <StackPanel Margin="24" Spacing="22">
-        <TextBlock x:Name="MessageText" TextWrapping="Wrap" Foreground="{DynamicResource Parchment}" />
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+    <StackPanel Margin="24" Spacing="20">
+        <TextBlock x:Name="MessageText" Classes="body" TextWrapping="Wrap" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button Content="Cancel" Click="OnCancel" />
             <Button Classes="primary" Content="Confirm" Click="OnConfirm" />
         </StackPanel>

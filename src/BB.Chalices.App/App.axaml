@@ -13,15 +13,33 @@
         <SolidColorBrush x:Key="BgPanelAlt" Color="#1B1A22" />
         <SolidColorBrush x:Key="Blood" Color="#8A0303" />
         <SolidColorBrush x:Key="BloodDim" Color="#3C0707" />
+        <SolidColorBrush x:Key="BloodDeep" Color="#4E0909" />
         <SolidColorBrush x:Key="BloodBright" Color="#C01717" />
         <SolidColorBrush x:Key="Parchment" Color="#D2C9B0" />
+        <SolidColorBrush x:Key="ParchmentHi" Color="#F2E9D0" />
+        <SolidColorBrush x:Key="ParchmentBright" Color="#F7F0DC" />
         <SolidColorBrush x:Key="ParchmentDim" Color="#8C8470" />
         <SolidColorBrush x:Key="Edge" Color="#2A2A31" />
+
+        <!-- One shared window backdrop for every window -->
+        <LinearGradientBrush x:Key="WindowBg" StartPoint="0%,0%" EndPoint="0%,100%">
+            <GradientStop Offset="0" Color="#100F14" />
+            <GradientStop Offset="1" Color="#070709" />
+        </LinearGradientBrush>
+
+        <!-- Spacing scale (use 4 / 8 / 12 / 16 / 20 / 24 for every gap and inset;
+             panels inset 20, dialogs inset 24, framed cards pad 12) -->
+        <x:Double x:Key="Space4">4</x:Double>
+        <x:Double x:Key="Space8">8</x:Double>
+        <x:Double x:Key="Space12">12</x:Double>
+        <x:Double x:Key="Space16">16</x:Double>
+        <x:Double x:Key="Space20">20</x:Double>
+        <x:Double x:Key="Space24">24</x:Double>
 
         <!-- Sharp corners everywhere -->
         <CornerRadius x:Key="ControlCornerRadius">0</CornerRadius>
 
-        <!-- Recolour the Fluent button states -->
+        <!-- Recolour the Fluent button states (mirror of the palette, keep in sync) -->
         <SolidColorBrush x:Key="ButtonBackground" Color="#1B1A22" />
         <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#3C0707" />
         <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#8A0303" />
@@ -32,7 +50,7 @@
         <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#8A0303" />
         <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#C01717" />
 
-        <!-- List selection in blood -->
+        <!-- List selection in blood (mirror of the palette) -->
         <SolidColorBrush x:Key="ListBoxItemBackgroundPointerOver" Color="#1B1A22" />
         <SolidColorBrush x:Key="ListBoxItemBackgroundSelected" Color="#3C0707" />
         <SolidColorBrush x:Key="ListBoxItemBackgroundSelectedPointerOver" Color="#4E0909" />
@@ -48,62 +66,147 @@
             </FluentTheme.Palettes>
         </FluentTheme>
 
-        <!-- Serif typography across the app -->
+        <!-- ===== Serif typography + control scale ===== -->
         <Style Selector="TextBlock">
             <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
         </Style>
         <Style Selector="Button">
             <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Padding" Value="12,8" />
         </Style>
         <Style Selector="TextBox">
             <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
+            <Setter Property="FontSize" Value="14" />
         </Style>
         <Style Selector="ComboBox">
             <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style Selector="CheckBox">
+            <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="{DynamicResource Parchment}" />
+        </Style>
+        <Style Selector="NumericUpDown">
+            <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
+            <Setter Property="FontSize" Value="14" />
         </Style>
 
+        <!-- ===== Type scale: 13 / 14 / 18 / 20 (mono 11 is reserved for hex) ===== -->
+        <Style Selector="TextBlock.title">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{DynamicResource Parchment}" />
+        </Style>
+        <Style Selector="TextBlock.heading">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource Parchment}" />
+        </Style>
+        <Style Selector="TextBlock.body">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="{DynamicResource Parchment}" />
+        </Style>
+        <Style Selector="TextBlock.caption">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{DynamicResource ParchmentDim}" />
+        </Style>
+        <!-- Combine with body/caption/heading for an accent-coloured tag -->
+        <Style Selector="TextBlock.accent">
+            <Setter Property="Foreground" Value="{DynamicResource BloodBright}" />
+        </Style>
+        <!-- Small-caps-ish section labels -->
+        <Style Selector="TextBlock.section">
+            <Setter Property="Foreground" Value="{DynamicResource ParchmentDim}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+        </Style>
+
+        <!-- ===== Buttons ===== -->
         <!-- Primary action buttons (Save, Apply, Restore…) -->
         <Style Selector="Button.primary">
             <Setter Property="Background" Value="{DynamicResource Blood}" />
-            <Setter Property="Foreground" Value="#F7F0DC" />
+            <Setter Property="Foreground" Value="{DynamicResource ParchmentBright}" />
             <Setter Property="BorderBrush" Value="{DynamicResource BloodBright}" />
             <Setter Property="FontWeight" Value="SemiBold" />
         </Style>
-        <!-- Primary buttons brighten on hover (the Fluent template would otherwise darken them) -->
         <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource BloodBright}" />
         </Style>
         <Style Selector="Button.primary:pressed /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource Blood}" />
         </Style>
+        <!-- The one hero call-to-action (Save changes) -->
+        <Style Selector="Button.cta">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Padding" Value="12,12" />
+        </Style>
+        <!-- Destructive (Clear slot) -->
+        <Style Selector="Button.danger">
+            <Setter Property="BorderBrush" Value="{DynamicResource BloodBright}" />
+        </Style>
+        <Style Selector="Button.danger:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource BloodDim}" />
+        </Style>
+        <!-- Quiet text link (credits, "where this comes from") -->
+        <Style Selector="Button.link">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Foreground" Value="{DynamicResource ParchmentDim}" />
+        </Style>
+        <Style Selector="Button.link:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource Parchment}" />
+        </Style>
+        <!-- Vertical navigation buttons in the left sidebar -->
+        <Style Selector="Button.nav">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Padding" Value="12,8" />
+        </Style>
+        <!-- Segmented source toggle -->
+        <Style Selector="Button.toggle">
+            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Background" Value="{DynamicResource BgPanelAlt}" />
+        </Style>
+        <Style Selector="Button.toggle.active /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Blood}" />
+        </Style>
 
+        <!-- ===== Tabs ===== -->
+        <Style Selector="TabItem">
+            <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="{DynamicResource ParchmentDim}" />
+            <Setter Property="Padding" Value="12,6" />
+        </Style>
+        <Style Selector="TabItem:selected">
+            <Setter Property="Foreground" Value="{DynamicResource Parchment}" />
+        </Style>
+
+        <!-- ===== Lists ===== -->
         <!-- Roomier list rows + a blood accent bar on the selected one -->
         <Style Selector="ListBoxItem">
-            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="Padding" Value="12,8" />
         </Style>
         <Style Selector="ListBoxItem:selected">
             <Setter Property="BorderBrush" Value="{DynamicResource Blood}" />
             <Setter Property="BorderThickness" Value="3,0,0,0" />
         </Style>
-
-        <!-- Small-caps-ish section labels -->
-        <Style Selector="TextBlock.section">
-            <Setter Property="Foreground" Value="{DynamicResource ParchmentDim}" />
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-        </Style>
-
-        <!-- Vertical action buttons in the left sidebar -->
-        <Style Selector="Button.nav">
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="HorizontalContentAlignment" Value="Left" />
-            <Setter Property="Padding" Value="12,9" />
-            <Setter Property="FontSize" Value="14" />
+        <!-- Frameless list (catalogue, backups, slot selector) -->
+        <Style Selector="ListBox.plain">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
         </Style>
 
         <!-- Altar slot selector: six segmented buttons, active one in blood -->
         <Style Selector="ListBox.slots ListBoxItem">
-            <Setter Property="Padding" Value="0,7" />
+            <Setter Property="Padding" Value="0,8" />
             <Setter Property="Margin" Value="0,0,4,0" />
             <Setter Property="BorderBrush" Value="{DynamicResource Edge}" />
             <Setter Property="BorderThickness" Value="1" />
@@ -117,14 +220,23 @@
             <Setter Property="Background" Value="{DynamicResource Blood}" />
         </Style>
 
-        <!-- Segmented source toggle -->
-        <Style Selector="Button.toggle">
-            <Setter Property="Padding" Value="16,6" />
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="Background" Value="{DynamicResource BgPanelAlt}" />
+        <!-- ===== Surfaces (one definition per panel role) ===== -->
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{DynamicResource BgPanel}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Edge}" />
+            <Setter Property="BorderThickness" Value="1" />
         </Style>
-        <Style Selector="Button.toggle.active /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource Blood}" />
+        <Style Selector="Border.accent">
+            <Setter Property="Background" Value="{DynamicResource BgPanelAlt}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Blood}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <!-- Recessed hex/preview surface -->
+        <Style Selector="Border.hexPanel">
+            <Setter Property="Background" Value="{DynamicResource BgBase}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Edge}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="12" />
         </Style>
     </Application.Styles>
 </Application>

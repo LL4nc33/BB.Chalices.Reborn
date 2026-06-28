@@ -7,25 +7,23 @@
         WindowStartupLocation="CenterOwner"
         RequestedThemeVariant="Dark"
         FontFamily="{DynamicResource GothicFont}"
-        Background="{DynamicResource BgBase}"
+        Background="{DynamicResource WindowBg}"
         Icon="/Assets/favicon.png"
         Title="Dungeon builder">
 
     <Grid Margin="24" RowDefinitions="Auto,*,Auto">
 
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,18">
-            <TextBlock Grid.Column="0" Text="Dungeon builder" FontSize="22" FontWeight="Bold"
-                       Foreground="{DynamicResource Parchment}" />
-            <TextBlock Grid.Column="1" Text="{Binding StepLabel}" VerticalAlignment="Center"
-                       Foreground="{DynamicResource ParchmentDim}" />
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+            <TextBlock Grid.Column="0" Classes="title" Text="Dungeon builder" />
+            <TextBlock Grid.Column="1" Classes="caption" Text="{Binding StepLabel}" VerticalAlignment="Center" />
         </Grid>
 
         <Grid Grid.Row="1">
 
             <!-- Step 1: area and depth -->
-            <StackPanel IsVisible="{Binding IsAreaStep}" Spacing="14">
+            <StackPanel IsVisible="{Binding IsAreaStep}" Spacing="12">
                 <TextBlock Classes="section" Text="WHERE AND HOW DEEP" />
-                <TextBlock TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource ParchmentDim}"
+                <TextBlock Classes="body" TextWrapping="Wrap"
                            Text="Every chalice dungeon belongs to an area (Pthumeru, Hintertomb, Loran or Isz) and a depth from 1 to 5. Deeper dungeons have tougher enemies and better loot. Pick where you want to go." />
                 <ComboBox ItemsSource="{Binding Areas}" SelectedItem="{Binding SelectedArea}" HorizontalAlignment="Stretch"
                           ToolTip.Tip="Sets the area byte and draws a valid base dungeon from the catalogue" />
@@ -34,48 +32,47 @@
             <!-- Step 2: layout -->
             <StackPanel IsVisible="{Binding IsLayoutStep}" Spacing="12">
                 <TextBlock Classes="section" Text="WHICH LAYOUT" />
-                <TextBlock TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource ParchmentDim}"
+                <TextBlock Classes="body" TextWrapping="Wrap"
                            Text="Each area has a fixed set of layouts (100, or 200 for depth 4 and 5). Pick a layout number, and optionally a variant: Defiled is a harder cursed version, Sinister can be invaded and has no 4th layer." />
                 <Grid ColumnDefinitions="120,*">
-                    <TextBlock Grid.Column="0" Text="Variant" VerticalAlignment="Center" Foreground="{DynamicResource Parchment}" />
+                    <TextBlock Grid.Column="0" Classes="body" Text="Variant" VerticalAlignment="Center" />
                     <ComboBox Grid.Column="1" ItemsSource="{Binding Variants}" SelectedItem="{Binding SelectedVariant}"
                               HorizontalAlignment="Stretch" />
                 </Grid>
                 <CheckBox Content="Use the second hundred layouts (depth 4 and 5)"
                           IsChecked="{Binding SecondMap}" IsEnabled="{Binding SecondMapPossible}" />
                 <Grid ColumnDefinitions="120,*">
-                    <TextBlock Grid.Column="0" Text="Layout number" VerticalAlignment="Center" Foreground="{DynamicResource Parchment}" />
+                    <TextBlock Grid.Column="0" Classes="body" Text="Layout number" VerticalAlignment="Center" />
                     <NumericUpDown Grid.Column="1" Minimum="0" Maximum="99" Increment="1" FormatString="0"
                                    Value="{Binding DungeonNumber}" HorizontalAlignment="Left" Width="140" />
                 </Grid>
-                <Border Background="{DynamicResource BgPanel}" BorderBrush="{DynamicResource Edge}" BorderThickness="1" Padding="12,10">
+                <Border Classes="hexPanel">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" MaxHeight="210">
                         <SelectableTextBlock Text="{Binding PreviewHex}"
-                                             FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="12"
+                                             FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="11"
                                              Foreground="{DynamicResource Parchment}" />
                     </ScrollViewer>
                 </Border>
             </StackPanel>
 
             <!-- Step 3: review and place -->
-            <StackPanel IsVisible="{Binding IsPlaceStep}" Spacing="14">
+            <StackPanel IsVisible="{Binding IsPlaceStep}" Spacing="12">
                 <TextBlock Classes="section" Text="REVIEW AND PLACE" />
-                <TextBlock Text="{Binding Status}" Foreground="{DynamicResource BloodBright}" FontSize="14" />
-                <Border Background="{DynamicResource BgPanel}" BorderBrush="{DynamicResource Edge}" BorderThickness="1" Padding="12,10">
+                <TextBlock Classes="body accent" Text="{Binding Status}" />
+                <Border Classes="hexPanel">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" MaxHeight="240">
                         <SelectableTextBlock Text="{Binding PreviewHex}"
-                                             FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="12"
+                                             FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="11"
                                              Foreground="{DynamicResource Parchment}" />
                     </ScrollViewer>
                 </Border>
-                <TextBlock TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource ParchmentDim}"
+                <TextBlock Classes="caption" TextWrapping="Wrap"
                            Text="This is written into the slot selected in the main window. Set rites, poison and the 4th layer there afterwards." />
             </StackPanel>
         </Grid>
 
-        <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,18,0,0">
-            <Button Grid.Column="0" Content="Where this comes from" Click="OnLearnMore"
-                    Foreground="{DynamicResource ParchmentDim}" Background="Transparent" BorderThickness="0" Padding="0"
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,16,0,0">
+            <Button Grid.Column="0" Classes="link" Content="Where this comes from" Click="OnLearnMore"
                     ToolTip.Tip="The Tomb Prospectors data-mining the byte format builds on" />
             <Button Grid.Column="1" Content="Back" Click="OnBack" IsVisible="{Binding CanGoBack}" HorizontalAlignment="Right" Margin="0,0,8,0" />
             <Button Grid.Column="2" Content="Next" Click="OnNext" IsVisible="{Binding !IsPlaceStep}" />
