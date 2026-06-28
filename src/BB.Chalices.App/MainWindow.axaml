@@ -293,7 +293,7 @@
                                                 </ItemsControl.ItemsPanel>
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate x:DataType="vm:HeadstoneFieldViewModel">
-                                                        <Grid ColumnDefinitions="76,*" Margin="0,0,12,5" ToolTip.Tip="{Binding OffsetLabel}">
+                                                        <Grid ColumnDefinitions="100,*" Margin="0,0,12,6" ToolTip.Tip="{Binding OffsetLabel}">
                                                             <TextBlock Grid.Column="0" Text="{Binding Label}" VerticalAlignment="Center" FontSize="13"
                                                                        TextTrimming="CharacterEllipsis"
                                                                        Foreground="{Binding Offset, Converter={x:Static app:OffsetColorConverter.Instance}}" />
@@ -306,7 +306,7 @@
                                             <ItemsControl ItemsSource="{Binding LongFields}">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate x:DataType="vm:HeadstoneFieldViewModel">
-                                                        <Grid ColumnDefinitions="128,*" Margin="0,0,0,5" ToolTip.Tip="{Binding OffsetLabel}">
+                                                        <Grid ColumnDefinitions="100,*" Margin="0,0,12,6" ToolTip.Tip="{Binding OffsetLabel}">
                                                             <TextBlock Grid.Column="0" Text="{Binding Label}" VerticalAlignment="Center" FontSize="13"
                                                                        Foreground="{Binding Offset, Converter={x:Static app:OffsetColorConverter.Instance}}" />
                                                             <TextBox Grid.Column="1" Text="{Binding Hex}" FontSize="13"

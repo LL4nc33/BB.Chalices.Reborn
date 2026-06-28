@@ -18,9 +18,17 @@ public class HeadstoneFieldViewModel : ViewModelBase
     }
 
     public Headstone.HeadstoneField Field { get; }
-    public string Label => Field.Name;
+
+    // Compact label for the narrow editor column; the full name lives in the tooltip.
+    public string Label => Field.Name switch
+    {
+        "Special enemy / shop" => "Special enemy",
+        "Join requirements" => "Join req",
+        _ => Field.Name,
+    };
+
     public int Offset => Field.Offset;
-    public string OffsetLabel => $"0x{Field.Offset:X2} · {Field.Length}b";
+    public string OffsetLabel => $"{Field.Name}  ·  0x{Field.Offset:X2}  ·  {Field.Length}b";
 
     public string Hex
     {
