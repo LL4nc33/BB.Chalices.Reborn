@@ -181,8 +181,10 @@
                             BorderBrush="{DynamicResource Edge}" BorderThickness="1,0,0,0">
                         <Grid Margin="20" RowDefinitions="Auto,*,Auto,Auto" IsEnabled="{Binding HasLoadedSave}">
                             <StackPanel Grid.Row="0" Spacing="8">
-                                <TextBlock Classes="section" Text="ALTAR SLOT" />
-                                <ListBox Classes="slots plain" ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}"
+                                <Grid ColumnDefinitions="Auto,*">
+                                <TextBlock Grid.Column="0" Classes="section" Text="ALTAR SLOT"
+                                           VerticalAlignment="Center" Margin="0,0,12,0" />
+                                <ListBox Grid.Column="1" Classes="slots plain" ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}"
                                          HorizontalAlignment="Stretch"
                                          ToolTip.Tip="Pick one of the six altar slots (a dot marks an occupied slot)">
                                     <ListBox.ItemsPanel>
@@ -192,14 +194,17 @@
                                     </ListBox.ItemsPanel>
                                     <ListBox.ItemTemplate>
                                         <DataTemplate x:DataType="vm:SlotViewModel">
-                                            <StackPanel Spacing="4">
-                                                <TextBlock Classes="heading" Text="{Binding Number}" HorizontalAlignment="Center" />
-                                                <Ellipse Width="6" Height="6" HorizontalAlignment="Center"
+                                            <Panel>
+                                                <TextBlock Classes="heading" Text="{Binding Number}"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                <Ellipse Width="5" Height="5" Margin="0,0,3,0"
+                                                         HorizontalAlignment="Right" VerticalAlignment="Top"
                                                          Fill="{DynamicResource BloodBright}" IsVisible="{Binding Occupied}" />
-                                            </StackPanel>
+                                            </Panel>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
+                                </Grid>
                                 <TextBlock Classes="heading accent" Text="{Binding SelectedSlotType}" Margin="0,8,0,0"
                                            IsVisible="{Binding SelectedSlotType, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                                 <TextBlock Classes="caption" Text="{Binding SelectedSlotJoin, StringFormat='Requires: {0} chalice'}"
@@ -276,7 +281,7 @@
                             <Grid Grid.Row="3" ColumnDefinitions="Auto,*" ColumnSpacing="8" Margin="0,16,0,0">
                                 <Button Grid.Column="0" Content="Undo" Command="{Binding UndoSlotCommand}" IsEnabled="{Binding CanUndo}"
                                         ToolTip.Tip="Revert the last slot change before saving" />
-                                <Button Grid.Column="1" Classes="primary cta" Content="Save changes" Command="{Binding SaveCommand}"
+                                <Button Grid.Column="1" Classes="primary" Content="Save changes" Command="{Binding SaveCommand}"
                                         IsEnabled="{Binding HasLoadedSave}" HotKey="Ctrl+S" HorizontalAlignment="Stretch"
                                         ToolTip.Tip="Write all your changes to the save file (Ctrl+S). A backup is made first." />
                             </Grid>

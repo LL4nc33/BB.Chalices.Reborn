@@ -138,12 +138,6 @@
         <Style Selector="Button.primary:pressed /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource Blood}" />
         </Style>
-        <!-- The one hero call-to-action (Save changes) -->
-        <Style Selector="Button.cta">
-            <Setter Property="FontSize" Value="18" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Padding" Value="12,12" />
-        </Style>
         <!-- Destructive (Clear slot) -->
         <Style Selector="Button.danger">
             <Setter Property="BorderBrush" Value="{DynamicResource BloodBright}" />
@@ -205,7 +199,7 @@
 
         <!-- Altar slot selector: six segmented buttons, active one in blood -->
         <Style Selector="ListBox.slots ListBoxItem">
-            <Setter Property="Padding" Value="0,8" />
+            <Setter Property="Padding" Value="0,6" />
             <Setter Property="Margin" Value="0,0,4,0" />
             <Setter Property="BorderBrush" Value="{DynamicResource Edge}" />
             <Setter Property="BorderThickness" Value="1" />
