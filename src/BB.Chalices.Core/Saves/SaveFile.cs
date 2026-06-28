@@ -65,6 +65,9 @@ public class SaveFile
     // shows the altar as available. These leading bytes are the known-good pattern.
     private void SetDiscoveryFlag(int slot)
     {
+        if (slot == SaveFileReader.MakeshiftSlot)
+            return; // the makeshift altar has no discovery flag (a bare headstone is enough)
+
         int flagOffset = SaveFileReader.GetFlagsOffset(_inventoryOffset, slot);
 
         var flag = new byte[DungeonStructure.Size];

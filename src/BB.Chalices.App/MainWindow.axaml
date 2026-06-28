@@ -193,9 +193,9 @@
                             <Button Grid.Column="0" Content="Build new" Click="OnBuilderClick"
                                     IsEnabled="{Binding HasLoadedSave}"
                                     ToolTip.Tip="Generate a dungeon by area, variant and layout" />
-                            <Button Grid.Column="1" Content="Fill all 6" Command="{Binding FillAllSlotsCommand}"
+                            <Button Grid.Column="1" Content="Fill all" Command="{Binding FillAllSlotsCommand}"
                                     IsEnabled="{Binding HasLoadedSave}"
-                                    ToolTip.Tip="Put the selected dungeon in all six slots at once (e.g. to farm the same gems). Save to write to disk." />
+                                    ToolTip.Tip="Put the selected dungeon in every slot at once (makeshift + the six stored, e.g. to farm the same gems). Save to write to disk." />
                             <Button Grid.Column="2" Classes="primary" Content="PLACE IN SELECTED SLOT"
                                     Command="{Binding ApplyDungeonCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                                     IsEnabled="{Binding HasLoadedSave}"
@@ -212,16 +212,16 @@
                                            VerticalAlignment="Center" Margin="0,0,12,0" />
                                 <ListBox Grid.Column="1" Classes="slots plain" ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}"
                                          HorizontalAlignment="Stretch"
-                                         ToolTip.Tip="Pick one of the six altar slots (a dot marks an occupied slot)">
+                                         ToolTip.Tip="M = the makeshift altar (ritual setup), 1-6 = the stored slots. A dot marks an occupied slot.">
                                     <ListBox.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <UniformGrid Columns="6" />
+                                            <UniformGrid Columns="7" />
                                         </ItemsPanelTemplate>
                                     </ListBox.ItemsPanel>
                                     <ListBox.ItemTemplate>
                                         <DataTemplate x:DataType="vm:SlotViewModel">
-                                            <Panel>
-                                                <TextBlock Classes="heading" Text="{Binding Number}"
+                                            <Panel ToolTip.Tip="{Binding Label}">
+                                                <TextBlock Classes="heading" Text="{Binding ShortLabel}"
                                                            HorizontalAlignment="Center" VerticalAlignment="Center" />
                                                 <Ellipse Width="5" Height="5" Margin="0,0,3,0"
                                                          HorizontalAlignment="Right" VerticalAlignment="Top"

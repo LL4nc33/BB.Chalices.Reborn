@@ -29,6 +29,7 @@ public class SaveFileReaderTests
     }
 
     [Theory]
+    [InlineData(0, 87578)]   // Makeshift altar (88328 - 6*125)
     [InlineData(1, 88328)]   // Slot 1
     [InlineData(2, 88453)]   // Slot 2 (88328 + 125)
     [InlineData(3, 88578)]   // Slot 3 (88328 + 250)
@@ -49,7 +50,6 @@ public class SaveFileReaderTests
     }
 
     [Theory]
-    [InlineData(0)]
     [InlineData(7)]
     [InlineData(-1)]
     public void GetHeadstoneOffset_InvalidSlot_ThrowsException(int invalidSlot)

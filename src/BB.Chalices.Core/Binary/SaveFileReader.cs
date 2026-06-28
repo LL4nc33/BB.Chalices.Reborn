@@ -15,6 +15,10 @@ public static class SaveFileReader
     private const int LevelOffset = NameOffset - 23;    // character level, u32 little-endian
     private const int InsightOffset = NameOffset - 35;  // insight, u32 little-endian
     private const int MaxSlots = 6;
+    // The makeshift altar is a 7th headstone sitting one full 6-slot block before
+    // slot 1 (inventory + 87578). Confirmed in-game; it has no discovery flag.
+    public const int MakeshiftSlot = 0;
+    private const int MakeshiftBase = HeadstoneBase - MaxSlots * Stride;
 
     // The inventory block opens with the bytes 40 F0 FF FF. Returns the marker's
     // offset, or -1 if it isn't there (not a valid save).
@@ -30,8 +34,10 @@ public static class SaveFileReader
 
     public static int GetHeadstoneOffset(int inventory, int slot)
     {
+        if (slot == MakeshiftSlot)
+            return inventory + MakeshiftBase;
         if (slot < 1 || slot > MaxSlots)
-            throw new ArgumentOutOfRangeException(nameof(slot), $"Slot must be 1-{MaxSlots}");
+            throw new ArgumentOutOfRangeException(nameof(slot), $"Slot must be {MakeshiftSlot} (makeshift) or 1-{MaxSlots}");
 
         return inventory + HeadstoneBase + (slot - 1) * Stride;
     }

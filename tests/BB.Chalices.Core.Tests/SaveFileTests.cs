@@ -33,6 +33,23 @@ public class SaveFileTests
     }
 
     [Fact]
+    public void MakeshiftSlot_SitsBeforeSlot1_AndWritesNoDiscoveryFlag()
+    {
+        var save = MakeSave(out _);
+
+        // The makeshift altar (slot 0) is one full 6-slot block before slot 1.
+        Assert.Equal(save.GetSlotOffset(1) - 750, save.GetSlotOffset(0));
+
+        var record = new byte[DungeonStructure.Size];
+        record[0] = 0x1D;
+        record[1] = 0x35;
+        record[124] = 0x42;
+        save.SetSlot(0, record); // must not throw - the makeshift has no flag region
+
+        Assert.Equal(record, save.GetSlot(0).Data.ToArray());
+    }
+
+    [Fact]
     public void CharacterName_RoundTripsAsUtf16()
     {
         var save = MakeSave(out var buffer);

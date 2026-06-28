@@ -2,7 +2,8 @@ using ReactiveUI;
 
 namespace BB.Chalices.ViewModels;
 
-// One of the six chalice altar slots, shown in the slot dropdown.
+// An altar slot shown in the slot selector: slots 1-6 are the stored dungeons,
+// slot 0 is the makeshift altar (the ritual-setup slot just before slot 1).
 public class SlotViewModel : ViewModelBase
 {
     private bool _occupied;
@@ -11,8 +12,13 @@ public class SlotViewModel : ViewModelBase
     public SlotViewModel(int number) => Number = number;
 
     public int Number { get; }
-    public string Label => $"Slot {Number}";
-    public string Display => $"Slot {Number}:  {(_occupied ? _headline : "empty")}";
+
+    public bool IsMakeshift => Number == 0;
+    public string ShortLabel => IsMakeshift ? "M" : Number.ToString();
+    public string Label => IsMakeshift ? "Makeshift altar" : $"Slot {Number}";
+    public string Display => IsMakeshift
+        ? $"Makeshift altar:  {(_occupied ? _headline : "empty")}"
+        : $"Slot {Number}:  {(_occupied ? _headline : "empty")}";
 
     public bool Occupied
     {

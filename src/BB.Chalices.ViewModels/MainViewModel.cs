@@ -51,13 +51,14 @@ public class MainViewModel : ViewModelBase
 
         Dungeons = new ObservableCollection<DungeonViewModel>();
         Categories = new ObservableCollection<string> { AllCategories };
-        Slots = new ObservableCollection<SlotViewModel>(Enumerable.Range(1, 6).Select(n => new SlotViewModel(n)));
+        // Slot 0 = the makeshift altar, then the six stored slots 1-6.
+        Slots = new ObservableCollection<SlotViewModel>(Enumerable.Range(0, 7).Select(n => new SlotViewModel(n)));
         DetectedSaves = new ObservableCollection<DetectedSaveViewModel>();
         RiteSlots = new ObservableCollection<RiteSlotViewModel>(
             Enumerable.Range(0, 4).Select(i => new RiteSlotViewModel(i, ApplyRite)));
         Fields = new ObservableCollection<HeadstoneFieldViewModel>(
             Headstone.Fields.Select(f => new HeadstoneFieldViewModel(f, ApplyField)));
-        _selectedSlot = Slots[0];
+        _selectedSlot = Slots.First(s => s.Number == 1);
 
         LoadDungeonsCommand = ReactiveCommand.CreateFromTask(LoadDungeonsAsync);
         LoadSaveCommand = ReactiveCommand.Create<string>(LoadSave);
@@ -390,8 +391,9 @@ public class MainViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref _selectedSlotBytes, value);
     }
 
-    // The last-saved bytes per slot; the live view colours only what differs from these.
-    private readonly byte[]?[] _slotBaselines = new byte[6][];
+    // The last-saved bytes per slot, indexed by slot number 0-6 (0 = makeshift);
+    // the live view colours only what differs from these.
+    private readonly byte[]?[] _slotBaselines = new byte[7][];
 
     private byte[]? _selectedSlotBaseline;
     public byte[]? SelectedSlotBaseline
@@ -571,15 +573,13 @@ public class MainViewModel : ViewModelBase
         if (!HasLoadedSave) { StatusMessage = "Open a save first."; return; }
         if (SelectedDungeon is null) { StatusMessage = "Pick a dungeon from the list first."; return; }
 
-        for (int slot = 1; slot <= 6; slot++)
+        foreach (var target in Slots)
         {
-            _saves.SetSlot(slot, SelectedDungeon.Bytes);
-            SlotViewModel? target = Slots.FirstOrDefault(s => s.Number == slot);
-            if (target is not null)
-                RefreshSlot(target);
+            _saves.SetSlot(target.Number, SelectedDungeon.Bytes);
+            RefreshSlot(target);
         }
         LoadSelectedSlot();
-        StatusMessage = $"Filled all 6 slots with {SelectedDungeon.Glyph}. Save to write to disk.";
+        StatusMessage = $"Filled all {Slots.Count} slots with {SelectedDungeon.Glyph}. Save to write to disk.";
     }
 
     private void ClearSlot()
@@ -651,7 +651,7 @@ public class MainViewModel : ViewModelBase
         StatusMessage = $"Pasted dungeon into slot {slot}. Save to write it to disk.";
     }
 
-    // Copy all six altar slots (6 x 125 bytes) as one hex string for sharing a loadout.
+    // Copy every altar slot (makeshift + the six stored, 125 bytes each) as one hex string.
     public string? CopyAltarHex()
     {
         if (!HasLoadedSave)
@@ -659,14 +659,15 @@ public class MainViewModel : ViewModelBase
             StatusMessage = "Open a save first.";
             return null;
         }
-        var all = new byte[DungeonStructure.Size * 6];
-        for (int slot = 1; slot <= 6; slot++)
-            _saves.GetSlotBytes(slot).CopyTo(all, (slot - 1) * DungeonStructure.Size);
-        StatusMessage = "All 6 altar slots copied to the clipboard.";
+        var all = new byte[DungeonStructure.Size * Slots.Count];
+        for (int i = 0; i < Slots.Count; i++)
+            _saves.GetSlotBytes(Slots[i].Number).CopyTo(all, i * DungeonStructure.Size);
+        StatusMessage = $"All {Slots.Count} altar slots copied to the clipboard.";
         return Convert.ToHexString(all);
     }
 
-    // Replace all six altar slots from one hex string (6 x 125 bytes).
+    // Replace altar slots from one hex string. Accepts the full set (makeshift + the
+    // six stored) or a legacy 6-slot code, which fills slots 1-6 only.
     public void PasteAltarHex(string? hex)
     {
         if (!HasLoadedSave)
@@ -676,24 +677,31 @@ public class MainViewModel : ViewModelBase
         }
 
         string compact = hex is null ? "" : new string(hex.Where(Uri.IsHexDigit).ToArray());
-        int needed = DungeonStructure.Size * 6;
-        if (compact.Length != needed * 2)
+        int bytes = compact.Length / 2;
+
+        int[] targets;
+        if (bytes == DungeonStructure.Size * Slots.Count)
+            targets = Slots.Select(s => s.Number).ToArray();
+        else if (bytes == DungeonStructure.Size * 6)
+            targets = Enumerable.Range(1, 6).ToArray();
+        else
         {
-            StatusMessage = $"Altar paste needs all 6 slots ({needed} bytes); the clipboard had {compact.Length / 2}.";
+            StatusMessage = $"Altar paste needs {DungeonStructure.Size * Slots.Count} bytes " +
+                            $"(or a legacy {DungeonStructure.Size * 6}); the clipboard had {bytes}.";
             return;
         }
 
         byte[] all = Convert.FromHexString(compact);
-        for (int slot = 1; slot <= 6; slot++)
+        for (int i = 0; i < targets.Length; i++)
         {
-            byte[] record = all[((slot - 1) * DungeonStructure.Size)..(slot * DungeonStructure.Size)];
-            _saves.SetSlot(slot, record);
-            SlotViewModel? target = Slots.FirstOrDefault(s => s.Number == slot);
+            byte[] record = all[(i * DungeonStructure.Size)..((i + 1) * DungeonStructure.Size)];
+            _saves.SetSlot(targets[i], record);
+            SlotViewModel? target = Slots.FirstOrDefault(s => s.Number == targets[i]);
             if (target is not null)
                 RefreshSlot(target);
         }
         LoadSelectedSlot();
-        StatusMessage = "Pasted all 6 altar slots. Save to write them to disk.";
+        StatusMessage = $"Pasted {targets.Length} altar slots. Save to write them to disk.";
     }
 
     // Save the selected slot's dungeon into the player's own catalogue under a name.
@@ -950,13 +958,13 @@ public class MainViewModel : ViewModelBase
     // only the bytes changed since (reset on load and after every save).
     private void SnapshotBaselines()
     {
-        for (int slot = 1; slot <= _slotBaselines.Length; slot++)
-            _slotBaselines[slot - 1] = HasLoadedSave ? _saves.GetSlotBytes(slot) : null;
+        foreach (var s in Slots)
+            _slotBaselines[s.Number] = HasLoadedSave ? _saves.GetSlotBytes(s.Number) : null;
         UpdateSelectedSlotBaseline();
     }
 
     private void UpdateSelectedSlotBaseline()
-        => SelectedSlotBaseline = SelectedSlot is { } slot ? _slotBaselines[slot.Number - 1] : null;
+        => SelectedSlotBaseline = SelectedSlot is { } slot ? _slotBaselines[slot.Number] : null;
 
     private void LoadSelectedSlot()
     {
