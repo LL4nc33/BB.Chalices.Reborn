@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Text;
 using BB.Chalices.Core.Binary;
 using ReactiveUI;
 
@@ -30,15 +32,32 @@ public class HeadstoneFieldViewModel : ViewModelBase
     public int Offset => Field.Offset;
     public string OffsetLabel => $"{Field.Name}  ·  0x{Field.Offset:X2}  ·  {Field.Length}b";
 
+    // Shown grouped into byte pairs ("10 32 15 58"); applied as compact hex.
     public string Hex
     {
         get => _hex;
         set
         {
-            this.RaiseAndSetIfChanged(ref _hex, value);
+            string compact = new(value.Where(c => !char.IsWhiteSpace(c)).ToArray());
+            this.RaiseAndSetIfChanged(ref _hex, GroupBytes(compact));
             if (!_suppress)
-                _apply(Field, value);
+                _apply(Field, compact);
         }
+    }
+
+    private static string GroupBytes(string compact)
+    {
+        if (compact.Length <= 2)
+            return compact;
+
+        var grouped = new StringBuilder(compact.Length + compact.Length / 2);
+        for (int i = 0; i < compact.Length; i++)
+        {
+            if (i > 0 && i % 2 == 0)
+                grouped.Append(' ');
+            grouped.Append(compact[i]);
+        }
+        return grouped.ToString();
     }
 
     // Set the displayed value without applying it (used when loading a slot).
