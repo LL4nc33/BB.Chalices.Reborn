@@ -72,44 +72,44 @@
         </Style>
         <Style Selector="Button">
             <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="15" />
             <Setter Property="Padding" Value="12,8" />
         </Style>
         <Style Selector="TextBox">
             <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="15" />
         </Style>
         <Style Selector="ComboBox">
             <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="15" />
         </Style>
         <Style Selector="CheckBox">
             <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="15" />
             <Setter Property="Foreground" Value="{DynamicResource Parchment}" />
         </Style>
         <Style Selector="NumericUpDown">
             <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="15" />
         </Style>
 
-        <!-- ===== Type scale: 13 / 14 / 18 / 20 (mono 11 is reserved for hex) ===== -->
+        <!-- ===== Type scale: 14 / 15 / 20 / 22 (mono 13 is reserved for hex) ===== -->
         <Style Selector="TextBlock.title">
-            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontSize" Value="22" />
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="Foreground" Value="{DynamicResource Parchment}" />
         </Style>
         <Style Selector="TextBlock.heading">
-            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontSize" Value="20" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Foreground" Value="{DynamicResource Parchment}" />
         </Style>
         <Style Selector="TextBlock.body">
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="15" />
             <Setter Property="Foreground" Value="{DynamicResource Parchment}" />
         </Style>
         <Style Selector="TextBlock.caption">
-            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontSize" Value="14" />
             <Setter Property="Foreground" Value="{DynamicResource ParchmentDim}" />
         </Style>
         <!-- Combine with body/caption/heading for an accent-coloured tag -->
@@ -119,7 +119,7 @@
         <!-- Small-caps-ish section labels -->
         <Style Selector="TextBlock.section">
             <Setter Property="Foreground" Value="{DynamicResource ParchmentDim}" />
-            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontSize" Value="14" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Margin" Value="0,0,0,8" />
         </Style>
@@ -174,7 +174,7 @@
         <!-- ===== Tabs ===== -->
         <Style Selector="TabItem">
             <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="15" />
             <Setter Property="Foreground" Value="{DynamicResource ParchmentDim}" />
             <Setter Property="Padding" Value="12,6" />
         </Style>

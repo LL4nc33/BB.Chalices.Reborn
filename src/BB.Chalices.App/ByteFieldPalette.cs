@@ -12,25 +12,27 @@ public static class ByteFieldPalette
 {
     private static SolidColorBrush B(string hex) => new(Color.Parse(hex));
 
-    public static readonly IBrush Gutter      = B("#6E6E78"); // offsets + ascii
-    public static readonly IBrush Neutral     = B("#D2C9B0"); // unchanged bytes
-    public static readonly IBrush Start       = B("#9A9AA4"); // the 1D start byte
-    public static readonly IBrush AreaDepth   = B("#C0392B");
-    public static readonly IBrush LayoutSeed  = B("#8E2A22");
-    public static readonly IBrush Serial      = B("#8B5A2B");
-    public static readonly IBrush Filler      = B("#4A4A52"); // zeros / padding
-    public static readonly IBrush JoinReq     = B("#D98DA8");
-    public static readonly IBrush Special     = B("#CA6F1E");
-    public static readonly IBrush Unique      = B("#C9A227");
-    public static readonly IBrush Gem         = B("#8FA82E");
-    public static readonly IBrush FourthLayer = B("#2E8B57");
-    public static readonly IBrush Poison      = B("#B39DDB");
-    public static readonly IBrush RiteFetid   = B("#4DB6C9");
-    public static readonly IBrush RiteRotted  = B("#2980B9");
-    public static readonly IBrush RiteCursed  = B("#3949AB");
-    public static readonly IBrush RiteUnused  = B("#7E94A8");
-    public static readonly IBrush CreatorPsn  = B("#8C8C8C");
-    public static readonly IBrush CharName    = B("#B0B0B0");
+    // Brightened for readability on the dark panels: every colour sits at a
+    // luminance close to the parchment text, while staying distinct per field.
+    public static readonly IBrush Gutter      = B("#9292A0"); // offsets + ascii
+    public static readonly IBrush Neutral     = B("#E0D8C2"); // unchanged bytes
+    public static readonly IBrush Start       = B("#B7B7C2"); // the 1D start byte
+    public static readonly IBrush AreaDepth   = B("#E6584A");
+    public static readonly IBrush LayoutSeed  = B("#EC9A84");
+    public static readonly IBrush Serial      = B("#D9A85F");
+    public static readonly IBrush Filler      = B("#71717C"); // zeros / padding
+    public static readonly IBrush JoinReq     = B("#EBA1BB");
+    public static readonly IBrush Special     = B("#EE9038");
+    public static readonly IBrush Unique      = B("#E6C047");
+    public static readonly IBrush Gem         = B("#BBD653");
+    public static readonly IBrush FourthLayer = B("#4FCE88");
+    public static readonly IBrush Poison      = B("#CBB8EC");
+    public static readonly IBrush RiteFetid   = B("#6BD3E6");
+    public static readonly IBrush RiteRotted  = B("#5FB1EA");
+    public static readonly IBrush RiteCursed  = B("#8C99EE");
+    public static readonly IBrush RiteUnused  = B("#A6BBCF");
+    public static readonly IBrush CreatorPsn  = B("#B0B0B0");
+    public static readonly IBrush CharName    = B("#CACACA");
 
     // The colour for one byte by its offset in the 125-byte record.
     public static IBrush OffsetBrush(int o) => o switch
