@@ -335,8 +335,8 @@ public class MainViewModel : ViewModelBase
 
     public ObservableCollection<Headstone.SpecialEnemy> SpecialEnemyOptions { get; } = new();
 
-    private Headstone.SpecialEnemy _selectedSpecialEnemy;
-    public Headstone.SpecialEnemy SelectedSpecialEnemy
+    private Headstone.SpecialEnemy? _selectedSpecialEnemy;
+    public Headstone.SpecialEnemy? SelectedSpecialEnemy
     {
         get => _selectedSpecialEnemy;
         set { this.RaiseAndSetIfChanged(ref _selectedSpecialEnemy, value); ApplySpecialEnemy(value); }
@@ -711,12 +711,12 @@ public class MainViewModel : ViewModelBase
         AfterEdit(up ? "Difficulty up." : "Difficulty normal.");
     }
 
-    private void ApplySpecialEnemy(Headstone.SpecialEnemy option)
+    private void ApplySpecialEnemy(Headstone.SpecialEnemy? option)
     {
-        if (_suppressEdits || !HasLoadedSave || SelectedSlot is null)
+        if (_suppressEdits || !HasLoadedSave || SelectedSlot is null || option is null)
             return;
 
-        _saves.SetSpecialEnemy(SelectedSlot.Number, option);
+        _saves.SetSpecialEnemy(SelectedSlot.Number, option.Value);
         AfterEdit("Special enemy set.");
     }
 
