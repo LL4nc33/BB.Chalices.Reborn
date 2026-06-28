@@ -65,6 +65,28 @@ public class SaveFileService
         _save.SetCharacterName(name);
     }
 
+    public uint Echoes => _save?.Echoes ?? 0;
+    public uint Insight => _save?.Insight ?? 0;
+    public uint Level => _save?.Level ?? 0;
+
+    public void SetEchoes(uint value)
+    {
+        if (_save is null) throw new InvalidOperationException("No save file loaded");
+        _save.SetEchoes(value);
+    }
+
+    public void SetInsight(uint value)
+    {
+        if (_save is null) throw new InvalidOperationException("No save file loaded");
+        _save.SetInsight(value);
+    }
+
+    public void SetLevel(uint value)
+    {
+        if (_save is null) throw new InvalidOperationException("No save file loaded");
+        _save.SetLevel(value);
+    }
+
     public DungeonStructure GetSlot(int slot)
     {
         if (_save is null) throw new InvalidOperationException("No save file loaded");

@@ -27,6 +27,13 @@ public class SaveFile
     // Renames the hunter in place; the change is written on the next Save.
     public void SetCharacterName(string name) => SaveFileReader.SetCharacterName(_data, _inventoryOffset, name);
 
+    public uint Echoes => SaveFileReader.GetEchoes(_data, _inventoryOffset);
+    public uint Insight => SaveFileReader.GetInsight(_data, _inventoryOffset);
+    public uint Level => SaveFileReader.GetLevel(_data, _inventoryOffset);
+    public void SetEchoes(uint value) => SaveFileReader.SetEchoes(_data, _inventoryOffset, value);
+    public void SetInsight(uint value) => SaveFileReader.SetInsight(_data, _inventoryOffset, value);
+    public void SetLevel(uint value) => SaveFileReader.SetLevel(_data, _inventoryOffset, value);
+
     public int InventoryOffset => _inventoryOffset;
 
     public DungeonStructure GetSlot(int slot)

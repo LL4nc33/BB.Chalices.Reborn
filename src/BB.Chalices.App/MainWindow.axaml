@@ -46,10 +46,23 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" IsVisible="{Binding HasLoadedSave}"
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" IsVisible="{Binding HasLoadedSave}"
                               ToolTip.Tip="The hunter's name. Edit it, click Rename, then Save changes to write it.">
-                            <TextBox Grid.Column="0" Text="{Binding EditableName}" MaxLength="16" VerticalAlignment="Center" />
-                            <Button Grid.Column="1" Content="Rename" Command="{Binding RenameCommand}" />
+                            <TextBlock Grid.Column="0" Classes="caption" Text="Hunter" VerticalAlignment="Center" Width="48" />
+                            <TextBox Grid.Column="1" Text="{Binding EditableName}" MaxLength="16" VerticalAlignment="Center" />
+                            <Button Grid.Column="2" Content="Rename" Command="{Binding RenameCommand}" />
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" IsVisible="{Binding HasLoadedSave}">
+                            <TextBlock Grid.Column="0" Classes="caption" Text="Level" VerticalAlignment="Center" Width="48" />
+                            <TextBox Grid.Column="1" Text="{Binding EditableLevel}" ToolTip.Tip="Character level. Written on Save changes." />
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" IsVisible="{Binding HasLoadedSave}">
+                            <TextBlock Grid.Column="0" Classes="caption" Text="Insight" VerticalAlignment="Center" Width="48" />
+                            <TextBox Grid.Column="1" Text="{Binding EditableInsight}" ToolTip.Tip="Insight. Written on Save changes." />
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" IsVisible="{Binding HasLoadedSave}">
+                            <TextBlock Grid.Column="0" Classes="caption" Text="Echoes" VerticalAlignment="Center" Width="48" />
+                            <TextBox Grid.Column="1" Text="{Binding EditableEchoes}" ToolTip.Tip="Blood Echoes. Written on Save changes." />
                         </Grid>
                         <TextBlock Classes="caption" Text="No save loaded"
                                    IsVisible="{Binding !HasLoadedSave}" />
@@ -216,9 +229,14 @@
                                     <StackPanel Spacing="0" Margin="0,12,0,0">
                                         <TextBlock Classes="section" Text="RITES" />
                                         <ItemsControl ItemsSource="{Binding RiteSlots}" Margin="0,0,0,16">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <UniformGrid Columns="2" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate x:DataType="vm:RiteSlotViewModel">
-                                                    <Grid ColumnDefinitions="80,*" Margin="0,4"
+                                                    <Grid ColumnDefinitions="52,*" Margin="0,0,12,8"
                                                           ToolTip.Tip="Set a rite (Fetid, Rotted, Cursed or Sinister), or None to remove it">
                                                         <TextBlock Grid.Column="0" Classes="caption" Text="{Binding Label}" VerticalAlignment="Center" />
                                                         <ComboBox Grid.Column="1" ItemsSource="{Binding Options}"
@@ -230,28 +248,33 @@
 
                                         <TextBlock Classes="section" Text="MODIFIERS"
                                                    ToolTip.Tip="Only certain dungeon types support poison or a 4th layer." />
-                                        <StackPanel Spacing="8">
-                                            <CheckBox Content="Poison" IsChecked="{Binding PoisonEnabled}"
-                                                      IsEnabled="{Binding PoisonPossible}"
+                                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="16">
+                                            <CheckBox Grid.Column="0" Content="Poison" IsChecked="{Binding PoisonEnabled}"
+                                                      IsEnabled="{Binding PoisonPossible}" VerticalAlignment="Center"
                                                       ToolTip.Tip="Toggle the poison mist (only some dungeon types)" />
-                                            <CheckBox Content="Open 4th layer" IsChecked="{Binding FourthLayerOpen}"
-                                                      IsEnabled="{Binding FourthLayerPossible}"
+                                            <CheckBox Grid.Column="1" Content="Open 4th layer" IsChecked="{Binding FourthLayerOpen}"
+                                                      IsEnabled="{Binding FourthLayerPossible}" VerticalAlignment="Center"
                                                       ToolTip.Tip="Open or close the optional 4th layer (only some dungeons)" />
-                                        </StackPanel>
-
-                                        <Button Classes="danger" Content="Clear slot" Command="{Binding ClearSlotCommand}"
-                                                HorizontalAlignment="Stretch" Margin="0,16,0,0"
-                                                ToolTip.Tip="Empty this altar slot" />
+                                            <Button Grid.Column="2" Classes="danger" Content="Clear slot" Command="{Binding ClearSlotCommand}"
+                                                    HorizontalAlignment="Right"
+                                                    ToolTip.Tip="Empty this altar slot" />
+                                        </Grid>
                                     </StackPanel>
                                 </TabItem>
                                 <TabItem Header="Fields">
                                     <ScrollViewer Margin="0,12,0,0" VerticalScrollBarVisibility="Auto"
                                                   ToolTip.Tip="Edit each headstone field as raw hex. A change applies once it is the right length.">
                                         <ItemsControl ItemsSource="{Binding Fields}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <UniformGrid Columns="2" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate x:DataType="vm:HeadstoneFieldViewModel">
-                                                    <Grid ColumnDefinitions="140,*" Margin="0,4" ToolTip.Tip="{Binding OffsetLabel}">
-                                                        <TextBlock Grid.Column="0" Classes="caption" Text="{Binding Label}" VerticalAlignment="Center" />
+                                                    <Grid ColumnDefinitions="76,*" Margin="0,0,12,6" ToolTip.Tip="{Binding OffsetLabel}">
+                                                        <TextBlock Grid.Column="0" Classes="caption" Text="{Binding Label}" VerticalAlignment="Center"
+                                                                   TextTrimming="CharacterEllipsis" />
                                                         <TextBox Grid.Column="1" Text="{Binding Hex}" FontSize="13"
                                                                  FontFamily="Cascadia Mono,Consolas,Menlo,monospace" />
                                                     </Grid>

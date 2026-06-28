@@ -86,12 +86,33 @@ public class MainViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref _characterName, value);
     }
 
-    // The editable copy shown in the rename box; applied to the save on Rename.
+    // The editable copies shown in the character boxes; applied to the save on Save.
     private string? _editableName;
     public string? EditableName
     {
         get => _editableName;
         set => this.RaiseAndSetIfChanged(ref _editableName, value);
+    }
+
+    private string _editableInsight = string.Empty;
+    public string EditableInsight
+    {
+        get => _editableInsight;
+        set => this.RaiseAndSetIfChanged(ref _editableInsight, value);
+    }
+
+    private string _editableEchoes = string.Empty;
+    public string EditableEchoes
+    {
+        get => _editableEchoes;
+        set => this.RaiseAndSetIfChanged(ref _editableEchoes, value);
+    }
+
+    private string _editableLevel = string.Empty;
+    public string EditableLevel
+    {
+        get => _editableLevel;
+        set => this.RaiseAndSetIfChanged(ref _editableLevel, value);
     }
 
     public bool HasLoadedSave
@@ -390,6 +411,9 @@ public class MainViewModel : ViewModelBase
             var save = _saves.Load(path);
             CharacterName = save.CharacterName;
             EditableName = save.CharacterName;
+            EditableInsight = save.Insight.ToString();
+            EditableEchoes = save.Echoes.ToString();
+            EditableLevel = save.Level.ToString();
             HasLoadedSave = true;
             _config.Settings.LastSavePath = path;
             _config.Save();
@@ -411,7 +435,7 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
-            ApplyPendingRename();
+            ApplyCharacterEdits();
 
             if (_config.Settings.AutoBackupEnabled && _saves.CurrentPath is { } path)
                 _backups.Create(path, "before save");
@@ -534,6 +558,20 @@ public class MainViewModel : ViewModelBase
             _saves.SetCharacterName(name);
             CharacterName = name;
         }
+    }
+
+    // Applies the name, insight and blood echoes from the boxes to the in-memory save.
+    private void ApplyCharacterEdits()
+    {
+        ApplyPendingRename();
+        if (!HasLoadedSave)
+            return;
+        if (uint.TryParse(EditableInsight, out uint insight) && insight != _saves.Insight)
+            _saves.SetInsight(insight);
+        if (uint.TryParse(EditableEchoes, out uint echoes) && echoes != _saves.Echoes)
+            _saves.SetEchoes(echoes);
+        if (uint.TryParse(EditableLevel, out uint level) && level != _saves.Level)
+            _saves.SetLevel(level);
     }
 
     private void DetectSaves()

@@ -48,6 +48,20 @@ public class SaveFileTests
     }
 
     [Fact]
+    public void LevelInsightEchoes_RoundTripAsLittleEndianU32()
+    {
+        var save = MakeSave(out _);
+
+        save.SetLevel(120);
+        save.SetInsight(99);
+        save.SetEchoes(9_999_999);
+
+        Assert.Equal(120u, save.Level);
+        Assert.Equal(99u, save.Insight);
+        Assert.Equal(9_999_999u, save.Echoes);
+    }
+
+    [Fact]
     public void WriteSlotRaw_RoundTripsThroughGetSlotBytes()
     {
         var save = MakeSave(out _);

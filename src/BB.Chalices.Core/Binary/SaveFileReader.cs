@@ -11,6 +11,9 @@ public static class SaveFileReader
     private const int NameOffset = -469;  // username field, relative to the marker
     private const int NameStringOffset = NameOffset + 1; // the UTF-16 string begins one byte in
     private const int NameMaxChars = 16;  // up to 16 characters, stored as UTF-16LE
+    private const int EchoesOffset = NameOffset - 19;   // blood echoes, u32 little-endian
+    private const int LevelOffset = NameOffset - 23;    // character level, u32 little-endian
+    private const int InsightOffset = NameOffset - 35;  // insight, u32 little-endian
     private const int MaxSlots = 6;
 
     // The inventory block opens with the bytes 40 F0 FF FF. Returns the marker's
@@ -68,6 +71,29 @@ public static class SaveFileReader
             data[offset + i * 2] = i < ascii.Length ? ascii[i] : (byte)0;
             data[offset + i * 2 + 1] = 0; // high byte of the UTF-16 character
         }
+    }
+
+    // Blood echoes and insight are u32 little-endian stats near the username field
+    // (offsets from Noxde's Bloodborne-save-editor stats.json: -19 and -35).
+    public static uint GetEchoes(ReadOnlySpan<byte> data, int inventory) => ReadUInt32(data, inventory + EchoesOffset);
+    public static void SetEchoes(Span<byte> data, int inventory, uint value) => WriteUInt32(data, inventory + EchoesOffset, value);
+    public static uint GetInsight(ReadOnlySpan<byte> data, int inventory) => ReadUInt32(data, inventory + InsightOffset);
+    public static void SetInsight(Span<byte> data, int inventory, uint value) => WriteUInt32(data, inventory + InsightOffset, value);
+    public static uint GetLevel(ReadOnlySpan<byte> data, int inventory) => ReadUInt32(data, inventory + LevelOffset);
+    public static void SetLevel(Span<byte> data, int inventory, uint value) => WriteUInt32(data, inventory + LevelOffset, value);
+
+    private static uint ReadUInt32(ReadOnlySpan<byte> data, int offset)
+    {
+        if (offset < 0 || offset + 4 > data.Length)
+            return 0;
+        return System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(data.Slice(offset, 4));
+    }
+
+    private static void WriteUInt32(Span<byte> data, int offset, uint value)
+    {
+        if (offset < 0 || offset + 4 > data.Length)
+            return;
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(data.Slice(offset, 4), value);
     }
 
     // Writing a slot stamps a 125-byte discovery flag at GetFlagsOffset(inventory, slot);
