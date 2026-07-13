@@ -151,6 +151,12 @@ public partial class MainWindow : Window
             await Launcher.LaunchDirectoryInfoAsync(new DirectoryInfo(viewModel.BackupPath));
     }
 
+    private async void OnChooseDataFolder(object? sender, RoutedEventArgs e)
+    {
+        if (await PickFolderAsync() is { } path && DataContext is MainViewModel viewModel)
+            viewModel.UseCustomFolder(path);
+    }
+
     private async void OnOpenDataFolder(object? sender, RoutedEventArgs e)
     {
         if (DataContext is MainViewModel viewModel

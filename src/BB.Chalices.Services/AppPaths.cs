@@ -1,83 +1,101 @@
 namespace BB.Chalices.Services;
 
-// Decides where the app keeps its data. Portable mode: if a "portable.txt" marker
-// sits next to the executable, everything (settings, database, catalogue cache,
-// backups) lives in a "data" folder beside the exe instead of in the user profile.
-// Switching modes migrates the data on the next launch, before anything opens it.
+public enum StorageMode { Profile, Portable, Custom }
+
+// Decides where the app keeps its data (settings, database, catalogue cache, backups).
+// Three modes, chosen by marker files next to the executable so the location can be
+// known before any data is opened:
+//   - Profile (default): <LocalAppData>/BBChalices
+//   - Portable  (portable.txt present): a "data" folder next to the exe
+//   - Custom    (datadir.txt present):  the folder path stored in that file
+// Switching records the old location so the next launch migrates the data across
+// before anything is opened (no file locks).
 public static class AppPaths
 {
     private const string PortableMarker = "portable.txt";
+    private const string CustomMarker = "datadir.txt";
+    private const string MigrateMarker = "migrate-from.txt";
     private const string FolderName = "BBChalices";
 
     private static readonly string ExeDir = AppContext.BaseDirectory;
-    private static string MarkerPath => Path.Combine(ExeDir, PortableMarker);
+    private static string PortableMarkerPath => Path.Combine(ExeDir, PortableMarker);
+    private static string CustomMarkerPath => Path.Combine(ExeDir, CustomMarker);
+    private static string MigrateMarkerPath => Path.Combine(ExeDir, MigrateMarker);
     private static string PortableDir => Path.Combine(ExeDir, "data");
     private static string ProfileDir => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), FolderName);
 
-    public static bool IsPortable { get; private set; }
+    public static StorageMode Mode { get; private set; } = StorageMode.Profile;
+    public static bool IsPortable => Mode == StorageMode.Portable;
+    public static bool IsCustom => Mode == StorageMode.Custom;
 
     // The base folder all app data goes under. Resolved once at startup.
     public static string BaseDirectory { get; } = Resolve();
 
     private static string Resolve()
     {
-        string active, inactive;
+        string active = ProfileDir;
         try
         {
-            if (File.Exists(MarkerPath))
+            if (File.Exists(CustomMarkerPath) && File.ReadAllText(CustomMarkerPath).Trim() is { Length: > 0 } custom)
             {
-                IsPortable = true;
-                active = PortableDir;
-                inactive = ProfileDir;
+                Mode = StorageMode.Custom;
+                active = custom;
             }
-            else
+            else if (File.Exists(PortableMarkerPath))
             {
-                active = ProfileDir;
-                inactive = PortableDir;
+                Mode = StorageMode.Portable;
+                active = PortableDir;
             }
         }
         catch
         {
+            Mode = StorageMode.Profile;
             active = ProfileDir;
-            inactive = PortableDir;
         }
 
-        Directory.CreateDirectory(active);
-
-        // First launch in this mode with data still in the other location: bring it
-        // over. Runs before the DB/settings are opened, so nothing is locked.
         try
         {
-            if (!File.Exists(Path.Combine(active, "settings.json"))
-                && Directory.Exists(inactive)
-                && File.Exists(Path.Combine(inactive, "settings.json")))
+            Directory.CreateDirectory(active);
+        }
+        catch
+        {
+            // The chosen folder isn't usable (e.g. a removed drive): fall back to the profile.
+            Mode = StorageMode.Profile;
+            active = ProfileDir;
+            Directory.CreateDirectory(active);
+        }
+
+        MigrateIfPending(active);
+        return active;
+    }
+
+    // Bring data over from the location we were switching away from, if the new one is
+    // still empty. Runs before the DB/settings are opened, so nothing is locked.
+    private static void MigrateIfPending(string active)
+    {
+        try
+        {
+            if (!File.Exists(MigrateMarkerPath))
+                return;
+
+            var from = File.ReadAllText(MigrateMarkerPath).Trim();
+            if (from.Length > 0 && !PathsEqual(from, active)
+                && Directory.Exists(from) && File.Exists(Path.Combine(from, "settings.json"))
+                && !File.Exists(Path.Combine(active, "settings.json")))
             {
-                CopyDirectory(inactive, active);
+                CopyDirectory(from, active);
             }
+            File.Delete(MigrateMarkerPath);
         }
         catch
         {
             // Migration is best-effort; the app still runs with a fresh data folder.
         }
-
-        return active;
     }
 
-    // Turn portable mode on/off by creating/removing the marker. Takes effect on the
-    // next launch, when Resolve migrates the data to the new location.
-    public static void SetPortable(bool portable)
-    {
-        if (portable)
-            File.WriteAllText(MarkerPath,
-                "This file makes BB Chalices portable: its data is kept in the data/ folder next to the app.\n");
-        else if (File.Exists(MarkerPath))
-            File.Delete(MarkerPath);
-    }
-
-    // Portable toggling only makes sense where the exe folder is writable (not, say,
-    // Program Files without elevation).
-    public static bool CanTogglePortable()
+    // Whether the exe folder is writable (markers can't be dropped in, say, Program Files).
+    public static bool CanChangeLocation()
     {
         try
         {
@@ -91,6 +109,43 @@ public static class AppPaths
             return false;
         }
     }
+
+    public static void UseProfile()
+    {
+        RememberCurrentLocation();
+        SafeDelete(CustomMarkerPath);
+        SafeDelete(PortableMarkerPath);
+    }
+
+    public static void UsePortable()
+    {
+        RememberCurrentLocation();
+        SafeDelete(CustomMarkerPath);
+        File.WriteAllText(PortableMarkerPath,
+            "This file makes BB Chalices portable: its data is kept in the data/ folder next to the app.\n");
+    }
+
+    public static void UseCustomFolder(string path)
+    {
+        RememberCurrentLocation();
+        SafeDelete(PortableMarkerPath);
+        File.WriteAllText(CustomMarkerPath, path.Trim());
+    }
+
+    private static void RememberCurrentLocation()
+    {
+        try { File.WriteAllText(MigrateMarkerPath, BaseDirectory); } catch { }
+    }
+
+    private static void SafeDelete(string path)
+    {
+        try { if (File.Exists(path)) File.Delete(path); } catch { }
+    }
+
+    private static bool PathsEqual(string a, string b) =>
+        string.Equals(Path.TrimEndingDirectorySeparator(Path.GetFullPath(a)),
+                      Path.TrimEndingDirectorySeparator(Path.GetFullPath(b)),
+                      StringComparison.OrdinalIgnoreCase);
 
     private static void CopyDirectory(string source, string dest)
     {

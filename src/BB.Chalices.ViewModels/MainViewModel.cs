@@ -74,7 +74,8 @@ public class MainViewModel : ViewModelBase
         ApplySoundFixCommand = ReactiveCommand.Create(ApplySoundFix);
         ZoomInCommand = ReactiveCommand.Create(() => SetUiScale(UiScale + ZoomStep));
         ZoomOutCommand = ReactiveCommand.Create(() => SetUiScale(UiScale - ZoomStep));
-        TogglePortableCommand = ReactiveCommand.Create(TogglePortable);
+        UsePortableLocationCommand = ReactiveCommand.Create(UsePortableLocation);
+        UseDefaultLocationCommand = ReactiveCommand.Create(UseDefaultLocation);
 
         _uiScale = _config.Settings.UiScale is >= MinScale and <= MaxScale ? _config.Settings.UiScale : 1.0;
     }
@@ -97,9 +98,20 @@ public class MainViewModel : ViewModelBase
 
     public string UiScalePercent => $"{UiScale * 100:0}%";
 
+    // The app version shown under the logo (from the assembly version).
+    public string AppVersion
+    {
+        get
+        {
+            var v = (System.Reflection.Assembly.GetEntryAssembly() ?? typeof(MainViewModel).Assembly).GetName().Version;
+            return v is null ? "" : $"v{v.Major}.{v.Minor}.{v.Build}";
+        }
+    }
+
     public ReactiveCommand<Unit, Unit> ZoomInCommand { get; }
     public ReactiveCommand<Unit, Unit> ZoomOutCommand { get; }
-    public ReactiveCommand<Unit, Unit> TogglePortableCommand { get; }
+    public ReactiveCommand<Unit, Unit> UsePortableLocationCommand { get; }
+    public ReactiveCommand<Unit, Unit> UseDefaultLocationCommand { get; }
 
     private void SetUiScale(double value)
     {
@@ -280,22 +292,33 @@ public class MainViewModel : ViewModelBase
 
     // Where the app keeps its settings, database and catalogue cache.
     public string DataFolder => _config.DataDirectory;
-    public bool CanTogglePortable => AppPaths.CanTogglePortable();
-    public string PortableToggleLabel => AppPaths.IsPortable ? "Switch to user profile" : "Make portable";
-    public string StorageMode => AppPaths.IsPortable
-        ? "Portable: data is kept in the data/ folder next to the app."
-        : "Data is kept in your user profile.";
+    public bool CanChangeLocation => AppPaths.CanChangeLocation();
+    public bool ShowMakePortable => CanChangeLocation && !AppPaths.IsPortable;
+    public bool ShowUseDefault => CanChangeLocation && AppPaths.Mode != StorageMode.Profile;
+    public string StorageModeText => AppPaths.Mode switch
+    {
+        StorageMode.Portable => "Portable: data is kept in the data/ folder next to the app.",
+        StorageMode.Custom => "Custom folder: data is kept in the folder shown above.",
+        _ => "Data is kept in your user profile.",
+    };
 
-    private void TogglePortable()
+    private void RestartHint() =>
+        StatusMessage = "Storage location changed. Restart the app to apply - your data moves over automatically.";
+
+    private void UsePortableLocation() => ChangeLocation(AppPaths.UsePortable);
+    private void UseDefaultLocation() => ChangeLocation(AppPaths.UseProfile);
+    public void UseCustomFolder(string path) => ChangeLocation(() => AppPaths.UseCustomFolder(path));
+
+    private void ChangeLocation(Action change)
     {
         try
         {
-            AppPaths.SetPortable(!AppPaths.IsPortable);
-            StatusMessage = "Storage mode changed. Restart the app to apply - your data moves over automatically.";
+            change();
+            RestartHint();
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Couldn't change storage mode: {ex.Message}";
+            StatusMessage = $"Couldn't change storage location: {ex.Message}";
         }
     }
 

@@ -34,7 +34,10 @@
                 <DockPanel Margin="20">
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,20">
                         <Image Source="/Assets/favicon.png" Width="26" Height="26" VerticalAlignment="Center" />
-                        <TextBlock Classes="heading" Text="BB Chalices" VerticalAlignment="Center" />
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Classes="heading" Text="BB Chalices" />
+                            <TextBlock Classes="caption" Text="{Binding AppVersion}" />
+                        </StackPanel>
                     </StackPanel>
 
                     <!-- the save lives in its own block at the bottom, with one big Save button -->
@@ -447,10 +450,17 @@
                                          ToolTip.Tip="Where settings, the database and the catalogue cache are kept." />
                                 <Button Grid.Column="1" Content="Open" Click="OnOpenDataFolder" ToolTip.Tip="Open the data folder" />
                             </Grid>
-                            <TextBlock Classes="caption" Text="{Binding StorageMode}" TextWrapping="Wrap" />
-                            <Button Content="{Binding PortableToggleLabel}" Command="{Binding TogglePortableCommand}"
-                                    IsVisible="{Binding CanTogglePortable}" HorizontalAlignment="Left"
-                                    ToolTip.Tip="Switch between a portable install (data next to the app) and the user profile. Applies on restart; your data moves over automatically." />
+                            <TextBlock Classes="caption" Text="{Binding StorageModeText}" TextWrapping="Wrap" />
+                            <WrapPanel IsVisible="{Binding CanChangeLocation}">
+                                <Button Content="Choose folder..." Click="OnChooseDataFolder" Margin="0,0,8,0"
+                                        ToolTip.Tip="Keep the app's data in a folder you pick. Applies on restart; your data moves over automatically." />
+                                <Button Content="Make portable" Command="{Binding UsePortableLocationCommand}"
+                                        IsVisible="{Binding ShowMakePortable}" Margin="0,0,8,0"
+                                        ToolTip.Tip="Keep data in a data/ folder right next to the app. Applies on restart; your data moves over automatically." />
+                                <Button Content="Use default folder" Command="{Binding UseDefaultLocationCommand}"
+                                        IsVisible="{Binding ShowUseDefault}"
+                                        ToolTip.Tip="Keep data in your user profile (AppData). Applies on restart; your data moves over automatically." />
+                            </WrapPanel>
                         </StackPanel>
 
                         <StackPanel Spacing="8">
