@@ -53,10 +53,19 @@ public class BackupService
         {
             EnsureDirectory();
             var stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
-            var name = $"{Path.GetFileName(savePath)}_{stamp}.bak";
+            var baseName = $"{Path.GetFileName(savePath)}_{stamp}";
+            // Two backups can land in the same millisecond (e.g. a restore backs up the
+            // current state right before overwriting it, and some clocks are coarse).
+            // Disambiguate instead of overwriting, so an earlier backup is never clobbered.
+            var name = $"{baseName}.bak";
             var dest = Path.Combine(BackupDirectory, name);
+            for (int i = 2; File.Exists(dest); i++)
+            {
+                name = $"{baseName}_{i}.bak";
+                dest = Path.Combine(BackupDirectory, name);
+            }
 
-            File.Copy(savePath, dest, overwrite: true);
+            File.Copy(savePath, dest, overwrite: false);
             File.WriteAllText(dest + ".meta", $"OriginalFile={savePath}\nDate={DateTime.Now}\nNotes={notes}");
 
             return $"Backup created: {name}";
