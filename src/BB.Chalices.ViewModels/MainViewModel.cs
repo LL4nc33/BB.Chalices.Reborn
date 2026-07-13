@@ -481,31 +481,38 @@ public class MainViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref _canUndo, value);
     }
 
-    private bool _isCatalogueEmpty;
-    // True until the ready-made catalogue has been downloaded; drives the catalogue
-    // prompt. The app stays fully usable offline without it (Build new, paste, custom).
-    public bool IsCatalogueEmpty
+    private bool _noxMissing;
+    // True when Noxde's curated categories aren't in the DB yet (not downloaded).
+    public bool NoxCatalogueMissing
     {
-        get => _isCatalogueEmpty;
-        private set => this.RaiseAndSetIfChanged(ref _isCatalogueEmpty, value);
+        get => _noxMissing;
+        private set
+        {
+            this.RaiseAndSetIfChanged(ref _noxMissing, value);
+            this.RaisePropertyChanged(nameof(ShowNoxDownloadPrompt));
+        }
     }
+
+    // Show the "download Noxde's dungeons" prompt when the user is on the Noxde tab
+    // but that set hasn't been downloaded yet.
+    public bool ShowNoxDownloadPrompt => ShowNox && NoxCatalogueMissing;
 
     private async Task LoadDungeonsAsync()
     {
         var all = await _dungeons.GetAllAsync();
         _all = all.Select(d => new DungeonViewModel(d)).ToList();
         RebuildCategories();
-        IsCatalogueEmpty = _all.Count == 0;
-        StatusMessage = _all.Count == 0
-            ? "Catalogue empty. The ready-made dungeons are Noxde's - download them when online; the app works offline without them."
-            : $"{_all.Count} dungeons ready.";
+        NoxCatalogueMissing = !_all.Any(d => NoxCategories.Contains(d.Category));
+        StatusMessage = $"{_all.Count} dungeons ready.";
     }
 
     // Noxde's curated list is kept separate from the full Tomb Prospectors set.
     private static readonly HashSet<string> NoxCategories =
         new(StringComparer.OrdinalIgnoreCase) { "farming", "equipment", "bloodgems", "testing" };
 
-    private bool _showNox = true;
+    // Start on the bundled by-area set (always present) rather than Noxde's list,
+    // which is empty until downloaded.
+    private bool _showNox = false;
     public bool ShowNox
     {
         get => _showNox;
@@ -513,6 +520,7 @@ public class MainViewModel : ViewModelBase
         {
             this.RaiseAndSetIfChanged(ref _showNox, value);
             this.RaisePropertyChanged(nameof(ShowAll));
+            this.RaisePropertyChanged(nameof(ShowNoxDownloadPrompt));
             RebuildCategories();
         }
     }

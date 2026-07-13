@@ -174,11 +174,11 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                         <Border Grid.Row="2" Classes="card" VerticalAlignment="Center" Padding="20"
-                                IsVisible="{Binding IsCatalogueEmpty}">
+                                IsVisible="{Binding ShowNoxDownloadPrompt}">
                             <StackPanel Spacing="12" HorizontalAlignment="Center" MaxWidth="440">
-                                <TextBlock Classes="heading" Text="Get the dungeon catalogue" HorizontalAlignment="Center" />
+                                <TextBlock Classes="heading" Text="Noxde's dungeons aren't downloaded yet" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
                                 <TextBlock Classes="body" TextWrapping="Wrap" TextAlignment="Center"
-                                           Text="The 200+ ready-made dungeons are Noxde's work, hosted on his gist. The app fetches them once (with your OK) and caches them for offline use. Everything else works offline without them - open saves, edit slots, build or paste dungeons." />
+                                           Text="These 200+ curated dungeons are Noxde's work, hosted on his gist. Fetch them once (with your OK) and they're cached for offline use. The bundled 'All' set works offline without them - switch to the All tab above to browse right now." />
                                 <Button Classes="primary" Content="Download from Noxde's gist" Command="{Binding UpdateDungeonsCommand}"
                                         HorizontalAlignment="Center" HorizontalContentAlignment="Center"
                                         ToolTip.Tip="One-time download from gist.github.com/Noxde, then cached locally for offline use" />
