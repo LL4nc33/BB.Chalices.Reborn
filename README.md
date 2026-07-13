@@ -6,8 +6,8 @@ Handy for farming runs, blood-gem setups, or just testing things without grindin
 glyphs by hand.
 
 The catalogue has two parts. A large by-area set (compiled from the public Tomb
-Prospectors research) is bundled and works fully offline - that is the **All** view.
-Nox's 200+ curated dungeons (the **Nox** view) are his work, so they are fetched
+Prospectors research) is bundled and works fully offline - that is the **Community**
+view. Nox's 200+ curated dungeons (the **Nox** view) are his work, so they are fetched
 once from his gist with your consent and cached locally. The app is fully usable
 offline either way.
 

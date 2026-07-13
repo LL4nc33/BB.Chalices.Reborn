@@ -3,8 +3,19 @@
 All notable changes to BB Chalices are listed here. Versions follow the
 NexusMods release numbers.
 
+## v0.98.2
+
+- Renamed the "All" catalogue tab to "Community" (the Tomb Prospectors by-area
+  set). It never contained Nox's dungeons, so "All" was misleading; the Nox tab
+  now also states its dungeons need a one-time download.
+- No more double backups: with auto-backup on you get one timestamped backup in
+  the backup folder; with it off, one rolling backup/ folder next to the save.
+  Never both.
+
 ## v0.98.1
 
+- Fixed a backup being overwritten when two saves landed in the same millisecond
+  (could corrupt a restore on macOS).
 - Storage location is now fully configurable in Settings: keep data in your
   user profile, make the install portable (a data/ folder next to the app), or
   pick any folder with "Choose folder...". Switching moves your data over on the

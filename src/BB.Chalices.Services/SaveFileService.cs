@@ -20,13 +20,16 @@ public class SaveFileService
         return _save;
     }
 
-    // Back up the file, then write the edited bytes over it.
-    public void Save()
+    // Write the edited bytes over the file. By default a rolling <dir>/backup/<name>.bak
+    // is written first as a safety net; the caller can skip it when a managed backup was
+    // already made (auto-backup), so a save never leaves two copies behind.
+    public void Save(bool createBackup = true)
     {
         if (_save is null || string.IsNullOrEmpty(_path))
             throw new InvalidOperationException("No save file loaded");
 
-        SaveFile.CreateBackup(_path);
+        if (createBackup)
+            SaveFile.CreateBackup(_path);
         _save.SaveToFile(_path);
     }
 

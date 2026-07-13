@@ -642,10 +642,13 @@ public class MainViewModel : ViewModelBase
         {
             ApplyCharacterEdits();
 
-            if (_config.Settings.AutoBackupEnabled && _saves.CurrentPath is { } path)
+            // With auto-backup on, keep the managed timestamped backup as the single copy;
+            // otherwise fall back to the rolling .bak next to the save. Never both.
+            bool autoBackup = _config.Settings.AutoBackupEnabled;
+            if (autoBackup && _saves.CurrentPath is { } path)
                 _backups.Create(path, "before save");
 
-            _saves.Save();
+            _saves.Save(createBackup: !autoBackup);
             SnapshotBaselines();
             StatusMessage = $"Saved as {CharacterName}. A backup was written first.";
         }
@@ -818,7 +821,7 @@ public class MainViewModel : ViewModelBase
         _all.Add(new DungeonViewModel(entity));
         RebuildCategories();
         ApplyFilter();
-        StatusMessage = $"Saved \"{name}\" to your dungeons. Find it in the catalogue (All tab, Custom).";
+        StatusMessage = $"Saved \"{name}\" to your dungeons. Find it in the catalogue (Community tab, Custom).";
     }
 
     // Remove the selected dungeon from the player's catalogue (custom dungeons only).

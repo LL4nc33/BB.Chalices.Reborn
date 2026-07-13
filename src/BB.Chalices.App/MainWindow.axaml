@@ -152,10 +152,10 @@
                                 <UniformGrid Grid.Column="2" Columns="2" VerticalAlignment="Center">
                                     <Button Classes="toggle" Classes.active="{Binding ShowNox}" Content="Nox" Click="OnShowNox"
                                             HorizontalAlignment="Stretch"
-                                            ToolTip.Tip="Nox's curated farming, equipment and gem dungeons" />
-                                    <Button Classes="toggle" Classes.active="{Binding ShowAll}" Content="All" Click="OnShowAll"
+                                            ToolTip.Tip="Nox's curated farming, equipment and gem dungeons. Needs a one-time download (Settings), then works offline." />
+                                    <Button Classes="toggle" Classes.active="{Binding ShowAll}" Content="Community" Click="OnShowAll"
                                             HorizontalAlignment="Stretch"
-                                            ToolTip.Tip="The full Tomb Prospectors set by area" />
+                                            ToolTip.Tip="The Tomb Prospectors set, by area. Bundled and offline. Does not include Nox's dungeons (see the Nox tab for those)." />
                                 </UniformGrid>
                             </Grid>
                         </StackPanel>
@@ -189,7 +189,7 @@
                             <StackPanel Spacing="12" HorizontalAlignment="Center" MaxWidth="440">
                                 <TextBlock Classes="heading" Text="Nox's dungeons aren't downloaded yet" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
                                 <TextBlock Classes="body" TextWrapping="Wrap" TextAlignment="Center"
-                                           Text="These 200+ curated dungeons are Nox's work, hosted on his gist. Fetch them once (with your OK) and they're cached for offline use. The bundled 'All' set works offline without them - switch to the All tab above to browse right now." />
+                                           Text="These 200+ curated dungeons are Nox's work, hosted on his gist. Fetch them once (with your OK) and they're cached for offline use. The bundled Community set works offline without them - switch to the Community tab above to browse right now." />
                                 <Button Classes="primary" Content="Download from Nox's gist" Command="{Binding UpdateDungeonsCommand}"
                                         HorizontalAlignment="Center" HorizontalContentAlignment="Center"
                                         ToolTip.Tip="One-time download from Nox's gist, then cached locally for offline use" />
@@ -439,9 +439,13 @@
                             </Grid>
                         </StackPanel>
 
-                        <CheckBox Content="Back up automatically before every save"
-                                  IsChecked="{Binding AutoBackup}"
-                                  ToolTip.Tip="Keep a timestamped backup every time you save" />
+                        <StackPanel Spacing="4">
+                            <CheckBox Content="Back up automatically before every save"
+                                      IsChecked="{Binding AutoBackup}"
+                                      ToolTip.Tip="Keep a timestamped backup every time you save" />
+                            <TextBlock Classes="caption" TextWrapping="Wrap"
+                                       Text="On: a timestamped copy is kept in the backup folder, listed under Backups. Off: a single rolling backup/ folder is kept next to the save instead. Either way you get one backup per save, never two." />
+                        </StackPanel>
 
                         <StackPanel Spacing="8">
                             <TextBlock Classes="section" Text="STORAGE" />
