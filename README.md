@@ -41,7 +41,13 @@ Under the shadPS4 emulator, Bloodborne saves live at:
 The `CUSA` folder depends on your game's region/version, so the app doesn't
 hard-code it. Hit **Detect saves** and it walks your shadPS4 folder looking for the
 `SPRJ0005` save directory and lists the characters it finds. You can also browse to
-a `userdata` file directly with **Open Save**.
+a `userdata` file directly with **Open Save**, **drag-and-drop** one onto the window,
+or just relaunch - it reopens the last save automatically.
+
+By default settings, the database and the catalogue cache live in your user profile.
+For a **portable** install, drop an empty `portable.txt` next to the executable and
+everything is kept in a `data/` folder beside it instead. You can also resize the UI
+any time with the **A- / A+** buttons (or Ctrl +/-).
 
 Every time you save, the original file is copied to a `backup/` folder next to it
 first, so you can always roll back.

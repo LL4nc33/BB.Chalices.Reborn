@@ -13,6 +13,13 @@
         DragDrop.AllowDrop="True"
         Title="BB Chalices">
 
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Ctrl+OemPlus" Command="{Binding ZoomInCommand}" />
+        <KeyBinding Gesture="Ctrl+Add" Command="{Binding ZoomInCommand}" />
+        <KeyBinding Gesture="Ctrl+OemMinus" Command="{Binding ZoomOutCommand}" />
+        <KeyBinding Gesture="Ctrl+Subtract" Command="{Binding ZoomOutCommand}" />
+    </Window.KeyBindings>
+
     <LayoutTransformControl>
         <LayoutTransformControl.LayoutTransform>
             <ScaleTransform ScaleX="{Binding UiScale}" ScaleY="{Binding UiScale}" />
