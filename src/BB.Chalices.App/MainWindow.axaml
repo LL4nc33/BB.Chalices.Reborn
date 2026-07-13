@@ -12,6 +12,10 @@
         Background="{DynamicResource WindowBg}"
         Title="BB Chalices">
 
+    <LayoutTransformControl>
+        <LayoutTransformControl.LayoutTransform>
+            <ScaleTransform ScaleX="{Binding UiScale}" ScaleY="{Binding UiScale}" />
+        </LayoutTransformControl.LayoutTransform>
     <Grid RowDefinitions="*,Auto">
 
         <Grid Grid.Row="0" ColumnDefinitions="220,*">
@@ -92,6 +96,17 @@
                                     IsVisible="{Binding IsBackupsView}" />
                             <Button Classes="nav" Content="Backups" Click="OnShowBackups"
                                     ToolTip.Tip="Browse, restore or delete backups" />
+                        </Grid>
+
+                        <Border Height="1" Background="{DynamicResource Edge}" Margin="0,8,0,0" />
+                        <TextBlock Classes="section" Text="TEXT SIZE" Margin="0,4,0,0" />
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Button Grid.Column="0" Content="A-" Command="{Binding ZoomOutCommand}"
+                                    ToolTip.Tip="Make everything smaller" />
+                            <TextBlock Grid.Column="1" Text="{Binding UiScalePercent}" Classes="body"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Button Grid.Column="2" Content="A+" Command="{Binding ZoomInCommand}"
+                                    ToolTip.Tip="Make everything bigger" />
                         </Grid>
                     </StackPanel>
                 </DockPanel>
@@ -521,4 +536,5 @@
             </Grid>
         </Border>
     </Grid>
+    </LayoutTransformControl>
 </Window>

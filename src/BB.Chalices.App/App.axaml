@@ -15,10 +15,10 @@
         <SolidColorBrush x:Key="BloodDim" Color="#3C0707" />
         <SolidColorBrush x:Key="BloodDeep" Color="#4E0909" />
         <SolidColorBrush x:Key="BloodBright" Color="#C01717" />
-        <SolidColorBrush x:Key="Parchment" Color="#E2DBCA" />
-        <SolidColorBrush x:Key="ParchmentHi" Color="#F4ECD6" />
-        <SolidColorBrush x:Key="ParchmentBright" Color="#F9F2E0" />
-        <SolidColorBrush x:Key="ParchmentDim" Color="#C2BAA6" />
+        <SolidColorBrush x:Key="Parchment" Color="#EDE7D8" />
+        <SolidColorBrush x:Key="ParchmentHi" Color="#F6EFDC" />
+        <SolidColorBrush x:Key="ParchmentBright" Color="#FBF5E6" />
+        <SolidColorBrush x:Key="ParchmentDim" Color="#D2CBB9" />
         <SolidColorBrush x:Key="Edge" Color="#2A2A31" />
 
         <!-- One shared window backdrop for every window -->

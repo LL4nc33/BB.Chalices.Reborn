@@ -72,6 +72,41 @@ public class MainViewModel : ViewModelBase
         CreateBackupCommand = ReactiveCommand.Create(CreateBackup);
         RestoreBackupCommand = ReactiveCommand.Create(RestoreSelectedBackup);
         ApplySoundFixCommand = ReactiveCommand.Create(ApplySoundFix);
+        ZoomInCommand = ReactiveCommand.Create(() => SetUiScale(UiScale + ZoomStep));
+        ZoomOutCommand = ReactiveCommand.Create(() => SetUiScale(UiScale - ZoomStep));
+
+        _uiScale = _config.Settings.UiScale is >= MinScale and <= MaxScale ? _config.Settings.UiScale : 1.0;
+    }
+
+    // --- UI zoom (the +/- buttons) ---
+    private const double ZoomStep = 0.1;
+    private const double MinScale = 0.8;
+    private const double MaxScale = 2.0;
+
+    private double _uiScale = 1.0;
+    public double UiScale
+    {
+        get => _uiScale;
+        private set
+        {
+            this.RaiseAndSetIfChanged(ref _uiScale, value);
+            this.RaisePropertyChanged(nameof(UiScalePercent));
+        }
+    }
+
+    public string UiScalePercent => $"{UiScale * 100:0}%";
+
+    public ReactiveCommand<Unit, Unit> ZoomInCommand { get; }
+    public ReactiveCommand<Unit, Unit> ZoomOutCommand { get; }
+
+    private void SetUiScale(double value)
+    {
+        double clamped = Math.Clamp(Math.Round(value, 2), MinScale, MaxScale);
+        if (clamped == UiScale)
+            return;
+        UiScale = clamped;
+        _config.Settings.UiScale = clamped;
+        _config.Save();
     }
 
     public ObservableCollection<DungeonViewModel> Dungeons { get; }

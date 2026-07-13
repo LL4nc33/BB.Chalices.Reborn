@@ -22,4 +22,7 @@ public class AppSettings
 
     // Bumped when the bundled catalogue changes, to trigger a one-time reseed.
     public int CatalogueVersion { get; set; }
+
+    // UI zoom factor (1.0 = 100%), adjustable with the +/- buttons.
+    public double UiScale { get; set; } = 1.0;
 }
