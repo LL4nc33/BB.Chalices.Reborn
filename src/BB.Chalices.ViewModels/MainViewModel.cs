@@ -74,6 +74,7 @@ public class MainViewModel : ViewModelBase
         ApplySoundFixCommand = ReactiveCommand.Create(ApplySoundFix);
         ZoomInCommand = ReactiveCommand.Create(() => SetUiScale(UiScale + ZoomStep));
         ZoomOutCommand = ReactiveCommand.Create(() => SetUiScale(UiScale - ZoomStep));
+        TogglePortableCommand = ReactiveCommand.Create(TogglePortable);
 
         _uiScale = _config.Settings.UiScale is >= MinScale and <= MaxScale ? _config.Settings.UiScale : 1.0;
     }
@@ -98,6 +99,7 @@ public class MainViewModel : ViewModelBase
 
     public ReactiveCommand<Unit, Unit> ZoomInCommand { get; }
     public ReactiveCommand<Unit, Unit> ZoomOutCommand { get; }
+    public ReactiveCommand<Unit, Unit> TogglePortableCommand { get; }
 
     private void SetUiScale(double value)
     {
@@ -278,10 +280,24 @@ public class MainViewModel : ViewModelBase
 
     // Where the app keeps its settings, database and catalogue cache.
     public string DataFolder => _config.DataDirectory;
-    public bool IsPortable => AppPaths.IsPortable;
+    public bool CanTogglePortable => AppPaths.CanTogglePortable();
+    public string PortableToggleLabel => AppPaths.IsPortable ? "Switch to user profile" : "Make portable";
     public string StorageMode => AppPaths.IsPortable
-        ? "Portable: data is kept next to the app."
-        : "Data is kept in your user profile. Drop a \"portable.txt\" next to the app to make it portable.";
+        ? "Portable: data is kept in the data/ folder next to the app."
+        : "Data is kept in your user profile.";
+
+    private void TogglePortable()
+    {
+        try
+        {
+            AppPaths.SetPortable(!AppPaths.IsPortable);
+            StatusMessage = "Storage mode changed. Restart the app to apply - your data moves over automatically.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Couldn't change storage mode: {ex.Message}";
+        }
+    }
 
     // Load the current settings into the form and switch to the settings page.
     public void OpenSettings()

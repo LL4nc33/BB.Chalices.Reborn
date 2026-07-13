@@ -448,6 +448,9 @@
                                 <Button Grid.Column="1" Content="Open" Click="OnOpenDataFolder" ToolTip.Tip="Open the data folder" />
                             </Grid>
                             <TextBlock Classes="caption" Text="{Binding StorageMode}" TextWrapping="Wrap" />
+                            <Button Content="{Binding PortableToggleLabel}" Command="{Binding TogglePortableCommand}"
+                                    IsVisible="{Binding CanTogglePortable}" HorizontalAlignment="Left"
+                                    ToolTip.Tip="Switch between a portable install (data next to the app) and the user profile. Applies on restart; your data moves over automatically." />
                         </StackPanel>
 
                         <StackPanel Spacing="8">
