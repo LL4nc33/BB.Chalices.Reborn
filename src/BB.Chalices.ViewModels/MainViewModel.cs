@@ -72,10 +72,21 @@ public class MainViewModel : ViewModelBase
         CreateBackupCommand = ReactiveCommand.Create(CreateBackup);
         RestoreBackupCommand = ReactiveCommand.Create(RestoreSelectedBackup);
         ApplySoundFixCommand = ReactiveCommand.Create(ApplySoundFix);
-        ZoomInCommand = ReactiveCommand.Create(() => SetUiScale(UiScale + ZoomStep));
-        ZoomOutCommand = ReactiveCommand.Create(() => SetUiScale(UiScale - ZoomStep));
+        ZoomInCommand = ReactiveCommand.Create(() => Adjust(ZoomStep));
+        ZoomOutCommand = ReactiveCommand.Create(() => Adjust(-ZoomStep));
 
-        _uiScale = _config.Settings.UiScale is >= MinScale and <= MaxScale ? _config.Settings.UiScale : 1.0;
+        double legacy = _config.Settings.UiScale;
+        _sidebarScale = InitScale(_config.Settings.SidebarScale, legacy);
+        _catalogueScale = InitScale(_config.Settings.CatalogueScale, legacy);
+        _editorScale = InitScale(_config.Settings.EditorScale, legacy);
+    }
+
+    // Prefer the saved per-column scale; fall back to the older single UiScale so an
+    // upgrade keeps the zoom the user had.
+    private static double InitScale(double columnScale, double legacy)
+    {
+        double v = columnScale != 1.0 ? columnScale : legacy;
+        return v is >= MinScale and <= MaxScale ? v : 1.0;
     }
 
     // --- UI zoom (the +/- buttons) ---
@@ -83,18 +94,51 @@ public class MainViewModel : ViewModelBase
     private const double MinScale = 0.8;
     private const double MaxScale = 2.0;
 
-    private double _uiScale = 1.0;
-    public double UiScale
+    // Each of the three main columns has its own zoom, so the +/- buttons can target
+    // one column at a time (or all at once).
+    private double _sidebarScale = 1.0;
+    public double SidebarScale
     {
-        get => _uiScale;
-        private set
+        get => _sidebarScale;
+        private set => this.RaiseAndSetIfChanged(ref _sidebarScale, value);
+    }
+
+    private double _catalogueScale = 1.0;
+    public double CatalogueScale
+    {
+        get => _catalogueScale;
+        private set => this.RaiseAndSetIfChanged(ref _catalogueScale, value);
+    }
+
+    private double _editorScale = 1.0;
+    public double EditorScale
+    {
+        get => _editorScale;
+        private set => this.RaiseAndSetIfChanged(ref _editorScale, value);
+    }
+
+    public IReadOnlyList<ZoomTarget> ZoomTargets { get; } =
+        new[] { ZoomTarget.All, ZoomTarget.Sidebar, ZoomTarget.Catalogue, ZoomTarget.Editor };
+
+    private ZoomTarget _zoomTarget = ZoomTarget.All;
+    public ZoomTarget SelectedZoomTarget
+    {
+        get => _zoomTarget;
+        set
         {
-            this.RaiseAndSetIfChanged(ref _uiScale, value);
+            this.RaiseAndSetIfChanged(ref _zoomTarget, value);
             this.RaisePropertyChanged(nameof(UiScalePercent));
         }
     }
 
-    public string UiScalePercent => $"{UiScale * 100:0}%";
+    public string UiScalePercent => $"{ScaleFor(SelectedZoomTarget) * 100:0}%";
+
+    private double ScaleFor(ZoomTarget target) => target switch
+    {
+        ZoomTarget.Sidebar => SidebarScale,
+        ZoomTarget.Editor => EditorScale,
+        _ => CatalogueScale, // Catalogue and All display the catalogue scale
+    };
 
     // The app version shown under the logo (from the assembly version).
     public string AppVersion
@@ -109,14 +153,23 @@ public class MainViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ZoomInCommand { get; }
     public ReactiveCommand<Unit, Unit> ZoomOutCommand { get; }
 
-    private void SetUiScale(double value)
+    // Grow or shrink the selected column (or all three) by one step, then persist.
+    private void Adjust(double delta)
     {
-        double clamped = Math.Clamp(Math.Round(value, 2), MinScale, MaxScale);
-        if (clamped == UiScale)
-            return;
-        UiScale = clamped;
-        _config.Settings.UiScale = clamped;
+        double value = Math.Clamp(Math.Round(ScaleFor(SelectedZoomTarget) + delta, 2), MinScale, MaxScale);
+        switch (SelectedZoomTarget)
+        {
+            case ZoomTarget.Sidebar: SidebarScale = value; break;
+            case ZoomTarget.Catalogue: CatalogueScale = value; break;
+            case ZoomTarget.Editor: EditorScale = value; break;
+            default: SidebarScale = CatalogueScale = EditorScale = value; break; // All
+        }
+
+        _config.Settings.SidebarScale = SidebarScale;
+        _config.Settings.CatalogueScale = CatalogueScale;
+        _config.Settings.EditorScale = EditorScale;
         _config.Save();
+        this.RaisePropertyChanged(nameof(UiScalePercent));
     }
 
     public ObservableCollection<DungeonViewModel> Dungeons { get; }

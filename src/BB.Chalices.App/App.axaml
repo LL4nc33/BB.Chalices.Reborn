@@ -173,6 +173,14 @@
             <Setter Property="HorizontalContentAlignment" Value="Left" />
             <Setter Property="Padding" Value="12,8" />
         </Style>
+        <!-- The active view's nav button stays highlighted, not just on hover -->
+        <Style Selector="Button.nav.active /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource BgPanelAlt}" />
+        </Style>
+        <Style Selector="Button.nav.active">
+            <Setter Property="Foreground" Value="{DynamicResource Parchment}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
         <!-- Segmented source toggle: same height as every button, equal width via the parent UniformGrid -->
         <Style Selector="Button.toggle">
             <Setter Property="Background" Value="{DynamicResource BgPanelAlt}" />
