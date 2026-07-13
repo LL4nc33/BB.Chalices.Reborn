@@ -26,7 +26,12 @@
         </LayoutTransformControl.LayoutTransform>
     <Grid RowDefinitions="*,Auto">
 
-        <Grid Grid.Row="0" ColumnDefinitions="220,*">
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220" MinWidth="180" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" MinWidth="830" />
+            </Grid.ColumnDefinitions>
 
             <!-- LEFT: navigation + actions -->
             <Border Grid.Column="0" Background="{DynamicResource BgPanel}"
@@ -123,11 +128,19 @@
                 </DockPanel>
             </Border>
 
+            <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns"
+                          Background="{DynamicResource Edge}" ToolTip.Tip="Drag to resize the sidebar" />
+
             <!-- CENTRE/RIGHT: the content host (catalogue workspace or settings page) -->
-            <Panel Grid.Column="1">
+            <Panel Grid.Column="2">
 
                 <!-- Catalogue workspace -->
-                <Grid ColumnDefinitions="*,660" IsVisible="{Binding IsCatalogueView}">
+                <Grid IsVisible="{Binding IsCatalogueView}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" MinWidth="340" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="640" MinWidth="480" />
+                    </Grid.ColumnDefinitions>
 
                     <Grid Grid.Column="0" Margin="20" RowDefinitions="Auto,Auto,*,Auto,Auto">
                         <StackPanel Grid.Row="0">
@@ -240,7 +253,10 @@
                         </Grid>
                     </Grid>
 
-                    <Border Grid.Column="1" Background="{DynamicResource BgPanel}"
+                    <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns"
+                                  Background="{DynamicResource Edge}" ToolTip.Tip="Drag to resize the editor panel" />
+
+                    <Border Grid.Column="2" Background="{DynamicResource BgPanel}"
                             BorderBrush="{DynamicResource Edge}" BorderThickness="1,0,0,0">
                         <Grid Margin="20" RowDefinitions="Auto,*,Auto,Auto" IsEnabled="{Binding HasLoadedSave}">
                             <StackPanel Grid.Row="0" Spacing="8">
