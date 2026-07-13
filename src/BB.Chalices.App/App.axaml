@@ -92,6 +92,17 @@
             <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
             <Setter Property="FontSize" Value="15" />
         </Style>
+        <!-- Tooltips render outside the zoom transform, so give them a readable size of their own. -->
+        <Style Selector="ToolTip">
+            <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="MaxWidth" Value="380" />
+            <Setter Property="Padding" Value="10,7" />
+            <Setter Property="Background" Value="{DynamicResource BgPanelAlt}" />
+            <Setter Property="Foreground" Value="{DynamicResource Parchment}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Edge}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
 
         <!-- ===== Type scale: 14 / 15 / 20 / 22 (mono 13 is reserved for hex) ===== -->
         <Style Selector="TextBlock.title">
