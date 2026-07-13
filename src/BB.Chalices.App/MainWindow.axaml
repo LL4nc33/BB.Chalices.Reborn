@@ -353,7 +353,9 @@
                                 <TabItem Header="STRINGS">
                                     <ScrollViewer Margin="0,12,0,0" VerticalScrollBarVisibility="Auto"
                                                   ToolTip.Tip="Edit each headstone string as raw hex. A change applies once it is the right length.">
-                                        <StackPanel>
+                                        <StackPanel Spacing="10">
+                                            <TextBlock Classes="section" Text="BYTE FIELDS"
+                                                       ToolTip.Tip="The numeric headstone fields (map, rites, effects). Each colour matches the byte legend." />
                                             <ItemsControl ItemsSource="{Binding ShortFields}">
                                                 <ItemsControl.ItemsPanel>
                                                     <ItemsPanelTemplate>
@@ -362,23 +364,26 @@
                                                 </ItemsControl.ItemsPanel>
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate x:DataType="vm:HeadstoneFieldViewModel">
-                                                        <Grid ColumnDefinitions="100,*" Margin="0,0,12,6" ToolTip.Tip="{Binding OffsetLabel}">
+                                                        <Grid ColumnDefinitions="110,*" Margin="0,0,12,7" ToolTip.Tip="{Binding OffsetLabel}">
                                                             <TextBlock Grid.Column="0" Text="{Binding Label}" VerticalAlignment="Center" FontSize="14"
-                                                                       TextTrimming="CharacterEllipsis"
+                                                                       TextTrimming="CharacterEllipsis" Margin="0,0,8,0"
                                                                        Foreground="{Binding Offset, Converter={x:Static app:OffsetColorConverter.Instance}}" />
-                                                            <TextBox Grid.Column="1" Text="{Binding Hex}" FontSize="12"
+                                                            <TextBox Grid.Column="1" Text="{Binding Hex}" FontSize="13"
                                                                      FontFamily="Cascadia Mono,Consolas,Menlo,monospace" />
                                                         </Grid>
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>
                                             </ItemsControl>
+                                            <TextBlock Classes="section" Text="TEXT  (PSN and character name)" Margin="0,4,0,0"
+                                                       ToolTip.Tip="The 16-byte creator PSN and character-name fields, as raw hex." />
                                             <ItemsControl ItemsSource="{Binding LongFields}">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate x:DataType="vm:HeadstoneFieldViewModel">
-                                                        <Grid ColumnDefinitions="100,*" Margin="0,0,12,6" ToolTip.Tip="{Binding OffsetLabel}">
+                                                        <Grid ColumnDefinitions="110,*" Margin="0,0,12,7" ToolTip.Tip="{Binding OffsetLabel}">
                                                             <TextBlock Grid.Column="0" Text="{Binding Label}" VerticalAlignment="Center" FontSize="14"
+                                                                       TextTrimming="CharacterEllipsis" Margin="0,0,8,0"
                                                                        Foreground="{Binding Offset, Converter={x:Static app:OffsetColorConverter.Instance}}" />
-                                                            <TextBox Grid.Column="1" Text="{Binding Hex}" FontSize="12"
+                                                            <TextBox Grid.Column="1" Text="{Binding Hex}" FontSize="13"
                                                                      FontFamily="Cascadia Mono,Consolas,Menlo,monospace" />
                                                         </Grid>
                                                     </DataTemplate>
