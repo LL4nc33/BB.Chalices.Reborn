@@ -241,6 +241,13 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _autoBackup, value);
     }
 
+    // Where the app keeps its settings, database and catalogue cache.
+    public string DataFolder => _config.DataDirectory;
+    public bool IsPortable => AppPaths.IsPortable;
+    public string StorageMode => AppPaths.IsPortable
+        ? "Portable: data is kept next to the app."
+        : "Data is kept in your user profile. Drop a \"portable.txt\" next to the app to make it portable.";
+
     // Load the current settings into the form and switch to the settings page.
     public void OpenSettings()
     {

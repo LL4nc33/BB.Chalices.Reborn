@@ -136,6 +136,14 @@ public partial class MainWindow : Window
             await Launcher.LaunchDirectoryInfoAsync(new DirectoryInfo(viewModel.BackupPath));
     }
 
+    private async void OnOpenDataFolder(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel
+            && !string.IsNullOrWhiteSpace(viewModel.DataFolder)
+            && Directory.Exists(viewModel.DataFolder))
+            await Launcher.LaunchDirectoryInfoAsync(new DirectoryInfo(viewModel.DataFolder));
+    }
+
     private async void OnOpenLink(object? sender, RoutedEventArgs e)
     {
         if (sender is Button { Tag: string url })

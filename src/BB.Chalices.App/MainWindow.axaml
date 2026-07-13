@@ -418,6 +418,16 @@
                                   ToolTip.Tip="Keep a timestamped backup every time you save" />
 
                         <StackPanel Spacing="8">
+                            <TextBlock Classes="section" Text="STORAGE" />
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBox Grid.Column="0" Text="{Binding DataFolder}" IsReadOnly="True" Margin="0,0,8,0"
+                                         ToolTip.Tip="Where settings, the database and the catalogue cache are kept." />
+                                <Button Grid.Column="1" Content="Open" Click="OnOpenDataFolder" ToolTip.Tip="Open the data folder" />
+                            </Grid>
+                            <TextBlock Classes="caption" Text="{Binding StorageMode}" TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="8">
                             <TextBlock Classes="section" Text="SHADPS4 FIXES" />
                             <Button Content="Fix sound crash" Command="{Binding ApplySoundFixCommand}" HorizontalAlignment="Left"
                                     ToolTip.Tip="Applies the shadPS4 sound-crash workaround: sets userdata0010 offset 0x204E to 01. A backup is made first." />

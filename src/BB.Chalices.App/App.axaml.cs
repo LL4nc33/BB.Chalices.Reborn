@@ -89,10 +89,7 @@ public partial class App : Application
 
     private static void ConfigureServices(IServiceCollection services)
     {
-        var dbPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "BBChalices", "chalices.db");
-        Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
+        var dbPath = Path.Combine(AppPaths.BaseDirectory, "chalices.db");
 
         services.AddDbContextFactory<ChaliceDbContext>(options => options.UseSqlite($"Data Source={dbPath}"));
 

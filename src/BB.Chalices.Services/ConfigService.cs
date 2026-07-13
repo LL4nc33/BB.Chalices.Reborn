@@ -12,12 +12,13 @@ public class ConfigService
 
     public ConfigService()
     {
-        _appDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "BBChalices");
-        Directory.CreateDirectory(_appDir);
+        _appDir = AppPaths.BaseDirectory;
         _path = Path.Combine(_appDir, "settings.json");
         Settings = Load();
     }
+
+    // The folder holding settings, database and catalogue cache (see AppPaths).
+    public string DataDirectory => _appDir;
 
     public AppSettings Settings { get; private set; }
 
