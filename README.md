@@ -44,10 +44,11 @@ hard-code it. Hit **Detect saves** and it walks your shadPS4 folder looking for 
 a `userdata` file directly with **Open Save**, **drag-and-drop** one onto the window,
 or just relaunch - it reopens the last save automatically.
 
-By default settings, the database and the catalogue cache live in your user profile.
-For a **portable** install, drop an empty `portable.txt` next to the executable and
-everything is kept in a `data/` folder beside it instead. You can also resize the UI
-any time with the **A- / A+** buttons (or Ctrl +/-).
+The app is **portable**: settings, the database, the catalogue cache and backups
+all live in a `data/` folder right next to the executable, so moving or copying the
+app folder takes everything with it. (If that folder isn't writable, it falls back
+to your user profile.) You can also resize the UI any time with the **A- / A+**
+buttons (or Ctrl +/-).
 
 Every time you save, the original file is copied to a `backup/` folder next to it
 first, so you can always roll back.

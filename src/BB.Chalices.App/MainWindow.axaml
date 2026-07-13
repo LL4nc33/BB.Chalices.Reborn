@@ -455,16 +455,6 @@
                                 <Button Grid.Column="1" Content="Open" Click="OnOpenDataFolder" ToolTip.Tip="Open the data folder" />
                             </Grid>
                             <TextBlock Classes="caption" Text="{Binding StorageModeText}" TextWrapping="Wrap" />
-                            <WrapPanel IsVisible="{Binding CanChangeLocation}">
-                                <Button Content="Choose folder..." Click="OnChooseDataFolder" Margin="0,0,8,0"
-                                        ToolTip.Tip="Keep the app's data in a folder you pick. Applies on restart; your data moves over automatically." />
-                                <Button Content="Make portable" Command="{Binding UsePortableLocationCommand}"
-                                        IsVisible="{Binding ShowMakePortable}" Margin="0,0,8,0"
-                                        ToolTip.Tip="Keep data in a data/ folder right next to the app. Applies on restart; your data moves over automatically." />
-                                <Button Content="Use default folder" Command="{Binding UseDefaultLocationCommand}"
-                                        IsVisible="{Binding ShowUseDefault}"
-                                        ToolTip.Tip="Keep data in your user profile (AppData). Applies on restart; your data moves over automatically." />
-                            </WrapPanel>
                         </StackPanel>
 
                         <StackPanel Spacing="8">

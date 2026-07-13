@@ -3,6 +3,15 @@
 All notable changes to BB Chalices are listed here. Versions follow the
 NexusMods release numbers.
 
+## v0.98.3
+
+- The app is now always portable: data (settings, database, catalogue cache,
+  backups) lives in a data/ folder next to the executable, so moving the app
+  folder takes everything with it. Removed the storage-location buttons; there
+  is nothing to configure. Data from an earlier profile install is moved over
+  automatically on first launch. Falls back to the user profile only if the app
+  folder isn't writable.
+
 ## v0.98.2
 
 - Renamed the "All" catalogue tab to "Community" (the Tomb Prospectors by-area

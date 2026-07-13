@@ -74,8 +74,6 @@ public class MainViewModel : ViewModelBase
         ApplySoundFixCommand = ReactiveCommand.Create(ApplySoundFix);
         ZoomInCommand = ReactiveCommand.Create(() => SetUiScale(UiScale + ZoomStep));
         ZoomOutCommand = ReactiveCommand.Create(() => SetUiScale(UiScale - ZoomStep));
-        UsePortableLocationCommand = ReactiveCommand.Create(UsePortableLocation);
-        UseDefaultLocationCommand = ReactiveCommand.Create(UseDefaultLocation);
 
         _uiScale = _config.Settings.UiScale is >= MinScale and <= MaxScale ? _config.Settings.UiScale : 1.0;
     }
@@ -110,8 +108,6 @@ public class MainViewModel : ViewModelBase
 
     public ReactiveCommand<Unit, Unit> ZoomInCommand { get; }
     public ReactiveCommand<Unit, Unit> ZoomOutCommand { get; }
-    public ReactiveCommand<Unit, Unit> UsePortableLocationCommand { get; }
-    public ReactiveCommand<Unit, Unit> UseDefaultLocationCommand { get; }
 
     private void SetUiScale(double value)
     {
@@ -290,37 +286,13 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _autoBackup, value);
     }
 
-    // Where the app keeps its settings, database and catalogue cache.
+    // Where the app keeps its settings, database and catalogue cache. This lives in
+    // a data/ folder next to the app (portable), so moving the app folder takes the
+    // data with it. Read-only: there's nothing to configure.
     public string DataFolder => _config.DataDirectory;
-    public bool CanChangeLocation => AppPaths.CanChangeLocation();
-    public bool ShowMakePortable => CanChangeLocation && !AppPaths.IsPortable;
-    public bool ShowUseDefault => CanChangeLocation && AppPaths.Mode != StorageMode.Profile;
-    public string StorageModeText => AppPaths.Mode switch
-    {
-        StorageMode.Portable => "Portable: data is kept in the data/ folder next to the app.",
-        StorageMode.Custom => "Custom folder: data is kept in the folder shown above.",
-        _ => "Data is kept in your user profile.",
-    };
-
-    private void RestartHint() =>
-        StatusMessage = "Storage location changed. Restart the app to apply - your data moves over automatically.";
-
-    private void UsePortableLocation() => ChangeLocation(AppPaths.UsePortable);
-    private void UseDefaultLocation() => ChangeLocation(AppPaths.UseProfile);
-    public void UseCustomFolder(string path) => ChangeLocation(() => AppPaths.UseCustomFolder(path));
-
-    private void ChangeLocation(Action change)
-    {
-        try
-        {
-            change();
-            RestartHint();
-        }
-        catch (Exception ex)
-        {
-            StatusMessage = $"Couldn't change storage location: {ex.Message}";
-        }
-    }
+    public string StorageModeText => AppPaths.IsPortable
+        ? "Data is kept in a data/ folder next to the app, so moving the app folder takes your saves-list, backups and settings with it."
+        : "The app folder isn't writable, so data is kept in your user profile instead.";
 
     // Load the current settings into the form and switch to the settings page.
     public void OpenSettings()
