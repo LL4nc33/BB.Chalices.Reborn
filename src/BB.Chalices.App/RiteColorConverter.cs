@@ -18,6 +18,25 @@ public sealed class RiteColorConverter : IValueConverter
         => throw new NotSupportedException();
 }
 
+// True when a width (e.g. a panel's Bounds.Width) is at least the threshold passed
+// as the converter parameter. Used to hide the wide live-bytes dump when the editor
+// panel is dragged too narrow to fit it without overlapping.
+public sealed class WidthAtLeastConverter : IValueConverter
+{
+    public static readonly WidthAtLeastConverter Instance = new();
+
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        double width = value is double d ? d : 0;
+        double threshold = parameter is string s && double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var t)
+            ? t : 0;
+        return width >= threshold;
+    }
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
 // Maps a byte offset to its legend colour, for the string-field labels.
 public sealed class OffsetColorConverter : IValueConverter
 {
