@@ -2,7 +2,7 @@ namespace BB.Chalices.Core.Binary;
 
 // Low-level reader for Bloodborne save files. Every offset here is relative to
 // the inventory marker, whose absolute position varies between saves. The magic
-// numbers come from Noxde's reverse-engineering of the userdata format.
+// numbers come from Nox's reverse-engineering of the userdata format.
 public static class SaveFileReader
 {
     private const int HeadstoneBase = 88328;
@@ -52,7 +52,7 @@ public static class SaveFileReader
 
     // The hunter's name is stored as UTF-16LE (two bytes per character), so the
     // old ASCII read stopped at the first character's null high byte. Matches
-    // Noxde's Bloodborne-save-editor (username field at marker - 468, 16 chars).
+    // Nox's Bloodborne-save-editor (username field at marker - 468, 16 chars).
     public static string GetCharacterName(ReadOnlySpan<byte> data, int inventory)
     {
         int offset = inventory + NameStringOffset;
@@ -80,7 +80,7 @@ public static class SaveFileReader
     }
 
     // Blood echoes and insight are u32 little-endian stats near the username field
-    // (offsets from Noxde's Bloodborne-save-editor stats.json: -19 and -35).
+    // (offsets from Nox's Bloodborne-save-editor stats.json: -19 and -35).
     public static uint GetEchoes(ReadOnlySpan<byte> data, int inventory) => ReadUInt32(data, inventory + EchoesOffset);
     public static void SetEchoes(Span<byte> data, int inventory, uint value) => WriteUInt32(data, inventory + EchoesOffset, value);
     public static uint GetInsight(ReadOnlySpan<byte> data, int inventory) => ReadUInt32(data, inventory + InsightOffset);

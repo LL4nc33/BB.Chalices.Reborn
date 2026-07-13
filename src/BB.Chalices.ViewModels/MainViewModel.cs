@@ -498,7 +498,7 @@ public class MainViewModel : ViewModelBase
     }
 
     private bool _noxMissing;
-    // True when Noxde's curated categories aren't in the DB yet (not downloaded).
+    // True when Nox's curated categories aren't in the DB yet (not downloaded).
     public bool NoxCatalogueMissing
     {
         get => _noxMissing;
@@ -509,7 +509,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    // Show the "download Noxde's dungeons" prompt when the user is on the Noxde tab
+    // Show the "download Nox's dungeons" prompt when the user is on the Nox tab
     // but that set hasn't been downloaded yet.
     public bool ShowNoxDownloadPrompt => ShowNox && NoxCatalogueMissing;
 
@@ -522,11 +522,11 @@ public class MainViewModel : ViewModelBase
         StatusMessage = $"{_all.Count} dungeons ready.";
     }
 
-    // Noxde's curated list is kept separate from the full Tomb Prospectors set.
+    // Nox's curated list is kept separate from the full Tomb Prospectors set.
     private static readonly HashSet<string> NoxCategories =
         new(StringComparer.OrdinalIgnoreCase) { "farming", "equipment", "bloodgems", "testing" };
 
-    // Start on the bundled by-area set (always present) rather than Noxde's list,
+    // Start on the bundled by-area set (always present) rather than Nox's list,
     // which is empty until downloaded.
     private bool _showNox = false;
     public bool ShowNox

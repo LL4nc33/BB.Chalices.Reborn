@@ -55,7 +55,7 @@ public class DungeonSeederTests
     {
         using var ctx = NewContext();
 
-        // A by-area set, Noxde's "farming", and one of the player's own (Custom) dungeons.
+        // A by-area set, Nox's "farming", and one of the player's own (Custom) dungeons.
         await DungeonSeeder.ImportAsync(ctx, """
         { "Pthumeru 5": [ { "glyph": "area1", "bytes": ["01"] } ],
           "farming":    [ { "glyph": "nox1",  "bytes": ["02"] } ],

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BB.Chalices.Services;
 
-// Pulls the latest dungeon catalogue from Noxde's gist and refreshes the database.
+// Pulls the latest dungeon catalogue from Nox's gist and refreshes the database.
 public class OnlineImportService
 {
     private const string GistApi = "https://api.github.com/gists/a29f699f4175bf315d9bd4baeebefb66";
@@ -45,7 +45,7 @@ public class OnlineImportService
             await DungeonSeeder.ImportAsync(db, content, replaceExisting: true);
 
             var count = await db.Dungeons.CountAsync();
-            return $"Catalogue downloaded: {count} dungeons from Noxde's gist (cached for offline use).";
+            return $"Catalogue downloaded: {count} dungeons from Nox's gist (cached for offline use).";
         }
         catch (Exception ex)
         {

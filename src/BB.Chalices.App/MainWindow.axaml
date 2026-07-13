@@ -147,9 +147,9 @@
                             <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,12">
                                 <TextBlock Grid.Column="0" Classes="title" Text="Catalogue" VerticalAlignment="Center" />
                                 <UniformGrid Grid.Column="2" Columns="2" VerticalAlignment="Center">
-                                    <Button Classes="toggle" Classes.active="{Binding ShowNox}" Content="Noxde" Click="OnShowNox"
+                                    <Button Classes="toggle" Classes.active="{Binding ShowNox}" Content="Nox" Click="OnShowNox"
                                             HorizontalAlignment="Stretch"
-                                            ToolTip.Tip="Noxde's curated farming, equipment and gem dungeons" />
+                                            ToolTip.Tip="Nox's curated farming, equipment and gem dungeons" />
                                     <Button Classes="toggle" Classes.active="{Binding ShowAll}" Content="All" Click="OnShowAll"
                                             HorizontalAlignment="Stretch"
                                             ToolTip.Tip="The full Tomb Prospectors set by area" />
@@ -184,12 +184,12 @@
                         <Border Grid.Row="2" Classes="card" VerticalAlignment="Center" Padding="20"
                                 IsVisible="{Binding ShowNoxDownloadPrompt}">
                             <StackPanel Spacing="12" HorizontalAlignment="Center" MaxWidth="440">
-                                <TextBlock Classes="heading" Text="Noxde's dungeons aren't downloaded yet" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
+                                <TextBlock Classes="heading" Text="Nox's dungeons aren't downloaded yet" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
                                 <TextBlock Classes="body" TextWrapping="Wrap" TextAlignment="Center"
-                                           Text="These 200+ curated dungeons are Noxde's work, hosted on his gist. Fetch them once (with your OK) and they're cached for offline use. The bundled 'All' set works offline without them - switch to the All tab above to browse right now." />
-                                <Button Classes="primary" Content="Download from Noxde's gist" Command="{Binding UpdateDungeonsCommand}"
+                                           Text="These 200+ curated dungeons are Nox's work, hosted on his gist. Fetch them once (with your OK) and they're cached for offline use. The bundled 'All' set works offline without them - switch to the All tab above to browse right now." />
+                                <Button Classes="primary" Content="Download from Nox's gist" Command="{Binding UpdateDungeonsCommand}"
                                         HorizontalAlignment="Center" HorizontalContentAlignment="Center"
-                                        ToolTip.Tip="One-time download from gist.github.com/Noxde, then cached locally for offline use" />
+                                        ToolTip.Tip="One-time download from Nox's gist, then cached locally for offline use" />
                             </StackPanel>
                         </Border>
                         <Border Grid.Row="3" Margin="0,16,0,0" Padding="0,12,0,0"
@@ -463,10 +463,10 @@
 
                         <StackPanel Spacing="8">
                             <TextBlock Classes="section" Text="DUNGEON CATALOGUE" />
-                            <Button Content="Download / update from Noxde's gist" Command="{Binding UpdateDungeonsCommand}" HorizontalAlignment="Left"
-                                    ToolTip.Tip="Fetch the latest catalogue from gist.github.com/Noxde and cache it locally for offline use." />
+                            <Button Content="Download / update from Nox's gist" Command="{Binding UpdateDungeonsCommand}" HorizontalAlignment="Left"
+                                    ToolTip.Tip="Fetch the latest catalogue from Nox's gist and cache it locally for offline use." />
                             <TextBlock Classes="caption" TextWrapping="Wrap"
-                                       Text="The 200+ ready-made dungeons are Noxde's work, fetched from his gist with your consent and cached locally. The app works offline without them." />
+                                       Text="The 200+ ready-made dungeons are Nox's work, fetched from his gist with your consent and cached locally. The app works offline without them." />
                         </StackPanel>
 
                         <Border BorderBrush="{DynamicResource Edge}" BorderThickness="0,1,0,0" Padding="0,16,0,0">
@@ -479,7 +479,7 @@
                                             Click="OnOpenLink" Margin="0,0,16,8" />
                                     <Button Classes="link" Content="Bloodborne Wiki" Tag="https://www.bloodborne-wiki.com/"
                                             Click="OnOpenLink" Margin="0,0,16,8" />
-                                    <Button Classes="link" Content="Noxde's dungeon list" Tag="https://www.nexusmods.com/bloodborne/mods/121"
+                                    <Button Classes="link" Content="Nox's dungeon list" Tag="https://www.nexusmods.com/bloodborne/mods/121"
                                             Click="OnOpenLink" Margin="0,0,16,8" />
                                     <Button Classes="link" Content="shadPS4" Tag="https://shadps4.net" Click="OnOpenLink" Margin="0,0,16,8" />
                                 </WrapPanel>

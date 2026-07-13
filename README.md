@@ -7,7 +7,7 @@ glyphs by hand.
 
 The catalogue has two parts. A large by-area set (compiled from the public Tomb
 Prospectors research) is bundled and works fully offline - that is the **All** view.
-Noxde's 200+ curated dungeons (the **Noxde** view) are his work, so they are fetched
+Nox's 200+ curated dungeons (the **Nox** view) are his work, so they are fetched
 once from his gist with your consent and cached locally. The app is fully usable
 offline either way.
 
@@ -25,7 +25,7 @@ shoulders of the Bloodborne data-mining community, plus my own research on top o
   - the glyph and hex research sheets
     ([one](https://docs.google.com/spreadsheets/d/1zFIzhnXHhYomlR-tFJcyk3cPywf1snqkDH900j6rtAI/edit?gid=1741467922#gid=1741467922),
     [two](https://docs.google.com/spreadsheets/d/1psfenhcQJ06EUQgcEHBIQcfLD5Iq-kyKGTZINvy6228/edit?gid=1625060027#gid=1625060027))
-- **Noxde's [Add Chalice Dungeons to your save](https://www.nexusmods.com/bloodborne/mods/121)**
+- **Nox's [Add Chalice Dungeons to your save](https://www.nexusmods.com/bloodborne/mods/121)**
   ([dungeon list](https://gist.github.com/Noxde/a29f699f4175bf315d9bd4baeebefb66)), for the
   dungeon glyph list (`dungeons.json`) and the original tool that first inspired this one.
 - **The shadPS4 team**, for the emulator this pairs with.
@@ -65,7 +65,7 @@ install needed, it is one file:
   right-click - Open.
 
 On first run, open **Settings** (or the catalogue prompt) and download the dungeon
-catalogue from Noxde's gist; after that it is cached and the app works offline.
+catalogue from Nox's gist; after that it is cached and the app works offline.
 
 Or build it yourself (below).
 
@@ -84,7 +84,7 @@ dotnet run --project src/BB.Chalices.App
 - **BB.Chalices.Core** is the save format itself: finding the inventory marker,
   reading and writing the 125-byte dungeon records, backups. No UI or framework dependencies.
 - **BB.Chalices.Data** holds the dungeon catalogue in SQLite (EF Core), seeded from the
-  bundled by-area set and, with your consent, Noxde's gist (downloaded once, then cached).
+  bundled by-area set and, with your consent, Nox's gist (downloaded once, then cached).
 - **BB.Chalices.Services** does load/save, catalogue queries and shadPS4 save discovery.
 - **BB.Chalices.ViewModels** has the ReactiveUI view models.
 - **BB.Chalices.App** is the Avalonia UI and theme.

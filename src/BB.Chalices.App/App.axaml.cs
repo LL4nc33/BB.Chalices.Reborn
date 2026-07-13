@@ -59,7 +59,7 @@ public partial class App : Application
                         }
                     }
 
-                    // 2) Noxde's curated categories, only if a consented copy was downloaded.
+                    // 2) Nox's curated categories, only if a consented copy was downloaded.
                     //    Per-category replace keeps the bundled set and any custom dungeons.
                     if (File.Exists(config.CatalogueCachePath))
                         await DungeonSeeder.ImportAsync(db, await File.ReadAllTextAsync(config.CatalogueCachePath), replaceExisting: true);

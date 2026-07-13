@@ -1,7 +1,7 @@
 namespace BB.Chalices.Core.Binary;
 
 // A single chalice dungeon as it sits in a save slot: a fixed 125-byte record.
-// The field map is from Noxde's notes on the userdata format.
+// The field map is from Nox's notes on the userdata format.
 public readonly struct DungeonStructure
 {
     public const int Size = 125; // 0x7D

@@ -4,7 +4,7 @@ namespace BB.Chalices.Services.Tests;
 
 public class SaveLocatorServiceTests
 {
-    // Mirrors Noxde's original filter: character files start with "userdata",
+    // Mirrors Nox's original filter: character files start with "userdata",
     // aren't backups, and aren't the "...10" system/options file.
     [Theory]
     [InlineData("userdata0000", true)]

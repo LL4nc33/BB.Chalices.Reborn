@@ -20,7 +20,7 @@ public static class DungeonSeeder
 
     // Parse a catalogue JSON string and load it. With replaceExisting only the
     // categories present in this JSON are swapped out - the other catalogue source
-    // (bundled vs Noxde's gist) and the player's own saved dungeons are left intact.
+    // (bundled vs Nox's gist) and the player's own saved dungeons are left intact.
     public static async Task ImportAsync(ChaliceDbContext context, string json, bool replaceExisting = false)
     {
         if (context.Dungeons.Any() && !replaceExisting)
