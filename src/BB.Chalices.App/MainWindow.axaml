@@ -10,6 +10,7 @@
         FontFamily="{DynamicResource GothicFont}"
         Icon="/Assets/favicon.png"
         Background="{DynamicResource WindowBg}"
+        DragDrop.AllowDrop="True"
         Title="BB Chalices">
 
     <LayoutTransformControl>

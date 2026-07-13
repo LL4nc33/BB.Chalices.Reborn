@@ -18,6 +18,21 @@ public partial class MainWindow : Window
         InitializeComponent();
         Opened += OnWindowOpened;
         Closing += OnWindowClosing;
+        AddHandler(DragDrop.DragOverEvent, OnDragOver);
+        AddHandler(DragDrop.DropEvent, OnDrop);
+    }
+
+    private void OnDragOver(object? sender, DragEventArgs e)
+        => e.DragEffects = e.DataTransfer.Contains(DataFormat.File) ? DragDropEffects.Copy : DragDropEffects.None;
+
+    private async void OnDrop(object? sender, DragEventArgs e)
+    {
+        if (DataContext is not MainViewModel viewModel)
+            return;
+
+        var file = e.DataTransfer.TryGetFiles()?.OfType<IStorageFile>().FirstOrDefault();
+        if (file?.TryGetLocalPath() is { } path)
+            await viewModel.LoadSaveCommand.Execute(path);
     }
 
     private void OnWindowOpened(object? sender, EventArgs e)
