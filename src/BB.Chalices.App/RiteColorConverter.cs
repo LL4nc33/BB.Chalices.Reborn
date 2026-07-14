@@ -1,10 +1,34 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
 using BB.Chalices.Core.Binary;
+using BB.Chalices.ViewModels;
 
 namespace BB.Chalices.App;
+
+// Labels a zoom target for the dropdown. The middle "Catalogue" target follows the
+// active view, so it reads "Settings" or "Backups" while you are on those pages.
+public sealed class ZoomTargetLabelConverter : IMultiValueConverter
+{
+    public static readonly ZoomTargetLabelConverter Instance = new();
+
+    public object Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        ZoomTarget target = values.Count > 0 && values[0] is ZoomTarget t ? t : ZoomTarget.All;
+        AppView view = values.Count > 1 && values[1] is AppView v ? v : AppView.Catalogue;
+
+        if (target == ZoomTarget.Catalogue)
+            return view switch
+            {
+                AppView.Settings => "Settings",
+                AppView.Backups => "Backups",
+                _ => "Catalogue",
+            };
+        return target.ToString();
+    }
+}
 
 // Maps a rite-slot index (0-3) to its legend colour, for the slot's coloured border.
 public sealed class RiteColorConverter : IValueConverter

@@ -118,13 +118,28 @@
                         <TextBlock Classes="section" Text="TEXT SIZE" Margin="0,4,0,0" />
                         <ComboBox ItemsSource="{Binding ZoomTargets}" SelectedItem="{Binding SelectedZoomTarget}"
                                   HorizontalAlignment="Stretch" Margin="0,0,0,4"
-                                  ToolTip.Tip="Which column the A- / A+ buttons resize. All resizes the whole window." />
+                                  ToolTip.Tip="Which column the - / + buttons resize. All resizes the whole window.">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:CompileBindings="False">
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{x:Static app:ZoomTargetLabelConverter.Instance}">
+                                                <Binding />
+                                                <Binding Path="DataContext.CurrentView" RelativeSource="{RelativeSource AncestorType=Window}" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                         <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Button Grid.Column="0" Content="A-" Command="{Binding ZoomOutCommand}"
+                            <Button Grid.Column="0" Content="-" Command="{Binding ZoomOutCommand}"
+                                    FontSize="20" FontWeight="SemiBold" Width="40" HorizontalContentAlignment="Center"
                                     ToolTip.Tip="Make the selected column smaller" />
                             <TextBlock Grid.Column="1" Text="{Binding UiScalePercent}" Classes="body"
                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            <Button Grid.Column="2" Content="A+" Command="{Binding ZoomInCommand}"
+                            <Button Grid.Column="2" Content="+" Command="{Binding ZoomInCommand}"
+                                    FontSize="20" FontWeight="SemiBold" Width="40" HorizontalContentAlignment="Center"
                                     ToolTip.Tip="Make the selected column bigger" />
                         </Grid>
                     </StackPanel>
