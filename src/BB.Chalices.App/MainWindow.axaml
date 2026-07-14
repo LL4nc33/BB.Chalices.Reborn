@@ -415,8 +415,7 @@
                                 </TabItem>
                             </TabControl>
 
-                            <StackPanel Grid.Row="2" Spacing="8" Margin="0,16,0,0"
-                                        IsVisible="{Binding #EditorPanel.Bounds.Width, Converter={x:Static app:WidthAtLeastConverter.Instance}, ConverterParameter=660}">
+                            <StackPanel Grid.Row="2" Spacing="8" Margin="0,16,0,0">
                                 <Grid ColumnDefinitions="*,Auto">
                                     <TextBlock Grid.Column="0" Classes="section" Text="LIVE BYTES" Margin="0" VerticalAlignment="Center" />
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="14">
@@ -436,6 +435,8 @@
                                             <SelectableTextBlock app:HexView.Bytes="{Binding SelectedSlotBytes}"
                                                                  app:HexView.Baseline="{Binding SelectedSlotBaseline}"
                                                                  app:HexView.RecordStart="{Binding SelectedSlotOffset}"
+                                                                 app:HexView.ShowAscii="{Binding #EditorPanel.Bounds.Width, Converter={x:Static app:WidthAtLeastConverter.Instance}, ConverterParameter=660}"
+                                                                 app:HexView.ShowOffset="{Binding #EditorPanel.Bounds.Width, Converter={x:Static app:WidthAtLeastConverter.Instance}, ConverterParameter=540}"
                                                                  FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="13"
                                                                  IsVisible="{Binding SlotHexDump, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                                         </ScrollViewer>

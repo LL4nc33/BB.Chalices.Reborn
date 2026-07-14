@@ -23,18 +23,32 @@ public class HexView
     public static readonly AttachedProperty<int> RecordStartProperty =
         AvaloniaProperty.RegisterAttached<HexView, SelectableTextBlock, int>("RecordStart");
 
+    // When false, the trailing ascii column is dropped so the dump fits a narrow panel.
+    public static readonly AttachedProperty<bool> ShowAsciiProperty =
+        AvaloniaProperty.RegisterAttached<HexView, SelectableTextBlock, bool>("ShowAscii", defaultValue: true);
+
+    // When false, the leading offset column is dropped too, leaving just the hex bytes.
+    public static readonly AttachedProperty<bool> ShowOffsetProperty =
+        AvaloniaProperty.RegisterAttached<HexView, SelectableTextBlock, bool>("ShowOffset", defaultValue: true);
+
     public static void SetBytes(SelectableTextBlock o, byte[]? v) => o.SetValue(BytesProperty, v);
     public static byte[]? GetBytes(SelectableTextBlock o) => o.GetValue(BytesProperty);
     public static void SetBaseline(SelectableTextBlock o, byte[]? v) => o.SetValue(BaselineProperty, v);
     public static byte[]? GetBaseline(SelectableTextBlock o) => o.GetValue(BaselineProperty);
     public static void SetRecordStart(SelectableTextBlock o, int v) => o.SetValue(RecordStartProperty, v);
     public static int GetRecordStart(SelectableTextBlock o) => o.GetValue(RecordStartProperty);
+    public static void SetShowAscii(SelectableTextBlock o, bool v) => o.SetValue(ShowAsciiProperty, v);
+    public static bool GetShowAscii(SelectableTextBlock o) => o.GetValue(ShowAsciiProperty);
+    public static void SetShowOffset(SelectableTextBlock o, bool v) => o.SetValue(ShowOffsetProperty, v);
+    public static bool GetShowOffset(SelectableTextBlock o) => o.GetValue(ShowOffsetProperty);
 
     static HexView()
     {
         BytesProperty.Changed.Subscribe(e => { if (e.Sender is SelectableTextBlock t) Render(t); });
         BaselineProperty.Changed.Subscribe(e => { if (e.Sender is SelectableTextBlock t) Render(t); });
         RecordStartProperty.Changed.Subscribe(e => { if (e.Sender is SelectableTextBlock t) Render(t); });
+        ShowAsciiProperty.Changed.Subscribe(e => { if (e.Sender is SelectableTextBlock t) Render(t); });
+        ShowOffsetProperty.Changed.Subscribe(e => { if (e.Sender is SelectableTextBlock t) Render(t); });
     }
 
     private static void Render(SelectableTextBlock target)
@@ -49,17 +63,21 @@ public class HexView
         if (bytes is null || bytes.Length == 0)
             return;
 
+        bool showAscii = GetShowAscii(target);
+        bool showOffset = GetShowOffset(target);
         int recordStart = GetRecordStart(target);
         int dumpStart = recordStart & ~0xF;
         int dumpEnd = (recordStart + bytes.Length + 0xF) & ~0xF;
 
         var gutter = ByteFieldPalette.Gutter;
-        inlines.Add(new Run("Offset(h)  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n") { Foreground = gutter });
-        inlines.Add(new Run("-----------------------------------------------------------\n") { Foreground = gutter });
+        string header = (showOffset ? "Offset(h)  " : "") + "00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F";
+        inlines.Add(new Run(header + "\n") { Foreground = gutter });
+        inlines.Add(new Run(new string('-', header.Length) + "\n") { Foreground = gutter });
 
         for (int line = dumpStart; line < dumpEnd; line += 16)
         {
-            inlines.Add(new Run($"{line:X8}   ") { Foreground = gutter });
+            if (showOffset)
+                inlines.Add(new Run($"{line:X8}   ") { Foreground = gutter });
 
             for (int i = 0; i < 16; i++)
             {
@@ -70,18 +88,21 @@ public class HexView
                     inlines.Add(new Run(".. ") { Foreground = gutter });
             }
 
-            inlines.Add(new Run(" ") { Foreground = gutter });
-            for (int i = 0; i < 16; i++)
+            if (showAscii)
             {
-                int rel = line + i - recordStart;
-                if (rel < 0 || rel >= bytes.Length)
+                inlines.Add(new Run(" ") { Foreground = gutter });
+                for (int i = 0; i < 16; i++)
                 {
-                    inlines.Add(new Run(".") { Foreground = gutter });
-                    continue;
+                    int rel = line + i - recordStart;
+                    if (rel < 0 || rel >= bytes.Length)
+                    {
+                        inlines.Add(new Run(".") { Foreground = gutter });
+                        continue;
+                    }
+                    byte b = bytes[rel];
+                    char c = b is >= 32 and <= 126 ? (char)b : '.';
+                    inlines.Add(new Run(c.ToString()) { Foreground = BrushFor(rel, bytes, baseline) });
                 }
-                byte b = bytes[rel];
-                char c = b is >= 32 and <= 126 ? (char)b : '.';
-                inlines.Add(new Run(c.ToString()) { Foreground = BrushFor(rel, bytes, baseline) });
             }
 
             if (line + 16 < dumpEnd)
