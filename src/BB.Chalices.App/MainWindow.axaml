@@ -30,7 +30,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- LEFT: navigation + actions -->
-            <Border Grid.Column="0" Background="{DynamicResource BgPanel}"
+            <Border Grid.Column="0" x:Name="SidebarPanel" Background="{DynamicResource BgPanel}"
                     BorderBrush="{DynamicResource Edge}" BorderThickness="0,0,1,0">
                 <LayoutTransformControl>
                     <LayoutTransformControl.LayoutTransform>
@@ -116,19 +116,12 @@
 
                         <Border Height="1" Background="{DynamicResource Edge}" Margin="0,8,0,0" />
                         <TextBlock Classes="section" Text="TEXT SIZE" Margin="0,4,0,0" />
-                        <ComboBox ItemsSource="{Binding ZoomTargets}" SelectedItem="{Binding SelectedZoomTarget}"
+                        <ComboBox ItemsSource="{Binding ZoomTargets}" SelectedItem="{Binding SelectedZoomTargetOption}"
                                   HorizontalAlignment="Stretch" Margin="0,0,0,4"
                                   ToolTip.Tip="Which column the - / + buttons resize. All resizes the whole window.">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate x:CompileBindings="False">
-                                    <TextBlock>
-                                        <TextBlock.Text>
-                                            <MultiBinding Converter="{x:Static app:ZoomTargetLabelConverter.Instance}">
-                                                <Binding />
-                                                <Binding Path="DataContext.CurrentView" RelativeSource="{RelativeSource AncestorType=Window}" />
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
+                                <DataTemplate x:DataType="vm:ZoomTargetOption">
+                                    <TextBlock Text="{Binding Label}" />
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
@@ -151,7 +144,7 @@
                           Background="{DynamicResource Edge}" ToolTip.Tip="Drag to resize the sidebar" />
 
             <!-- CENTRE/RIGHT: the content host (catalogue workspace or settings page) -->
-            <Panel Grid.Column="2">
+            <Panel Grid.Column="2" x:Name="MiddlePanel">
 
                 <!-- Catalogue workspace -->
                 <Grid IsVisible="{Binding IsCatalogueView}">

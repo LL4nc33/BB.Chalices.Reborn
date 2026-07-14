@@ -20,6 +20,18 @@ public partial class MainWindow : Window
         Closing += OnWindowClosing;
         AddHandler(DragDrop.DragOverEvent, OnDragOver);
         AddHandler(DragDrop.DropEvent, OnDrop);
+
+        // Clicking in a column points the text-size +/- buttons at it. Tunnel handlers
+        // fire from the outside in, so the editor (innermost) wins over the middle panel.
+        SidebarPanel.AddHandler(PointerPressedEvent, (_, _) => SelectZoom(ZoomTarget.Sidebar), RoutingStrategies.Tunnel);
+        MiddlePanel.AddHandler(PointerPressedEvent, (_, _) => SelectZoom(ZoomTarget.Catalogue), RoutingStrategies.Tunnel);
+        EditorPanel.AddHandler(PointerPressedEvent, (_, _) => SelectZoom(ZoomTarget.Editor), RoutingStrategies.Tunnel);
+    }
+
+    private void SelectZoom(ZoomTarget target)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.SelectZoomTarget(target);
     }
 
     private void OnDragOver(object? sender, DragEventArgs e)

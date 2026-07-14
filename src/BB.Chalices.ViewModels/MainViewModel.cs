@@ -79,6 +79,16 @@ public class MainViewModel : ViewModelBase
         _sidebarScale = InitScale(_config.Settings.SidebarScale, legacy);
         _catalogueScale = InitScale(_config.Settings.CatalogueScale, legacy);
         _editorScale = InitScale(_config.Settings.EditorScale, legacy);
+
+        _middleZoomOption = new ZoomTargetOption(ZoomTarget.Catalogue, "Catalogue");
+        ZoomTargets = new ObservableCollection<ZoomTargetOption>
+        {
+            new(ZoomTarget.All, "All"),
+            new(ZoomTarget.Sidebar, "Sidebar"),
+            _middleZoomOption,
+            new(ZoomTarget.Editor, "Editor"),
+        };
+        _selectedZoomOption = ZoomTargets[0];
     }
 
     // Prefer the saved per-column scale; fall back to the older single UiScale so an
@@ -117,18 +127,38 @@ public class MainViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref _editorScale, value);
     }
 
-    public IReadOnlyList<ZoomTarget> ZoomTargets { get; } =
-        new[] { ZoomTarget.All, ZoomTarget.Sidebar, ZoomTarget.Catalogue, ZoomTarget.Editor };
+    public ObservableCollection<ZoomTargetOption> ZoomTargets { get; }
 
-    private ZoomTarget _zoomTarget = ZoomTarget.All;
-    public ZoomTarget SelectedZoomTarget
+    // The middle option, whose label tracks the active view.
+    private readonly ZoomTargetOption _middleZoomOption;
+
+    private ZoomTargetOption _selectedZoomOption = null!;
+    public ZoomTargetOption SelectedZoomTargetOption
     {
-        get => _zoomTarget;
+        get => _selectedZoomOption;
         set
         {
-            this.RaiseAndSetIfChanged(ref _zoomTarget, value);
+            this.RaiseAndSetIfChanged(ref _selectedZoomOption, value);
             this.RaisePropertyChanged(nameof(UiScalePercent));
         }
+    }
+
+    public ZoomTarget SelectedZoomTarget => _selectedZoomOption?.Target ?? ZoomTarget.All;
+
+    private void UpdateMiddleZoomLabel() =>
+        _middleZoomOption?.SetLabel(CurrentView switch
+        {
+            AppView.Settings => "Settings",
+            AppView.Backups => "Backups",
+            _ => "Catalogue",
+        });
+
+    // Clicking inside a column points the +/- buttons at it.
+    public void SelectZoomTarget(ZoomTarget target)
+    {
+        var option = ZoomTargets.FirstOrDefault(o => o.Target == target);
+        if (option is not null && !ReferenceEquals(option, SelectedZoomTargetOption))
+            SelectedZoomTargetOption = option;
     }
 
     public string UiScalePercent => $"{ScaleFor(SelectedZoomTarget) * 100:0}%";
@@ -295,6 +325,7 @@ public class MainViewModel : ViewModelBase
             this.RaisePropertyChanged(nameof(IsCatalogueView));
             this.RaisePropertyChanged(nameof(IsSettingsView));
             this.RaisePropertyChanged(nameof(IsBackupsView));
+            UpdateMiddleZoomLabel();
         }
     }
 
