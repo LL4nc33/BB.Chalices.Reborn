@@ -450,7 +450,11 @@
                 </Grid>
 
                 <!-- Settings page -->
-                <ScrollViewer IsVisible="{Binding IsSettingsView}">
+                <LayoutTransformControl IsVisible="{Binding IsSettingsView}">
+                    <LayoutTransformControl.LayoutTransform>
+                        <ScaleTransform ScaleX="{Binding CatalogueScale}" ScaleY="{Binding CatalogueScale}" />
+                    </LayoutTransformControl.LayoutTransform>
+                <ScrollViewer>
                     <StackPanel Margin="20" Spacing="20" MaxWidth="680" HorizontalAlignment="Left">
                         <TextBlock Classes="title" Text="Settings" />
 
@@ -532,9 +536,14 @@
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
+                </LayoutTransformControl>
 
                 <!-- Backups page -->
-                <Grid IsVisible="{Binding IsBackupsView}" Margin="20" RowDefinitions="Auto,*,Auto"
+                <LayoutTransformControl IsVisible="{Binding IsBackupsView}" HorizontalAlignment="Left">
+                    <LayoutTransformControl.LayoutTransform>
+                        <ScaleTransform ScaleX="{Binding CatalogueScale}" ScaleY="{Binding CatalogueScale}" />
+                    </LayoutTransformControl.LayoutTransform>
+                <Grid Margin="20" RowDefinitions="Auto,*,Auto"
                       MaxWidth="900" HorizontalAlignment="Left">
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,16">
                         <TextBlock Classes="title" Text="Backups" />
@@ -573,6 +582,7 @@
                                 ToolTip.Tip="Open the backup folder" />
                     </StackPanel>
                 </Grid>
+                </LayoutTransformControl>
             </Panel>
         </Grid>
 
