@@ -146,7 +146,8 @@
                           Background="{DynamicResource Edge}" ToolTip.Tip="Drag to resize the sidebar" />
 
             <!-- CENTRE/RIGHT: the content host (catalogue workspace or settings page) -->
-            <Panel Grid.Column="2" x:Name="MiddlePanel">
+            <!-- Transparent (not null) background so clicks on empty middle area register for click-to-target -->
+            <Panel Grid.Column="2" x:Name="MiddlePanel" Background="Transparent">
 
                 <!-- Catalogue workspace -->
                 <Grid IsVisible="{Binding IsCatalogueView}">
