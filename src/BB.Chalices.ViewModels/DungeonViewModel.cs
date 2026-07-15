@@ -13,6 +13,7 @@ public class DungeonViewModel : ViewModelBase
         _entity = entity;
     }
 
+    public int Id => _entity.Id;
     public string Glyph => _entity.Glyph;
     public string Category => _entity.Category;
     public string? Description => _entity.Description;

@@ -136,16 +136,69 @@ public partial class MainWindow : Window
             viewModel.OpenSettings();
     }
 
-    private void OnShowNox(object? sender, RoutedEventArgs e)
+    private async void OnNewList(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is MainViewModel viewModel)
-            viewModel.ShowNox = true;
+        if (DataContext is not MainViewModel viewModel)
+            return;
+        string? name = await new PromptWindow("Name your new list:", "My list").ShowDialog<string?>(this);
+        if (!string.IsNullOrWhiteSpace(name))
+            await viewModel.CreateListAsync(name);
     }
 
-    private void OnShowAll(object? sender, RoutedEventArgs e)
+    private async void OnRenameList(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel { SelectedList: { } list } viewModel)
+            return;
+        string? name = await new PromptWindow("Rename this list:", list.Name).ShowDialog<string?>(this);
+        if (!string.IsNullOrWhiteSpace(name))
+            await viewModel.RenameSelectedListAsync(name);
+    }
+
+    private async void OnDeleteList(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel { SelectedList: { } list } viewModel)
+            return;
+        bool confirmed = await new ConfirmWindow($"Delete the list \"{list.Name}\"?\n\nThe dungeons themselves are not deleted.")
+            .ShowDialog<bool>(this);
+        if (confirmed)
+            await viewModel.DeleteSelectedListAsync();
+    }
+
+    private async void OnShareList(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel && viewModel.ShareSelectedList() is { } code && Clipboard is { } clipboard)
+            await clipboard.SetTextAsync(code);
+    }
+
+    private async void OnImportList(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel && Clipboard is { } clipboard)
+            await viewModel.ImportSharedAsync(await clipboard.TryGetTextAsync());
+    }
+
+    // The Add-to-list button just opens its flyout; the pick happens in OnAddToListPicked.
+    private void OnAddToList(object? sender, RoutedEventArgs e) { }
+
+    private async void OnAddToListPicked(object? sender, Avalonia.Controls.SelectionChangedEventArgs e)
+    {
+        if (sender is Avalonia.Controls.ListBox { SelectedItem: BB.Chalices.Data.Entities.DungeonList list } box
+            && DataContext is MainViewModel viewModel)
+        {
+            await viewModel.AddSelectedDungeonToListAsync(list.Id);
+            box.SelectedItem = null;
+        }
+    }
+
+    private async void OnRemoveFromList(object? sender, RoutedEventArgs e)
     {
         if (DataContext is MainViewModel viewModel)
-            viewModel.ShowNox = false;
+            await viewModel.RemoveSelectedFromListAsync();
+    }
+
+    private void OnApplyList(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.ApplyListToAltar();
     }
 
     private void OnSaveSettings(object? sender, RoutedEventArgs e)
@@ -255,17 +308,6 @@ public partial class MainWindow : Window
             .ShowDialog<string?>(this);
         if (!string.IsNullOrWhiteSpace(name))
             await viewModel.SaveCurrentSlotAsCustomAsync(name);
-    }
-
-    private async void OnDeleteCustom(object? sender, RoutedEventArgs e)
-    {
-        if (DataContext is not MainViewModel { SelectedDungeon: { IsCustom: true } dungeon } viewModel)
-            return;
-
-        bool confirmed = await new ConfirmWindow($"Remove \"{dungeon.Description ?? dungeon.Glyph}\" from your dungeons?")
-            .ShowDialog<bool>(this);
-        if (confirmed)
-            await viewModel.DeleteSelectedCustomAsync();
     }
 
     private async void OnDeleteBackup(object? sender, RoutedEventArgs e)

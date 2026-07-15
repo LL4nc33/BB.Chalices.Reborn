@@ -2,6 +2,8 @@ using System.Collections.ObjectModel;
 using System.Reactive;
 using BB.Chalices.Core.Binary;
 using BB.Chalices.Core.Saves;
+using BB.Chalices.Core.Sharing;
+using BB.Chalices.Data.Entities;
 using BB.Chalices.Services;
 using ReactiveUI;
 
@@ -19,6 +21,7 @@ public class MainViewModel : ViewModelBase
     private readonly ConfigService _config;
     private readonly BackupService _backups;
     private readonly OnlineImportService _online;
+    private readonly ListService _lists;
 
     private List<DungeonViewModel> _all = new();
     private bool _suppressEdits;
@@ -40,7 +43,7 @@ public class MainViewModel : ViewModelBase
     private string _slotHexDump = string.Empty;
 
     public MainViewModel(SaveFileService saves, DungeonService dungeons, SaveLocatorService locator,
-        ConfigService config, BackupService backups, OnlineImportService online)
+        ConfigService config, BackupService backups, OnlineImportService online, ListService lists)
     {
         _saves = saves;
         _dungeons = dungeons;
@@ -48,8 +51,10 @@ public class MainViewModel : ViewModelBase
         _config = config;
         _backups = backups;
         _online = online;
+        _lists = lists;
 
         Dungeons = new ObservableCollection<DungeonViewModel>();
+        Lists = new ObservableCollection<DungeonList>();
         Categories = new ObservableCollection<string> { AllCategories };
         // Slot 0 = the makeshift altar, then the six stored slots 1-6.
         Slots = new ObservableCollection<SlotViewModel>(Enumerable.Range(0, 7).Select(n => new SlotViewModel(n)));
@@ -589,58 +594,69 @@ public class MainViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref _canUndo, value);
     }
 
-    private bool _noxMissing;
-    // True when Nox's curated categories aren't in the DB yet (not downloaded).
-    public bool NoxCatalogueMissing
+    // The lists shown in the catalogue picker: built-in Nox and Community, plus the
+    // user's own. Everything is a list now; there is no separate catalogue.
+    public ObservableCollection<DungeonList> Lists { get; }
+
+    private DungeonList? _selectedList;
+    public DungeonList? SelectedList
     {
-        get => _noxMissing;
-        private set
+        get => _selectedList;
+        set
         {
-            this.RaiseAndSetIfChanged(ref _noxMissing, value);
+            this.RaiseAndSetIfChanged(ref _selectedList, value);
             this.RaisePropertyChanged(nameof(ShowNoxDownloadPrompt));
+            this.RaisePropertyChanged(nameof(CanEditSelectedList));
+            RebuildCategories();
         }
     }
 
-    // Show the "download Nox's dungeons" prompt when the user is on the Nox tab
-    // but that set hasn't been downloaded yet.
-    public bool ShowNoxDownloadPrompt => ShowNox && NoxCatalogueMissing;
+    // Built-in lists (Nox, Community) can't be edited; only the user's own can.
+    public bool CanEditSelectedList => SelectedList?.Source == ListSource.User;
+
+    // The user's own lists, for the "add to list" menu.
+    public IEnumerable<DungeonList> UserLists => Lists.Where(l => l.Source == ListSource.User);
+
+    // Show the "download Nox's dungeons" prompt when the empty Nox list is selected.
+    public bool ShowNoxDownloadPrompt => SelectedList?.Source == ListSource.Nox && SelectedList.Items.Count == 0;
+
+    // The dungeons that belong to the selected list (matched by catalogue id).
+    private IEnumerable<DungeonViewModel> CurrentListDungeons()
+    {
+        if (SelectedList is null)
+            return Array.Empty<DungeonViewModel>();
+        var ids = SelectedList.Items.Select(i => i.DungeonId).ToHashSet();
+        return _all.Where(d => ids.Contains(d.Id));
+    }
 
     private async Task LoadDungeonsAsync()
     {
         var all = await _dungeons.GetAllAsync();
         _all = all.Select(d => new DungeonViewModel(d)).ToList();
-        RebuildCategories();
-        NoxCatalogueMissing = !_all.Any(d => NoxCategories.Contains(d.Category));
+        await LoadListsAsync();
         StatusMessage = $"{_all.Count} dungeons ready.";
     }
 
-    // Nox's curated list is kept separate from the full Tomb Prospectors set.
-    private static readonly HashSet<string> NoxCategories =
-        new(StringComparer.OrdinalIgnoreCase) { "farming", "equipment", "bloodgems", "testing" };
-
-    // Start on the bundled by-area set (always present) rather than Nox's list,
-    // which is empty until downloaded.
-    private bool _showNox = false;
-    public bool ShowNox
+    // (Re)load the lists, keeping the current selection when possible and defaulting
+    // to the always-present Community list.
+    public async Task LoadListsAsync()
     {
-        get => _showNox;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _showNox, value);
-            this.RaisePropertyChanged(nameof(ShowAll));
-            this.RaisePropertyChanged(nameof(ShowNoxDownloadPrompt));
-            RebuildCategories();
-        }
-    }
+        int? previous = SelectedList?.Id;
+        Lists.Clear();
+        foreach (var list in await _lists.GetListsAsync())
+            Lists.Add(list);
 
-    public bool ShowAll => !_showNox;
+        SelectedList = Lists.FirstOrDefault(l => l.Id == previous)
+            ?? Lists.FirstOrDefault(l => l.Source == ListSource.Bundled)
+            ?? Lists.FirstOrDefault();
+        this.RaisePropertyChanged(nameof(UserLists));
+    }
 
     private void RebuildCategories()
     {
         Categories.Clear();
         Categories.Add(AllCategories);
-        foreach (var category in _all
-            .Where(d => NoxCategories.Contains(d.Category) == _showNox)
+        foreach (var category in CurrentListDungeons()
             .Select(d => d.Category).Distinct().OrderBy(c => c))
             Categories.Add(category);
 
@@ -651,14 +667,14 @@ public class MainViewModel : ViewModelBase
     {
         StatusMessage = "Fetching the latest dungeons…";
         var result = await _online.UpdateAsync();
+        await _lists.RebuildBuiltInListsAsync();
         await LoadDungeonsAsync();
         StatusMessage = result;
     }
 
     private void ApplyFilter()
     {
-        IEnumerable<DungeonViewModel> query = _all
-            .Where(d => NoxCategories.Contains(d.Category) == _showNox);
+        IEnumerable<DungeonViewModel> query = CurrentListDungeons();
 
         if (!string.IsNullOrEmpty(SelectedCategory) && SelectedCategory != AllCategories)
             query = query.Where(d => string.Equals(d.Category, SelectedCategory, StringComparison.OrdinalIgnoreCase));
@@ -877,7 +893,64 @@ public class MainViewModel : ViewModelBase
         StatusMessage = $"Pasted {targets.Length} altar slots. Save to write them to disk.";
     }
 
-    // Save the selected slot's dungeon into the player's own catalogue under a name.
+    // --- Lists: create, rename, delete, add, remove, apply, share ---
+
+    private const string MyDungeonsListName = "My dungeons";
+
+    public async Task CreateListAsync(string name)
+    {
+        var list = await _lists.CreateListAsync(name);
+        await LoadListsAsync();
+        SelectedList = Lists.FirstOrDefault(l => l.Id == list.Id) ?? SelectedList;
+        StatusMessage = $"Created list \"{name}\".";
+    }
+
+    public async Task RenameSelectedListAsync(string name)
+    {
+        if (SelectedList is not { Source: ListSource.User } list)
+            return;
+        await _lists.RenameListAsync(list.Id, name);
+        await LoadListsAsync();
+        StatusMessage = $"Renamed list to \"{name}\".";
+    }
+
+    public async Task DeleteSelectedListAsync()
+    {
+        if (SelectedList is not { Source: ListSource.User } list)
+            return;
+        string name = list.Name;
+        await _lists.DeleteListAsync(list.Id);
+        await LoadListsAsync();
+        StatusMessage = $"Deleted list \"{name}\".";
+    }
+
+    // Add the selected catalogue dungeon to one of the user's lists.
+    public async Task AddSelectedDungeonToListAsync(int listId)
+    {
+        if (SelectedDungeon is null)
+        {
+            StatusMessage = "Pick a dungeon first.";
+            return;
+        }
+        bool added = await _lists.AddDungeonAsync(listId, SelectedDungeon.Id);
+        await LoadListsAsync();
+        StatusMessage = added ? "Added to the list." : "That dungeon is already in the list.";
+    }
+
+    // Remove the selected dungeon from the current (user) list.
+    public async Task RemoveSelectedFromListAsync()
+    {
+        if (SelectedList is not { Source: ListSource.User } list || SelectedDungeon is null)
+        {
+            StatusMessage = "Pick a dungeon in one of your own lists.";
+            return;
+        }
+        await _lists.RemoveItemAsync(list.Id, SelectedDungeon.Id);
+        await LoadListsAsync();
+        StatusMessage = "Removed from the list.";
+    }
+
+    // Save the selected slot's dungeon into the My dungeons list.
     public async Task SaveCurrentSlotAsCustomAsync(string name)
     {
         if (SelectedSlotBytes is not { } bytes)
@@ -885,29 +958,101 @@ public class MainViewModel : ViewModelBase
             StatusMessage = "Pick a slot with a dungeon first.";
             return;
         }
-
-        var entity = await _dungeons.AddCustomAsync(name, bytes);
-        _all.Add(new DungeonViewModel(entity));
-        RebuildCategories();
-        ApplyFilter();
-        StatusMessage = $"Saved \"{name}\" to your dungeons. Find it in the catalogue (Community tab, Custom).";
+        int listId = await EnsureMyDungeonsListId();
+        await _lists.AddNewDungeonAsync(listId, name, null, bytes);
+        await LoadDungeonsAsync();
+        StatusMessage = $"Saved \"{name}\" to My dungeons.";
     }
 
-    // Remove the selected dungeon from the player's catalogue (custom dungeons only).
-    public async Task DeleteSelectedCustomAsync()
+    // Save the whole altar (its non-empty slots) as a new user list.
+    public async Task SaveAltarAsListAsync(string name)
     {
-        if (SelectedDungeon is not { IsCustom: true } dungeon)
+        if (!HasLoadedSave)
         {
-            StatusMessage = "Pick one of your own saved dungeons to remove.";
+            StatusMessage = "Open a save first.";
+            return;
+        }
+        var list = await _lists.CreateListAsync(name);
+        foreach (var slot in Slots)
+        {
+            var bytes = _saves.GetSlotBytes(slot.Number);
+            if (IsEmptyRecord(bytes))
+                continue;
+            await _lists.AddNewDungeonAsync(list.Id, $"Slot {slot.Number}", null, bytes);
+        }
+        await LoadDungeonsAsync();
+        SelectedList = Lists.FirstOrDefault(l => l.Id == list.Id) ?? SelectedList;
+        StatusMessage = $"Saved the altar as list \"{name}\".";
+    }
+
+    // Write the selected list's dungeons onto the altar (first 7, in order).
+    public void ApplyListToAltar()
+    {
+        if (!HasLoadedSave)
+        {
+            StatusMessage = "Open a save first.";
+            return;
+        }
+        if (SelectedList is null || SelectedList.Items.Count == 0)
+        {
+            StatusMessage = "Pick a non-empty list.";
             return;
         }
 
-        await _dungeons.DeleteCustomAsync(dungeon.Glyph);
-        _all.Remove(dungeon);
-        RebuildCategories();
-        ApplyFilter();
-        StatusMessage = $"Removed \"{dungeon.Description ?? dungeon.Glyph}\" from your dungeons.";
+        int[] slots = Slots.Select(s => s.Number).ToArray();
+        int count = Math.Min(slots.Length, SelectedList.Items.Count);
+        for (int i = 0; i < count; i++)
+        {
+            _saves.SetSlot(slots[i], SelectedList.Items[i].Dungeon.Bytes);
+            SlotViewModel? target = Slots.FirstOrDefault(s => s.Number == slots[i]);
+            if (target is not null)
+                RefreshSlot(target);
+        }
+        LoadSelectedSlot();
+        StatusMessage = count < SelectedList.Items.Count
+            ? $"Applied the first {count} of {SelectedList.Items.Count} to the altar. Save to write."
+            : $"Applied {count} dungeons to the altar. Save to write.";
     }
+
+    // Export the selected list as a share code (for the clipboard or a file).
+    public string? ShareSelectedList()
+    {
+        if (SelectedList is null || SelectedList.Items.Count == 0)
+        {
+            StatusMessage = "Pick a non-empty list to share.";
+            return null;
+        }
+        StatusMessage = $"Copied \"{SelectedList.Name}\" as a share code.";
+        return ListSharing.Export(SelectedList);
+    }
+
+    // Import a shared list/dungeon from a code or file into a new user list.
+    public async Task ImportSharedAsync(string? code)
+    {
+        ShareSet set;
+        try { set = ListSharing.Import(code); }
+        catch (FormatException) { StatusMessage = "That is not a dungeon share code."; return; }
+
+        var list = await _lists.CreateListAsync("Imported list");
+        foreach (var item in set.Items)
+            await _lists.AddNewDungeonAsync(list.Id,
+                string.IsNullOrWhiteSpace(item.Name) ? "Imported" : item.Name, item.Category, item.Bytes);
+        await LoadDungeonsAsync();
+        SelectedList = Lists.FirstOrDefault(l => l.Id == list.Id) ?? SelectedList;
+        StatusMessage = $"Imported {set.Items.Count} dungeon(s) into a new list.";
+    }
+
+    private async Task<int> EnsureMyDungeonsListId()
+    {
+        var mine = Lists.FirstOrDefault(l => l.Source == ListSource.User && l.Name == MyDungeonsListName);
+        if (mine is not null)
+            return mine.Id;
+        var created = await _lists.CreateListAsync(MyDungeonsListName);
+        return created.Id;
+    }
+
+    private static bool IsEmptyRecord(byte[] bytes) =>
+        bytes.Length >= 4 && bytes[0] == 0xFF && bytes[1] == 0xFF && bytes[2] == 0xFF && bytes[3] == 0xFF;
 
     private int? _undoSlot;
     private byte[]? _undoBytes;

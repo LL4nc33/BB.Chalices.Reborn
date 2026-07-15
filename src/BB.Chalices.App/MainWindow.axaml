@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:BB.Chalices.ViewModels"
         xmlns:services="using:BB.Chalices.Services"
+        xmlns:entities="using:BB.Chalices.Data.Entities"
         xmlns:app="using:BB.Chalices.App"
         x:Class="BB.Chalices.App.MainWindow"
         x:DataType="vm:MainViewModel"
@@ -179,16 +180,28 @@
                                                Text="4.  Tweak rites if you like, then Save changes." />
                                 </StackPanel>
                             </Border>
-                            <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,12">
-                                <TextBlock Grid.Column="0" Classes="title" Text="Catalogue" VerticalAlignment="Center" />
-                                <UniformGrid Grid.Column="2" Columns="2" VerticalAlignment="Center">
-                                    <Button Classes="toggle" Classes.active="{Binding ShowNox}" Content="Nox" Click="OnShowNox"
-                                            HorizontalAlignment="Stretch"
-                                            ToolTip.Tip="Nox's curated farming, equipment and gem dungeons. Needs a one-time download (Settings), then works offline." />
-                                    <Button Classes="toggle" Classes.active="{Binding ShowAll}" Content="Community" Click="OnShowAll"
-                                            HorizontalAlignment="Stretch"
-                                            ToolTip.Tip="The Tomb Prospectors set, by area. Bundled and offline. Does not include Nox's dungeons (see the Nox tab for those)." />
-                                </UniformGrid>
+                            <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,12">
+                                <TextBlock Grid.Column="0" Classes="title" Text="Lists" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                <WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <ComboBox ItemsSource="{Binding Lists}" SelectedItem="{Binding SelectedList}" MinWidth="150" Margin="0,0,6,4"
+                                              ToolTip.Tip="Pick a list. Nox and Community are built in; the rest are yours.">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate x:DataType="entities:DungeonList">
+                                                <TextBlock Text="{Binding Name}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                    <Button Content="+" FontSize="18" FontWeight="SemiBold" Width="34" HorizontalContentAlignment="Center" Margin="0,0,6,4"
+                                            Click="OnNewList" ToolTip.Tip="Create a new list" />
+                                    <Button Content="Share" Click="OnShareList" Margin="0,0,6,4"
+                                            ToolTip.Tip="Copy this list as a share code" />
+                                    <Button Content="Import" Click="OnImportList" Margin="0,0,6,4"
+                                            ToolTip.Tip="Import a shared list from a code" />
+                                    <Button Content="Rename" Click="OnRenameList" IsVisible="{Binding CanEditSelectedList}" Margin="0,0,6,4"
+                                            ToolTip.Tip="Rename this list" />
+                                    <Button Classes="danger" Content="Delete" Click="OnDeleteList" IsVisible="{Binding CanEditSelectedList}" Margin="0,0,0,4"
+                                            ToolTip.Tip="Delete this list" />
+                                </WrapPanel>
                             </Grid>
                         </StackPanel>
                         <Grid Grid.Row="1" ColumnDefinitions="*,200" Margin="0,0,0,12">
@@ -253,19 +266,42 @@
                                               IsVisible="{Binding Description, Converter={x:Static ObjectConverters.IsNotNull}}">
                                     <TextBlock Classes="body" Text="{Binding Description}" TextWrapping="Wrap" />
                                 </ScrollViewer>
-                                <Button Classes="link" Content="remove from my dungeons" Click="OnDeleteCustom"
-                                        HorizontalAlignment="Left" IsVisible="{Binding IsCustom}"
-                                        ToolTip.Tip="Delete this saved dungeon from your catalogue" />
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Button Classes="link" Content="add to list" Click="OnAddToList"
+                                            HorizontalAlignment="Left"
+                                            ToolTip.Tip="Add this dungeon to one of your lists">
+                                        <Button.Flyout>
+                                            <Flyout>
+                                                <ListBox x:CompileBindings="False" MinWidth="160"
+                                                         ItemsSource="{Binding $parent[Window].DataContext.UserLists}"
+                                                         SelectionChanged="OnAddToListPicked">
+                                                    <ListBox.ItemTemplate>
+                                                        <DataTemplate x:DataType="entities:DungeonList">
+                                                            <TextBlock Text="{Binding Name}" />
+                                                        </DataTemplate>
+                                                    </ListBox.ItemTemplate>
+                                                </ListBox>
+                                            </Flyout>
+                                        </Button.Flyout>
+                                    </Button>
+                                    <Button Classes="link" Content="remove from this list" Click="OnRemoveFromList"
+                                            HorizontalAlignment="Left"
+                                            IsVisible="{Binding $parent[Window].DataContext.CanEditSelectedList}"
+                                            ToolTip.Tip="Remove this dungeon from the current list" />
+                                </StackPanel>
                             </StackPanel>
                         </Border>
-                        <Grid Grid.Row="4" ColumnDefinitions="Auto,Auto,*" ColumnSpacing="8" Margin="0,16,0,0">
+                        <Grid Grid.Row="4" ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="8" Margin="0,16,0,0">
                             <Button Grid.Column="0" Content="Build new" Click="OnBuilderClick"
                                     IsEnabled="{Binding HasLoadedSave}"
                                     ToolTip.Tip="Generate a dungeon by area, variant and layout" />
                             <Button Grid.Column="1" Content="Fill all" Command="{Binding FillAllSlotsCommand}"
                                     IsEnabled="{Binding HasLoadedSave}"
                                     ToolTip.Tip="Put the selected dungeon in every slot at once (makeshift + the six stored, e.g. to farm the same gems). Save to write to disk." />
-                            <Button Grid.Column="2" Classes="primary" Content="PLACE IN SELECTED SLOT"
+                            <Button Grid.Column="2" Content="Apply list" Click="OnApplyList"
+                                    IsEnabled="{Binding HasLoadedSave}"
+                                    ToolTip.Tip="Write the current list's dungeons onto the altar (first 7, in order). Save to write to disk." />
+                            <Button Grid.Column="3" Classes="primary" Content="PLACE IN SELECTED SLOT"
                                     Command="{Binding ApplyDungeonCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                                     IsEnabled="{Binding HasLoadedSave}"
                                     ToolTip.Tip="Stage the selected dungeon in the chosen slot. Click Save changes to write it to disk." />

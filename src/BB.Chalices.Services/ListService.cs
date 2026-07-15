@@ -12,6 +12,14 @@ public class ListService
 
     public ListService(IDbContextFactory<ChaliceDbContext> factory) => _factory = factory;
 
+    // Rebuild the built-in Community and Nox lists from the current catalogue, e.g.
+    // after downloading Nox's gist mid-session.
+    public async Task RebuildBuiltInListsAsync()
+    {
+        await using var db = await _factory.CreateDbContextAsync();
+        await ListBootstrapper.RebuildBuiltInListsAsync(db);
+    }
+
     public async Task<List<DungeonList>> GetListsAsync()
     {
         await using var db = await _factory.CreateDbContextAsync();
