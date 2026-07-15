@@ -483,21 +483,6 @@
                             </StackPanel>
 
                             <StackPanel Spacing="6">
-                                <TextBlock Classes="section" Text="BACKUP FOLDER" />
-                                <Grid ColumnDefinitions="*,Auto,Auto">
-                                    <TextBox Grid.Column="0" Text="{Binding BackupPath}" Margin="0,0,8,0"
-                                             ToolTip.Tip="Folder where your backups are kept" />
-                                    <Button Grid.Column="1" Content="Browse" Click="OnBrowseBackup" Margin="0,0,8,0" />
-                                    <Button Grid.Column="2" Content="Open" Click="OnOpenBackupFolder" ToolTip.Tip="Open the backup folder" />
-                                </Grid>
-                                <CheckBox Content="Back up automatically before every save"
-                                          IsChecked="{Binding AutoBackup}"
-                                          ToolTip.Tip="Keep a timestamped backup every time you save" />
-                                <TextBlock Classes="caption" TextWrapping="Wrap"
-                                           Text="On: a timestamped copy is kept in the backup folder, listed under Backups. Off: a single rolling backup/ folder is kept next to the save instead. Either way you get one backup per save, never two." />
-                            </StackPanel>
-
-                            <StackPanel Spacing="6">
                                 <TextBlock Classes="section" Text="SHADPS4 FIXES" />
                                 <Button Content="Fix sound crash" Command="{Binding ApplySoundFixCommand}" HorizontalAlignment="Left"
                                         ToolTip.Tip="Applies the shadPS4 sound-crash workaround: sets userdata0010 offset 0x204E to 01. A backup is made first." />
@@ -572,23 +557,35 @@
                             <TextBlock Classes="title" Text="Backups" />
                             <TextBlock Classes="caption" Text="{Binding BackupSummary}" VerticalAlignment="Bottom" Margin="0,0,0,4" />
                         </StackPanel>
-                        <Border Grid.Row="1" Classes="card">
-                            <Grid>
-                                <ListBox Classes="plain" ItemsSource="{Binding BackupItems}" SelectedItem="{Binding SelectedBackup}"
+                        <Border Grid.Row="1" Classes="card" Padding="0">
+                            <Grid RowDefinitions="Auto,*">
+                                <Grid Grid.Row="0" ColumnDefinitions="*,105,80,1.5*" Margin="15,10,12,6"
+                                      IsVisible="{Binding HasBackups}">
+                                    <TextBlock Grid.Column="0" Classes="section" Text="FILE" Margin="0" />
+                                    <TextBlock Grid.Column="1" Classes="section" Text="DATE" Margin="0" />
+                                    <TextBlock Grid.Column="2" Classes="section" Text="TIME" Margin="0" />
+                                    <TextBlock Grid.Column="3" Classes="section" Text="NOTE" Margin="0" />
+                                </Grid>
+                                <ListBox Grid.Row="1" Classes="plain table" ItemsSource="{Binding BackupItems}" SelectedItem="{Binding SelectedBackup}"
                                          DoubleTapped="OnBackupDoubleTapped">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate x:DataType="services:BackupInfo">
-                                            <StackPanel Margin="0,2">
-                                                <TextBlock Classes="body" Text="{Binding DisplayName}" />
-                                                <TextBlock Classes="caption" Text="{Binding Notes}"
-                                                           IsVisible="{Binding Notes, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-                                            </StackPanel>
+                                            <Grid ColumnDefinitions="*,105,80,1.5*">
+                                                <TextBlock Grid.Column="0" Classes="body" Text="{Binding OriginalFile}"
+                                                           TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="1" Classes="caption" VerticalAlignment="Center"
+                                                           Text="{Binding Date, StringFormat='{}{0:yyyy-MM-dd}'}" />
+                                                <TextBlock Grid.Column="2" Classes="caption" VerticalAlignment="Center"
+                                                           Text="{Binding Date, StringFormat='{}{0:HH:mm:ss}'}" />
+                                                <TextBlock Grid.Column="3" Classes="caption" VerticalAlignment="Center"
+                                                           Text="{Binding Notes}" TextTrimming="CharacterEllipsis" />
+                                            </Grid>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
-                                <TextBlock Classes="caption" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                <TextBlock Grid.Row="1" Classes="caption" VerticalAlignment="Center" HorizontalAlignment="Center"
                                            TextWrapping="Wrap" TextAlignment="Center" Margin="24"
-                                           Text="No backups yet. Use Back up now, or enable auto-backup in Settings."
+                                           Text="No backups yet. Use Back up now, or turn on auto-backup on the right."
                                            IsVisible="{Binding !HasBackups}" />
                             </Grid>
                         </Border>
@@ -605,40 +602,57 @@
 
                     <Border Grid.Column="2" Background="{DynamicResource BgPanel}"
                             BorderBrush="{DynamicResource Edge}" BorderThickness="1,0,0,0">
-                        <Grid Margin="20" RowDefinitions="Auto,*,Auto">
-                            <TextBlock Grid.Row="0" Classes="section" Text="BACKUP DETAILS" Margin="0,0,0,12" />
-
-                            <TextBlock Grid.Row="1" Classes="caption" VerticalAlignment="Top" TextWrapping="Wrap"
-                                       Text="Select a backup on the left to see its details."
-                                       IsVisible="{Binding SelectedBackup, Converter={x:Static ObjectConverters.IsNull}}" />
-
-                            <StackPanel Grid.Row="1" Spacing="12" VerticalAlignment="Top"
-                                        IsVisible="{Binding SelectedBackup, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                <TextBlock Classes="heading" Text="{Binding SelectedBackup.OriginalFile}" TextWrapping="Wrap" />
-                                <StackPanel Spacing="2">
-                                    <TextBlock Classes="section" Text="WHEN" />
-                                    <TextBlock Classes="caption" Text="{Binding SelectedBackup.Date, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" />
-                                </StackPanel>
-                                <StackPanel Spacing="2" IsVisible="{Binding SelectedBackup.Notes, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                                    <TextBlock Classes="section" Text="NOTE" />
-                                    <TextBlock Classes="caption" Text="{Binding SelectedBackup.Notes}" TextWrapping="Wrap" />
-                                </StackPanel>
-                                <StackPanel Spacing="2">
-                                    <TextBlock Classes="section" Text="FILE" />
-                                    <TextBlock Classes="caption" Text="{Binding SelectedBackup.FilePath}" TextWrapping="Wrap" />
+                        <ScrollViewer>
+                        <StackPanel Margin="20" Spacing="18">
+                            <StackPanel Spacing="12">
+                                <TextBlock Classes="section" Text="BACKUP DETAILS" />
+                                <TextBlock Classes="caption" TextWrapping="Wrap"
+                                           Text="Select a backup on the left to see its details."
+                                           IsVisible="{Binding SelectedBackup, Converter={x:Static ObjectConverters.IsNull}}" />
+                                <StackPanel Spacing="12"
+                                            IsVisible="{Binding SelectedBackup, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <TextBlock Classes="heading" Text="{Binding SelectedBackup.OriginalFile}" TextWrapping="Wrap" />
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Classes="section" Text="WHEN" />
+                                        <TextBlock Classes="caption" Text="{Binding SelectedBackup.Date, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" />
+                                    </StackPanel>
+                                    <StackPanel Spacing="2" IsVisible="{Binding SelectedBackup.Notes, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                        <TextBlock Classes="section" Text="NOTE" />
+                                        <TextBlock Classes="caption" Text="{Binding SelectedBackup.Notes}" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Classes="section" Text="FILE" />
+                                        <TextBlock Classes="caption" Text="{Binding SelectedBackup.FilePath}" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <StackPanel Spacing="8" Margin="0,4,0,0">
+                                        <Button Classes="primary" Content="Restore this backup" Command="{Binding RestoreBackupCommand}"
+                                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                                ToolTip.Tip="Replace the current save with this backup (the current state is backed up first)" />
+                                        <Button Classes="danger" Content="Delete" Click="OnDeleteBackup"
+                                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                                ToolTip.Tip="Delete this backup" />
+                                    </StackPanel>
                                 </StackPanel>
                             </StackPanel>
 
-                            <StackPanel Grid.Row="2" Spacing="8" Margin="0,12,0,0"
-                                        IsVisible="{Binding SelectedBackup, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                <Button Classes="primary" Content="Restore this backup" Command="{Binding RestoreBackupCommand}"
-                                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                                        ToolTip.Tip="Replace the current save with this backup (the current state is backed up first)" />
-                                <Button Classes="danger" Content="Delete" Click="OnDeleteBackup"
-                                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                                        ToolTip.Tip="Delete this backup" />
-                            </StackPanel>
-                        </Grid>
+                            <Border BorderBrush="{DynamicResource Edge}" BorderThickness="0,1,0,0" Padding="0,16,0,0">
+                                <StackPanel Spacing="8">
+                                    <TextBlock Classes="section" Text="BACKUP FOLDER" />
+                                    <TextBox Text="{Binding BackupPath}" IsReadOnly="True"
+                                             ToolTip.Tip="Folder where your backups are kept" />
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Button Content="Browse" Click="OnBrowseBackup" />
+                                        <Button Content="Open" Click="OnOpenBackupFolder" ToolTip.Tip="Open the backup folder" />
+                                    </StackPanel>
+                                    <CheckBox Content="Back up automatically before every save"
+                                              IsChecked="{Binding AutoBackup}" IsCheckedChanged="OnAutoBackupChanged"
+                                              ToolTip.Tip="Keep a timestamped backup every time you save" />
+                                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                                               Text="On: a timestamped copy is kept here, listed on the left. Off: a single rolling backup/ folder is kept next to the save instead. Either way you get one backup per save, never two." />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                        </ScrollViewer>
                     </Border>
                 </Grid>
                 </LayoutTransformControl>

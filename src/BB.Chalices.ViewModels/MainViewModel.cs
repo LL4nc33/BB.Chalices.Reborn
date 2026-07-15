@@ -384,16 +384,12 @@ public class MainViewModel : ViewModelBase
     public void OpenSettings()
     {
         ShadPs4Path = _config.Settings.ShadPs4FolderPath ?? string.Empty;
-        BackupPath = _config.BackupDirectory;
-        AutoBackup = _config.Settings.AutoBackupEnabled;
         CurrentView = AppView.Settings;
     }
 
     public void SaveSettings()
     {
         _config.Settings.ShadPs4FolderPath = string.IsNullOrWhiteSpace(ShadPs4Path) ? null : ShadPs4Path;
-        _config.Settings.BackupDirectory = string.IsNullOrWhiteSpace(BackupPath) ? null : BackupPath;
-        _config.Settings.AutoBackupEnabled = AutoBackup;
         _config.Save();
         CurrentView = AppView.Catalogue;
     }
@@ -429,8 +425,23 @@ public class MainViewModel : ViewModelBase
     public void OpenBackups()
     {
         BackupPath = _config.BackupDirectory;
+        AutoBackup = _config.Settings.AutoBackupEnabled;
         RefreshBackups();
         CurrentView = AppView.Backups;
+    }
+
+    // The backup folder and auto-backup toggle now live in the Backups view, so they
+    // persist as soon as you change them rather than via a Save button.
+    public void PersistBackupPath()
+    {
+        _config.Settings.BackupDirectory = string.IsNullOrWhiteSpace(BackupPath) ? null : BackupPath;
+        _config.Save();
+    }
+
+    public void PersistAutoBackup()
+    {
+        _config.Settings.AutoBackupEnabled = AutoBackup;
+        _config.Save();
     }
 
     private void RefreshBackups()

@@ -216,6 +216,19 @@
             <Setter Property="BorderThickness" Value="0" />
         </Style>
 
+        <!-- Table rows: always reserve the 3px selection bar so columns never shift -->
+        <Style Selector="ListBox.table">
+            <Setter Property="Padding" Value="0" />
+        </Style>
+        <Style Selector="ListBox.table ListBoxItem">
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="BorderThickness" Value="3,0,0,0" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+        <Style Selector="ListBox.table ListBoxItem:selected">
+            <Setter Property="BorderBrush" Value="{DynamicResource Blood}" />
+        </Style>
+
         <!-- Altar slot selector: six segmented buttons, active one in blood -->
         <Style Selector="ListBox.slots ListBoxItem">
             <Setter Property="Padding" Value="0,6" />

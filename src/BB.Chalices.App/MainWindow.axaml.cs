@@ -163,7 +163,16 @@ public partial class MainWindow : Window
     private async void OnBrowseBackup(object? sender, RoutedEventArgs e)
     {
         if (await PickFolderAsync() is { } path && DataContext is MainViewModel viewModel)
+        {
             viewModel.BackupPath = path;
+            viewModel.PersistBackupPath();
+        }
+    }
+
+    private void OnAutoBackupChanged(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.PersistAutoBackup();
     }
 
     private async Task<string?> PickFolderAsync()
