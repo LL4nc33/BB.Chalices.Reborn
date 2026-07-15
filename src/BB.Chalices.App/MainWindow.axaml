@@ -6,7 +6,7 @@
         xmlns:app="using:BB.Chalices.App"
         x:Class="BB.Chalices.App.MainWindow"
         x:DataType="vm:MainViewModel"
-        Width="1600" Height="900" MinWidth="1500" MinHeight="780"
+        Width="1600" Height="880" MinWidth="1440" MinHeight="780"
         RequestedThemeVariant="Dark"
         FontFamily="{DynamicResource GothicFont}"
         Icon="/Assets/favicon.png"
@@ -25,7 +25,7 @@
 
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="310" MinWidth="260" MaxWidth="380" />
+                <ColumnDefinition Width="240" MinWidth="200" MaxWidth="260" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" MinWidth="1225" />
             </Grid.ColumnDefinitions>
