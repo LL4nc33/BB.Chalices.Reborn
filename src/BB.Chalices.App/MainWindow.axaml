@@ -466,133 +466,180 @@
                     <LayoutTransformControl.LayoutTransform>
                         <ScaleTransform ScaleX="{Binding CatalogueScale}" ScaleY="{Binding CatalogueScale}" />
                     </LayoutTransformControl.LayoutTransform>
-                <ScrollViewer>
-                    <StackPanel Margin="20" Spacing="20" MaxWidth="680" HorizontalAlignment="Left">
-                        <TextBlock Classes="title" Text="Settings" />
+                <Grid ColumnDefinitions="*,Auto,320">
+                    <ScrollViewer Grid.Column="0">
+                        <StackPanel Margin="20" Spacing="14" MaxWidth="620" HorizontalAlignment="Left">
+                            <TextBlock Classes="title" Text="Settings" />
 
-                        <StackPanel Spacing="8">
-                            <TextBlock Classes="section" Text="SHADPS4 FOLDER" />
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBox Grid.Column="0" Text="{Binding ShadPs4Path}" Margin="0,0,8,0"
-                                         PlaceholderText="leave empty to auto-detect"
-                                         ToolTip.Tip="Your shadPS4 folder. Leave empty to auto-detect it." />
-                                <Button Grid.Column="1" Content="Browse" Click="OnBrowseShad" />
-                            </Grid>
-                            <TextBlock Classes="caption" Text="{Binding DetectedShadInfo}" TextWrapping="Wrap" />
-                        </StackPanel>
-
-                        <StackPanel Spacing="8">
-                            <TextBlock Classes="section" Text="BACKUP FOLDER" />
-                            <Grid ColumnDefinitions="*,Auto,Auto">
-                                <TextBox Grid.Column="0" Text="{Binding BackupPath}" Margin="0,0,8,0"
-                                         ToolTip.Tip="Folder where your backups are kept" />
-                                <Button Grid.Column="1" Content="Browse" Click="OnBrowseBackup" Margin="0,0,8,0" />
-                                <Button Grid.Column="2" Content="Open" Click="OnOpenBackupFolder" ToolTip.Tip="Open the backup folder" />
-                            </Grid>
-                        </StackPanel>
-
-                        <StackPanel Spacing="4">
-                            <CheckBox Content="Back up automatically before every save"
-                                      IsChecked="{Binding AutoBackup}"
-                                      ToolTip.Tip="Keep a timestamped backup every time you save" />
-                            <TextBlock Classes="caption" TextWrapping="Wrap"
-                                       Text="On: a timestamped copy is kept in the backup folder, listed under Backups. Off: a single rolling backup/ folder is kept next to the save instead. Either way you get one backup per save, never two." />
-                        </StackPanel>
-
-                        <StackPanel Spacing="8">
-                            <TextBlock Classes="section" Text="STORAGE" />
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBox Grid.Column="0" Text="{Binding DataFolder}" IsReadOnly="True" Margin="0,0,8,0"
-                                         ToolTip.Tip="Where settings, the database and the catalogue cache are kept." />
-                                <Button Grid.Column="1" Content="Open" Click="OnOpenDataFolder" ToolTip.Tip="Open the data folder" />
-                            </Grid>
-                            <TextBlock Classes="caption" Text="{Binding StorageModeText}" TextWrapping="Wrap" />
-                        </StackPanel>
-
-                        <StackPanel Spacing="8">
-                            <TextBlock Classes="section" Text="SHADPS4 FIXES" />
-                            <Button Content="Fix sound crash" Command="{Binding ApplySoundFixCommand}" HorizontalAlignment="Left"
-                                    ToolTip.Tip="Applies the shadPS4 sound-crash workaround: sets userdata0010 offset 0x204E to 01. A backup is made first." />
-                            <TextBlock Classes="caption" TextWrapping="Wrap"
-                                       Text="Patches the options file (userdata0010) to stop the shadPS4 audio crash, for any build. Credit: imbal4nc3d, with proteh." />
-                        </StackPanel>
-
-                        <StackPanel Spacing="8">
-                            <TextBlock Classes="section" Text="DUNGEON CATALOGUE" />
-                            <Button Content="Download / update from Nox's gist" Command="{Binding UpdateDungeonsCommand}" HorizontalAlignment="Left"
-                                    ToolTip.Tip="Fetch the latest catalogue from Nox's gist and cache it locally for offline use." />
-                            <TextBlock Classes="caption" TextWrapping="Wrap"
-                                       Text="The 200+ ready-made dungeons are Nox's work, fetched from his gist with your consent and cached locally. The app works offline without them." />
-                        </StackPanel>
-
-                        <Border BorderBrush="{DynamicResource Edge}" BorderThickness="0,1,0,0" Padding="0,16,0,0">
-                            <StackPanel Spacing="8">
-                                <TextBlock Classes="section" Text="CREDITS AND SOURCES" />
-                                <TextBlock Classes="caption" TextWrapping="Wrap"
-                                           Text="The chalice byte format builds on the Tomb Prospectors community (DrAnger, Trin, Kazin). Dig into the research yourself:" />
-                                <WrapPanel>
-                                    <Button Classes="link" Content="Hex Research Central" Tag="https://docs.google.com/spreadsheets/d/1zFIzhnXHhYomlR-tFJcyk3cPywf1snqkDH900j6rtAI/edit?pli=1&amp;gid=935899711#gid=935899711"
-                                            Click="OnOpenLink" Margin="0,0,16,8" />
-                                    <Button Classes="link" Content="Bloodborne Wiki" Tag="https://www.bloodborne-wiki.com/"
-                                            Click="OnOpenLink" Margin="0,0,16,8" />
-                                    <Button Classes="link" Content="Nox's dungeon list" Tag="https://www.nexusmods.com/bloodborne/mods/121"
-                                            Click="OnOpenLink" Margin="0,0,16,8" />
-                                    <Button Classes="link" Content="shadPS4" Tag="https://shadps4.net" Click="OnOpenLink" Margin="0,0,16,8" />
-                                </WrapPanel>
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="section" Text="SHADPS4 FOLDER" />
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBox Grid.Column="0" Text="{Binding ShadPs4Path}" Margin="0,0,8,0"
+                                             PlaceholderText="leave empty to auto-detect"
+                                             ToolTip.Tip="Your shadPS4 folder. Leave empty to auto-detect it." />
+                                    <Button Grid.Column="1" Content="Browse" Click="OnBrowseShad" />
+                                </Grid>
+                                <TextBlock Classes="caption" Text="{Binding DetectedShadInfo}" TextWrapping="Wrap" />
                             </StackPanel>
-                        </Border>
 
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Button Content="Cancel" Click="OnShowCatalogue" />
-                            <Button Classes="primary" Content="Save settings" Click="OnSaveSettings" />
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="section" Text="BACKUP FOLDER" />
+                                <Grid ColumnDefinitions="*,Auto,Auto">
+                                    <TextBox Grid.Column="0" Text="{Binding BackupPath}" Margin="0,0,8,0"
+                                             ToolTip.Tip="Folder where your backups are kept" />
+                                    <Button Grid.Column="1" Content="Browse" Click="OnBrowseBackup" Margin="0,0,8,0" />
+                                    <Button Grid.Column="2" Content="Open" Click="OnOpenBackupFolder" ToolTip.Tip="Open the backup folder" />
+                                </Grid>
+                                <CheckBox Content="Back up automatically before every save"
+                                          IsChecked="{Binding AutoBackup}"
+                                          ToolTip.Tip="Keep a timestamped backup every time you save" />
+                                <TextBlock Classes="caption" TextWrapping="Wrap"
+                                           Text="On: a timestamped copy is kept in the backup folder, listed under Backups. Off: a single rolling backup/ folder is kept next to the save instead. Either way you get one backup per save, never two." />
+                            </StackPanel>
+
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="section" Text="SHADPS4 FIXES" />
+                                <Button Content="Fix sound crash" Command="{Binding ApplySoundFixCommand}" HorizontalAlignment="Left"
+                                        ToolTip.Tip="Applies the shadPS4 sound-crash workaround: sets userdata0010 offset 0x204E to 01. A backup is made first." />
+                                <TextBlock Classes="caption" TextWrapping="Wrap"
+                                           Text="Patches the options file (userdata0010) to stop the shadPS4 audio crash, for any build. Credit: imbal4nc3d, with proteh." />
+                            </StackPanel>
+
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="section" Text="DUNGEON CATALOGUE" />
+                                <Button Content="Download / update from Nox's gist" Command="{Binding UpdateDungeonsCommand}" HorizontalAlignment="Left"
+                                        ToolTip.Tip="Fetch the latest catalogue from Nox's gist and cache it locally for offline use." />
+                                <TextBlock Classes="caption" TextWrapping="Wrap"
+                                           Text="The 200+ ready-made dungeons are Nox's work, fetched from his gist with your consent and cached locally. The app works offline without them." />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
+                                <Button Content="Cancel" Click="OnShowCatalogue" />
+                                <Button Classes="primary" Content="Save settings" Click="OnSaveSettings" />
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </ScrollViewer>
+                    </ScrollViewer>
+
+                    <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns"
+                                  Background="{DynamicResource Edge}" ToolTip.Tip="Drag to resize the info panel" />
+
+                    <Border Grid.Column="2" Background="{DynamicResource BgPanel}"
+                            BorderBrush="{DynamicResource Edge}" BorderThickness="1,0,0,0">
+                        <ScrollViewer>
+                            <StackPanel Margin="20" Spacing="18">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Classes="section" Text="ABOUT" />
+                                    <TextBlock Classes="heading" Text="BB Chalices" />
+                                    <TextBlock Classes="caption" Text="{Binding AppVersion}" />
+                                </StackPanel>
+
+                                <StackPanel Spacing="4">
+                                    <TextBlock Classes="section" Text="DATA FOLDER" />
+                                    <TextBlock Classes="caption" Text="{Binding DataFolder}" TextWrapping="Wrap" />
+                                    <TextBlock Classes="caption" Text="{Binding StorageModeText}" TextWrapping="Wrap" />
+                                    <Button Content="Open data folder" Click="OnOpenDataFolder" HorizontalAlignment="Left" Margin="0,4,0,0" />
+                                </StackPanel>
+
+                                <StackPanel Spacing="6">
+                                    <TextBlock Classes="section" Text="CREDITS AND SOURCES" />
+                                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                                               Text="The chalice byte format builds on the Tomb Prospectors community (DrAnger, Trin, Kazin)." />
+                                    <StackPanel Spacing="2">
+                                        <Button Classes="link" Content="Hex Research Central" HorizontalAlignment="Left"
+                                                Tag="https://docs.google.com/spreadsheets/d/1zFIzhnXHhYomlR-tFJcyk3cPywf1snqkDH900j6rtAI/edit?pli=1&amp;gid=935899711#gid=935899711" Click="OnOpenLink" />
+                                        <Button Classes="link" Content="Bloodborne Wiki" HorizontalAlignment="Left"
+                                                Tag="https://www.bloodborne-wiki.com/" Click="OnOpenLink" />
+                                        <Button Classes="link" Content="Nox's dungeon list" HorizontalAlignment="Left"
+                                                Tag="https://www.nexusmods.com/bloodborne/mods/121" Click="OnOpenLink" />
+                                        <Button Classes="link" Content="shadPS4" HorizontalAlignment="Left"
+                                                Tag="https://shadps4.net" Click="OnOpenLink" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
                 </LayoutTransformControl>
 
                 <!-- Backups page -->
-                <LayoutTransformControl IsVisible="{Binding IsBackupsView}" HorizontalAlignment="Left">
+                <LayoutTransformControl IsVisible="{Binding IsBackupsView}">
                     <LayoutTransformControl.LayoutTransform>
                         <ScaleTransform ScaleX="{Binding CatalogueScale}" ScaleY="{Binding CatalogueScale}" />
                     </LayoutTransformControl.LayoutTransform>
-                <Grid Margin="20" RowDefinitions="Auto,*,Auto"
-                      MaxWidth="900" HorizontalAlignment="Left">
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,16">
-                        <TextBlock Classes="title" Text="Backups" />
-                        <TextBlock Classes="caption" Text="{Binding BackupSummary}" VerticalAlignment="Bottom" Margin="0,0,0,4" />
-                    </StackPanel>
-                    <Border Grid.Row="1" Classes="card">
-                        <Grid>
-                            <ListBox Classes="plain" ItemsSource="{Binding BackupItems}" SelectedItem="{Binding SelectedBackup}"
-                                     DoubleTapped="OnBackupDoubleTapped">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate x:DataType="services:BackupInfo">
-                                        <StackPanel Margin="0,4">
-                                            <TextBlock Classes="body" Text="{Binding DisplayName}" />
-                                            <TextBlock Classes="caption" Text="{Binding Notes}"
-                                                       IsVisible="{Binding Notes, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                            <TextBlock Classes="caption" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                       TextWrapping="Wrap" TextAlignment="Center" Margin="24"
-                                       Text="No backups yet. Use Back up now, or enable auto-backup in Settings."
-                                       IsVisible="{Binding !HasBackups}" />
+                <Grid ColumnDefinitions="*,Auto,320">
+                    <Grid Grid.Column="0" Margin="20" RowDefinitions="Auto,*,Auto">
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,12">
+                            <TextBlock Classes="title" Text="Backups" />
+                            <TextBlock Classes="caption" Text="{Binding BackupSummary}" VerticalAlignment="Bottom" Margin="0,0,0,4" />
+                        </StackPanel>
+                        <Border Grid.Row="1" Classes="card">
+                            <Grid>
+                                <ListBox Classes="plain" ItemsSource="{Binding BackupItems}" SelectedItem="{Binding SelectedBackup}"
+                                         DoubleTapped="OnBackupDoubleTapped">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate x:DataType="services:BackupInfo">
+                                            <StackPanel Margin="0,2">
+                                                <TextBlock Classes="body" Text="{Binding DisplayName}" />
+                                                <TextBlock Classes="caption" Text="{Binding Notes}"
+                                                           IsVisible="{Binding Notes, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <TextBlock Classes="caption" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                           TextWrapping="Wrap" TextAlignment="Center" Margin="24"
+                                           Text="No backups yet. Use Back up now, or enable auto-backup in Settings."
+                                           IsVisible="{Binding !HasBackups}" />
+                            </Grid>
+                        </Border>
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="0,12,0,0">
+                            <Button Content="Back up now" Command="{Binding CreateBackupCommand}" IsEnabled="{Binding HasLoadedSave}"
+                                    ToolTip.Tip="Create a backup of the current save" />
+                            <Button Content="Open folder" Click="OnOpenBackupFolder"
+                                    ToolTip.Tip="Open the backup folder" />
+                        </StackPanel>
+                    </Grid>
+
+                    <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns"
+                                  Background="{DynamicResource Edge}" ToolTip.Tip="Drag to resize the details panel" />
+
+                    <Border Grid.Column="2" Background="{DynamicResource BgPanel}"
+                            BorderBrush="{DynamicResource Edge}" BorderThickness="1,0,0,0">
+                        <Grid Margin="20" RowDefinitions="Auto,*,Auto">
+                            <TextBlock Grid.Row="0" Classes="section" Text="BACKUP DETAILS" Margin="0,0,0,12" />
+
+                            <TextBlock Grid.Row="1" Classes="caption" VerticalAlignment="Top" TextWrapping="Wrap"
+                                       Text="Select a backup on the left to see its details."
+                                       IsVisible="{Binding SelectedBackup, Converter={x:Static ObjectConverters.IsNull}}" />
+
+                            <StackPanel Grid.Row="1" Spacing="12" VerticalAlignment="Top"
+                                        IsVisible="{Binding SelectedBackup, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                <TextBlock Classes="heading" Text="{Binding SelectedBackup.OriginalFile}" TextWrapping="Wrap" />
+                                <StackPanel Spacing="2">
+                                    <TextBlock Classes="section" Text="WHEN" />
+                                    <TextBlock Classes="caption" Text="{Binding SelectedBackup.Date, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" />
+                                </StackPanel>
+                                <StackPanel Spacing="2" IsVisible="{Binding SelectedBackup.Notes, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                    <TextBlock Classes="section" Text="NOTE" />
+                                    <TextBlock Classes="caption" Text="{Binding SelectedBackup.Notes}" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Classes="section" Text="FILE" />
+                                    <TextBlock Classes="caption" Text="{Binding SelectedBackup.FilePath}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="2" Spacing="8" Margin="0,12,0,0"
+                                        IsVisible="{Binding SelectedBackup, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                <Button Classes="primary" Content="Restore this backup" Command="{Binding RestoreBackupCommand}"
+                                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                        ToolTip.Tip="Replace the current save with this backup (the current state is backed up first)" />
+                                <Button Classes="danger" Content="Delete" Click="OnDeleteBackup"
+                                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                        ToolTip.Tip="Delete this backup" />
+                            </StackPanel>
                         </Grid>
                     </Border>
-                    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="0,16,0,0">
-                        <Button Content="Back up now" Command="{Binding CreateBackupCommand}" IsEnabled="{Binding HasLoadedSave}"
-                                ToolTip.Tip="Create a backup of the current save" />
-                        <Button Content="Restore selected" Command="{Binding RestoreBackupCommand}"
-                                IsEnabled="{Binding SelectedBackup, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                ToolTip.Tip="Replace the current save with the selected backup (the current state is backed up first)" />
-                        <Button Classes="danger" Content="Delete" Click="OnDeleteBackup"
-                                IsEnabled="{Binding SelectedBackup, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                ToolTip.Tip="Delete the selected backup" />
-                        <Button Content="Open folder" Click="OnOpenBackupFolder"
-                                ToolTip.Tip="Open the backup folder" />
-                    </StackPanel>
                 </Grid>
                 </LayoutTransformControl>
             </Panel>
