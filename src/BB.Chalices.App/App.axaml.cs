@@ -67,6 +67,13 @@ public partial class App : Application
                     config.Settings.CatalogueVersion = catalogueVersion;
                     config.Save();
                 }
+
+                // Lists live in the same database; make sure their tables exist, the
+                // built-in lists match the current catalogue, and old custom dungeons
+                // have moved into a My dungeons list.
+                await ListBootstrapper.EnsureSchemaAsync(db);
+                await ListBootstrapper.RebuildBuiltInListsAsync(db);
+                await ListBootstrapper.MigrateCustomAsync(db);
             }
 
             var viewModel = Services!.GetRequiredService<MainViewModel>();
@@ -98,6 +105,7 @@ public partial class App : Application
         services.AddSingleton<SaveFileService>();
         services.AddSingleton<SaveLocatorService>();
         services.AddTransient<DungeonService>();
+        services.AddTransient<ListService>();
         services.AddTransient<OnlineImportService>();
         services.AddTransient<MainViewModel>();
     }
