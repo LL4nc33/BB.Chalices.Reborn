@@ -6,7 +6,7 @@
         xmlns:app="using:BB.Chalices.App"
         x:Class="BB.Chalices.App.MainWindow"
         x:DataType="vm:MainViewModel"
-        Width="1366" Height="850" MinWidth="1240" MinHeight="780"
+        Width="1600" Height="900" MinWidth="1500" MinHeight="780"
         RequestedThemeVariant="Dark"
         FontFamily="{DynamicResource GothicFont}"
         Icon="/Assets/favicon.png"
@@ -25,9 +25,9 @@
 
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="220" MinWidth="180" />
+                <ColumnDefinition Width="310" MinWidth="260" MaxWidth="380" />
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" MinWidth="830" />
+                <ColumnDefinition Width="*" MinWidth="1225" />
             </Grid.ColumnDefinitions>
 
             <!-- LEFT: navigation + actions -->
@@ -155,7 +155,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" MinWidth="340" />
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="680" MinWidth="480" />
+                        <ColumnDefinition Width="940" MinWidth="880" MaxWidth="1180" />
                     </Grid.ColumnDefinitions>
 
                     <LayoutTransformControl Grid.Column="0">
@@ -183,6 +183,15 @@
                             <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,12">
                                 <TextBlock Grid.Column="0" Classes="title" Text="Lists" VerticalAlignment="Center" Margin="0,0,12,0" />
                                 <WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <WrapPanel.Styles>
+                                        <Style Selector="Button">
+                                            <Setter Property="Height" Value="38" />
+                                        </Style>
+                                        <Style Selector="ComboBox">
+                                            <Setter Property="Height" Value="38" />
+                                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                                        </Style>
+                                    </WrapPanel.Styles>
                                     <ComboBox ItemsSource="{Binding Lists}" SelectedItem="{Binding SelectedList}" MinWidth="150" Margin="0,0,6,4"
                                               ToolTip.Tip="Pick a list. Nox and Community are built in; the rest are yours.">
                                         <ComboBox.ItemTemplate>
@@ -478,7 +487,7 @@
                                             <SelectableTextBlock app:HexView.Bytes="{Binding SelectedSlotBytes}"
                                                                  app:HexView.Baseline="{Binding SelectedSlotBaseline}"
                                                                  app:HexView.RecordStart="{Binding SelectedSlotOffset}"
-                                                                 app:HexView.ShowAscii="{Binding #EditorPanel.Bounds.Width, Converter={x:Static app:WidthAtLeastConverter.Instance}, ConverterParameter=660}"
+                                                                 app:HexView.ShowAscii="{Binding #EditorPanel.Bounds.Width, Converter={x:Static app:WidthAtLeastConverter.Instance}, ConverterParameter=1100}"
                                                                  app:HexView.ShowOffset="{Binding #EditorPanel.Bounds.Width, Converter={x:Static app:WidthAtLeastConverter.Instance}, ConverterParameter=540}"
                                                                  FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="13"
                                                                  IsVisible="{Binding SlotHexDump, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
