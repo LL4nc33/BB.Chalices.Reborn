@@ -115,6 +115,7 @@
                         </Grid>
 
                         <Border Height="1" Background="{DynamicResource Edge}" Margin="0,8,0,0" />
+                        <StackPanel x:Name="ZoomControls" Spacing="8">
                         <TextBlock Classes="section" Text="TEXT SIZE" Margin="0,4,0,0" />
                         <ComboBox ItemsSource="{Binding ZoomTargets}" SelectedItem="{Binding SelectedZoomTargetOption}"
                                   HorizontalAlignment="Stretch" Margin="0,0,0,4"
@@ -135,6 +136,7 @@
                                     FontSize="20" FontWeight="SemiBold" Width="40" HorizontalContentAlignment="Center"
                                     ToolTip.Tip="Make the selected column bigger" />
                         </Grid>
+                        </StackPanel>
                     </StackPanel>
                 </DockPanel>
                 </LayoutTransformControl>

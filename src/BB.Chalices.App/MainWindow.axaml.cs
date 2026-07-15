@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Avalonia.VisualTree;
 using BB.Chalices.Services;
 using BB.Chalices.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,9 +24,25 @@ public partial class MainWindow : Window
 
         // Clicking in a column points the text-size +/- buttons at it. Tunnel handlers
         // fire from the outside in, so the editor (innermost) wins over the middle panel.
-        SidebarPanel.AddHandler(PointerPressedEvent, (_, _) => SelectZoom(ZoomTarget.Sidebar), RoutingStrategies.Tunnel);
+        SidebarPanel.AddHandler(PointerPressedEvent, OnSidebarPressed, RoutingStrategies.Tunnel);
         MiddlePanel.AddHandler(PointerPressedEvent, (_, _) => SelectZoom(ZoomTarget.Catalogue), RoutingStrategies.Tunnel);
         EditorPanel.AddHandler(PointerPressedEvent, (_, _) => SelectZoom(ZoomTarget.Editor), RoutingStrategies.Tunnel);
+    }
+
+    private void OnSidebarPressed(object? sender, PointerPressedEventArgs e)
+    {
+        // The zoom controls live in the sidebar; clicking them must not re-target it.
+        if (IsWithin(e.Source, ZoomControls))
+            return;
+        SelectZoom(ZoomTarget.Sidebar);
+    }
+
+    private static bool IsWithin(object? source, Visual container)
+    {
+        for (Visual? v = source as Visual; v is not null; v = v.GetVisualParent())
+            if (ReferenceEquals(v, container))
+                return true;
+        return false;
     }
 
     private void SelectZoom(ZoomTarget target)
