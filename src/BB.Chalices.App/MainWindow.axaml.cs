@@ -60,7 +60,13 @@ public partial class MainWindow : Window
             return;
 
         var file = e.DataTransfer.TryGetFiles()?.OfType<IStorageFile>().FirstOrDefault();
-        if (file?.TryGetLocalPath() is { } path)
+        if (file?.TryGetLocalPath() is not { } path)
+            return;
+
+        // A .bbchalice file imports as a list; anything else opens as a save.
+        if (path.EndsWith(".bbchalice", StringComparison.OrdinalIgnoreCase))
+            await viewModel.ImportSharedAsync(await File.ReadAllTextAsync(path));
+        else
             await viewModel.LoadSaveCommand.Execute(path);
     }
 
@@ -174,6 +180,35 @@ public partial class MainWindow : Window
     {
         if (DataContext is MainViewModel viewModel && Clipboard is { } clipboard)
             await viewModel.ImportSharedAsync(await clipboard.TryGetTextAsync());
+    }
+
+    private async void OnSaveAltarAsList(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel viewModel)
+            return;
+        string? name = await new PromptWindow("Save the altar as a list. Name it:", "My altar").ShowDialog<string?>(this);
+        if (!string.IsNullOrWhiteSpace(name))
+            await viewModel.SaveAltarAsListAsync(name);
+    }
+
+    private async void OnExportListFile(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel viewModel || viewModel.BuildSelectedListCode() is not { } code)
+            return;
+
+        var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save the list as a dungeon file",
+            SuggestedFileName = "list.bbchalice",
+            DefaultExtension = "bbchalice",
+        });
+        if (file is null)
+            return;
+
+        await using var stream = await file.OpenWriteAsync();
+        await using var writer = new StreamWriter(stream);
+        await writer.WriteAsync(code);
+        viewModel.Notify($"Saved the list to {file.Name}.");
     }
 
     // The Add-to-list button just opens its flyout; the pick happens in OnAddToListPicked.

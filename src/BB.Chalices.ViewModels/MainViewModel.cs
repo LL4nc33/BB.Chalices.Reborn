@@ -1014,17 +1014,28 @@ public class MainViewModel : ViewModelBase
             : $"Applied {count} dungeons to the altar. Save to write.";
     }
 
-    // Export the selected list as a share code (for the clipboard or a file).
-    public string? ShareSelectedList()
+    // The selected list as a share code, or null (with a message) if it's empty.
+    public string? BuildSelectedListCode()
     {
         if (SelectedList is null || SelectedList.Items.Count == 0)
         {
             StatusMessage = "Pick a non-empty list to share.";
             return null;
         }
-        StatusMessage = $"Copied \"{SelectedList.Name}\" as a share code.";
         return ListSharing.Export(SelectedList);
     }
+
+    // Export the selected list as a share code for the clipboard.
+    public string? ShareSelectedList()
+    {
+        if (BuildSelectedListCode() is not { } code)
+            return null;
+        StatusMessage = $"Copied \"{SelectedList!.Name}\" as a share code.";
+        return code;
+    }
+
+    // Let the App set a status message (e.g. after saving a list to a file).
+    public void Notify(string message) => StatusMessage = message;
 
     // Import a shared list/dungeon from a code or file into a new user list.
     public async Task ImportSharedAsync(string? code)

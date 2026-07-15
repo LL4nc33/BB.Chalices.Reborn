@@ -193,10 +193,14 @@
                                     </ComboBox>
                                     <Button Content="+" FontSize="18" FontWeight="SemiBold" Width="34" HorizontalContentAlignment="Center" Margin="0,0,6,4"
                                             Click="OnNewList" ToolTip.Tip="Create a new list" />
+                                    <Button Content="Save altar" Click="OnSaveAltarAsList" IsEnabled="{Binding HasLoadedSave}" Margin="0,0,6,4"
+                                            ToolTip.Tip="Save the current altar (its filled slots) as a new list" />
                                     <Button Content="Share" Click="OnShareList" Margin="0,0,6,4"
-                                            ToolTip.Tip="Copy this list as a share code" />
+                                            ToolTip.Tip="Copy this list as a share code to paste anywhere" />
+                                    <Button Content="Save file" Click="OnExportListFile" Margin="0,0,6,4"
+                                            ToolTip.Tip="Save this list as a .bbchalice file to share or back up" />
                                     <Button Content="Import" Click="OnImportList" Margin="0,0,6,4"
-                                            ToolTip.Tip="Import a shared list from a code" />
+                                            ToolTip.Tip="Import a shared list from a copied code (or drop a .bbchalice file onto the window)" />
                                     <Button Content="Rename" Click="OnRenameList" IsVisible="{Binding CanEditSelectedList}" Margin="0,0,6,4"
                                             ToolTip.Tip="Rename this list" />
                                     <Button Classes="danger" Content="Delete" Click="OnDeleteList" IsVisible="{Binding CanEditSelectedList}" Margin="0,0,0,4"
