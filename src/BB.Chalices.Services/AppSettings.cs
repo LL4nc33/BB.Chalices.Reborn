@@ -23,12 +23,9 @@ public class AppSettings
     // Bumped when the bundled catalogue changes, to trigger a one-time reseed.
     public int CatalogueVersion { get; set; }
 
-    // UI zoom factor (1.0 = 100%), adjustable with the +/- buttons. Kept for
-    // backward compatibility; seeds the per-column scales below on first load.
-    public double UiScale { get; set; } = 1.0;
-
-    // Per-column zoom, so the +/- buttons can target one column at a time.
-    public double SidebarScale { get; set; } = 1.0;
-    public double CatalogueScale { get; set; } = 1.0;
-    public double EditorScale { get; set; } = 1.0;
+    // Per-column zoom factor (1.0 = 100% = the column's default size), adjustable with
+    // the +/- buttons. The actual scale is this factor times the column's baseline.
+    public double SidebarZoom { get; set; } = 1.0;
+    public double CatalogueZoom { get; set; } = 1.0;
+    public double EditorZoom { get; set; } = 1.0;
 }

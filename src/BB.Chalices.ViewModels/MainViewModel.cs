@@ -75,10 +75,9 @@ public class MainViewModel : ViewModelBase
         ZoomInCommand = ReactiveCommand.Create(() => Adjust(ZoomStep));
         ZoomOutCommand = ReactiveCommand.Create(() => Adjust(-ZoomStep));
 
-        double legacy = _config.Settings.UiScale;
-        _sidebarScale = InitScale(_config.Settings.SidebarScale, legacy);
-        _catalogueScale = InitScale(_config.Settings.CatalogueScale, legacy);
-        _editorScale = InitScale(_config.Settings.EditorScale, legacy);
+        _sidebarFactor = InitFactor(_config.Settings.SidebarZoom);
+        _catalogueFactor = InitFactor(_config.Settings.CatalogueZoom);
+        _editorFactor = InitFactor(_config.Settings.EditorZoom);
 
         _middleZoomOption = new ZoomTargetOption(ZoomTarget.Catalogue, "Catalogue");
         ZoomTargets = new ObservableCollection<ZoomTargetOption>
@@ -91,41 +90,30 @@ public class MainViewModel : ViewModelBase
         _selectedZoomOption = ZoomTargets[0];
     }
 
-    // Prefer the saved per-column scale; fall back to the older single UiScale so an
-    // upgrade keeps the zoom the user had.
-    private static double InitScale(double columnScale, double legacy)
-    {
-        double v = columnScale != 1.0 ? columnScale : legacy;
-        return v is >= MinScale and <= MaxScale ? v : 1.0;
-    }
+    private static double InitFactor(double factor) =>
+        factor is >= MinFactor and <= MaxFactor ? factor : 1.0;
 
     // --- UI zoom (the +/- buttons) ---
+    // The displayed percentage is a factor (100% = the column's default size). Each
+    // column has its own baseline, so "All at 100%" means sidebar 1.2x, catalogue and
+    // editor 1.3x. The actual render scale is baseline * factor.
     private const double ZoomStep = 0.1;
-    private const double MinScale = 0.8;
-    private const double MaxScale = 2.0;
+    private const double MinFactor = 0.8;
+    private const double MaxFactor = 2.0;
+    private const double SidebarBaseline = 1.2;
+    private const double CatalogueBaseline = 1.3;
+    private const double EditorBaseline = 1.3;
 
-    // Each of the three main columns has its own zoom, so the +/- buttons can target
-    // one column at a time (or all at once).
-    private double _sidebarScale = 1.0;
-    public double SidebarScale
-    {
-        get => _sidebarScale;
-        private set => this.RaiseAndSetIfChanged(ref _sidebarScale, value);
-    }
+    // Each of the three main columns has its own zoom factor, so the +/- buttons can
+    // target one column at a time (or all at once). The bound Scale is baseline * factor.
+    private double _sidebarFactor = 1.0;
+    public double SidebarScale => SidebarBaseline * _sidebarFactor;
 
-    private double _catalogueScale = 1.0;
-    public double CatalogueScale
-    {
-        get => _catalogueScale;
-        private set => this.RaiseAndSetIfChanged(ref _catalogueScale, value);
-    }
+    private double _catalogueFactor = 1.0;
+    public double CatalogueScale => CatalogueBaseline * _catalogueFactor;
 
-    private double _editorScale = 1.0;
-    public double EditorScale
-    {
-        get => _editorScale;
-        private set => this.RaiseAndSetIfChanged(ref _editorScale, value);
-    }
+    private double _editorFactor = 1.0;
+    public double EditorScale => EditorBaseline * _editorFactor;
 
     public ObservableCollection<ZoomTargetOption> ZoomTargets { get; }
 
@@ -161,13 +149,13 @@ public class MainViewModel : ViewModelBase
             SelectedZoomTargetOption = option;
     }
 
-    public string UiScalePercent => $"{ScaleFor(SelectedZoomTarget) * 100:0}%";
+    public string UiScalePercent => $"{FactorFor(SelectedZoomTarget) * 100:0}%";
 
-    private double ScaleFor(ZoomTarget target) => target switch
+    private double FactorFor(ZoomTarget target) => target switch
     {
-        ZoomTarget.Sidebar => SidebarScale,
-        ZoomTarget.Editor => EditorScale,
-        _ => CatalogueScale, // Catalogue and All display the catalogue scale
+        ZoomTarget.Sidebar => _sidebarFactor,
+        ZoomTarget.Editor => _editorFactor,
+        _ => _catalogueFactor, // Catalogue and All display the catalogue factor
     };
 
     // The app version shown under the logo (from the assembly version).
@@ -186,18 +174,32 @@ public class MainViewModel : ViewModelBase
     // Grow or shrink the selected column (or all three) by one step, then persist.
     private void Adjust(double delta)
     {
-        double value = Math.Clamp(Math.Round(ScaleFor(SelectedZoomTarget) + delta, 2), MinScale, MaxScale);
+        double value = Math.Clamp(Math.Round(FactorFor(SelectedZoomTarget) + delta, 2), MinFactor, MaxFactor);
         switch (SelectedZoomTarget)
         {
-            case ZoomTarget.Sidebar: SidebarScale = value; break;
-            case ZoomTarget.Catalogue: CatalogueScale = value; break;
-            case ZoomTarget.Editor: EditorScale = value; break;
-            default: SidebarScale = CatalogueScale = EditorScale = value; break; // All
+            case ZoomTarget.Sidebar:
+                _sidebarFactor = value;
+                this.RaisePropertyChanged(nameof(SidebarScale));
+                break;
+            case ZoomTarget.Editor:
+                _editorFactor = value;
+                this.RaisePropertyChanged(nameof(EditorScale));
+                break;
+            case ZoomTarget.Catalogue:
+                _catalogueFactor = value;
+                this.RaisePropertyChanged(nameof(CatalogueScale));
+                break;
+            default: // All
+                _sidebarFactor = _catalogueFactor = _editorFactor = value;
+                this.RaisePropertyChanged(nameof(SidebarScale));
+                this.RaisePropertyChanged(nameof(CatalogueScale));
+                this.RaisePropertyChanged(nameof(EditorScale));
+                break;
         }
 
-        _config.Settings.SidebarScale = SidebarScale;
-        _config.Settings.CatalogueScale = CatalogueScale;
-        _config.Settings.EditorScale = EditorScale;
+        _config.Settings.SidebarZoom = _sidebarFactor;
+        _config.Settings.CatalogueZoom = _catalogueFactor;
+        _config.Settings.EditorZoom = _editorFactor;
         _config.Save();
         this.RaisePropertyChanged(nameof(UiScalePercent));
     }
