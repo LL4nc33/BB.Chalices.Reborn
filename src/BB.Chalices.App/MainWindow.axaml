@@ -6,7 +6,7 @@
         xmlns:app="using:BB.Chalices.App"
         x:Class="BB.Chalices.App.MainWindow"
         x:DataType="vm:MainViewModel"
-        Width="1600" Height="880" MinWidth="1440" MinHeight="780"
+        Width="1366" Height="850" MinWidth="1240" MinHeight="780"
         RequestedThemeVariant="Dark"
         FontFamily="{DynamicResource GothicFont}"
         Icon="/Assets/favicon.png"
@@ -27,7 +27,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="240" MinWidth="200" MaxWidth="260" />
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" MinWidth="1225" />
+                <ColumnDefinition Width="*" MinWidth="830" />
             </Grid.ColumnDefinitions>
 
             <!-- LEFT: navigation + actions -->
@@ -155,7 +155,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" MinWidth="340" />
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="940" MinWidth="880" MaxWidth="1180" />
+                        <ColumnDefinition Width="680" MinWidth="480" />
                     </Grid.ColumnDefinitions>
 
                     <LayoutTransformControl Grid.Column="0">
@@ -487,7 +487,7 @@
                                             <SelectableTextBlock app:HexView.Bytes="{Binding SelectedSlotBytes}"
                                                                  app:HexView.Baseline="{Binding SelectedSlotBaseline}"
                                                                  app:HexView.RecordStart="{Binding SelectedSlotOffset}"
-                                                                 app:HexView.ShowAscii="{Binding #EditorPanel.Bounds.Width, Converter={x:Static app:WidthAtLeastConverter.Instance}, ConverterParameter=1100}"
+                                                                 app:HexView.ShowAscii="{Binding #EditorPanel.Bounds.Width, Converter={x:Static app:WidthAtLeastConverter.Instance}, ConverterParameter=660}"
                                                                  app:HexView.ShowOffset="{Binding #EditorPanel.Bounds.Width, Converter={x:Static app:WidthAtLeastConverter.Instance}, ConverterParameter=540}"
                                                                  FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="13"
                                                                  IsVisible="{Binding SlotHexDump, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
