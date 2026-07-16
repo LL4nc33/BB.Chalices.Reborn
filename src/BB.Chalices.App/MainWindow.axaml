@@ -192,6 +192,10 @@
                                             <Setter Property="VerticalContentAlignment" Value="Center" />
                                         </Style>
                                     </WrapPanel.Styles>
+                                    <Button Content="Rename" Click="OnRenameList" IsVisible="{Binding CanEditSelectedList}" Margin="0,0,6,4"
+                                            ToolTip.Tip="Rename this list" />
+                                    <Button Classes="danger" Content="Delete" Click="OnDeleteList" IsVisible="{Binding CanEditSelectedList}" Margin="0,0,6,4"
+                                            ToolTip.Tip="Delete this list" />
                                     <ComboBox ItemsSource="{Binding Lists}" SelectedItem="{Binding SelectedList}" MinWidth="150" Margin="0,0,6,4"
                                               ToolTip.Tip="Pick a list. Nox and Community are built in; the rest are yours.">
                                         <ComboBox.ItemTemplate>
@@ -204,16 +208,12 @@
                                             Click="OnNewList" ToolTip.Tip="Create a new list" />
                                     <Button Content="Save altar" Click="OnSaveAltarAsList" IsEnabled="{Binding HasLoadedSave}" Margin="0,0,6,4"
                                             ToolTip.Tip="Save the current altar (its filled slots) as a new list" />
-                                    <Button Content="Share" Click="OnShareList" Margin="0,0,6,4"
+                                    <Button Content="Share" Click="OnShareList" IsEnabled="{Binding SelectedListHasItems}" Margin="0,0,6,4"
                                             ToolTip.Tip="Copy this list as a share code to paste anywhere" />
-                                    <Button Content="Save file" Click="OnExportListFile" Margin="0,0,6,4"
+                                    <Button Content="Save file" Click="OnExportListFile" IsEnabled="{Binding SelectedListHasItems}" Margin="0,0,6,4"
                                             ToolTip.Tip="Save this list as a .bbc file to share or back up" />
-                                    <Button Content="Import" Click="OnImportList" Margin="0,0,6,4"
+                                    <Button Content="Import" Click="OnImportList" Margin="0,0,0,4"
                                             ToolTip.Tip="Import a shared list from a copied code (or drop a .bbc file onto the window)" />
-                                    <Button Content="Rename" Click="OnRenameList" IsVisible="{Binding CanEditSelectedList}" Margin="0,0,6,4"
-                                            ToolTip.Tip="Rename this list" />
-                                    <Button Classes="danger" Content="Delete" Click="OnDeleteList" IsVisible="{Binding CanEditSelectedList}" Margin="0,0,0,4"
-                                            ToolTip.Tip="Delete this list" />
                                 </WrapPanel>
                             </Grid>
                         </StackPanel>
@@ -253,6 +253,14 @@
                                         ToolTip.Tip="One-time download from Nox's gist, then cached locally for offline use" />
                             </StackPanel>
                         </Border>
+                        <Border Grid.Row="2" Classes="card" VerticalAlignment="Center" Padding="20"
+                                IsVisible="{Binding ShowEmptyListHint}">
+                            <StackPanel Spacing="8" HorizontalAlignment="Center" MaxWidth="420">
+                                <TextBlock Classes="heading" Text="This list is empty" HorizontalAlignment="Center" TextAlignment="Center" />
+                                <TextBlock Classes="body" TextWrapping="Wrap" TextAlignment="Center"
+                                           Text="Pick a dungeon in the Community or Nox list, then use 'add to list' to add it here. You can also import a shared list, or save the current altar as a list." />
+                            </StackPanel>
+                        </Border>
                         <Border Grid.Row="3" Margin="0,16,0,0" Padding="0,12,0,0"
                                 BorderBrush="{DynamicResource Edge}" BorderThickness="0,1,0,0"
                                 IsVisible="{Binding SelectedDungeon, Converter={x:Static ObjectConverters.IsNotNull}}">
@@ -285,15 +293,20 @@
                                             ToolTip.Tip="Add this dungeon to one of your lists">
                                         <Button.Flyout>
                                             <Flyout>
-                                                <ListBox x:CompileBindings="False" MinWidth="160"
-                                                         ItemsSource="{Binding $parent[Window].DataContext.UserLists}"
-                                                         SelectionChanged="OnAddToListPicked">
-                                                    <ListBox.ItemTemplate>
-                                                        <DataTemplate x:DataType="entities:DungeonList">
-                                                            <TextBlock Text="{Binding Name}" />
-                                                        </DataTemplate>
-                                                    </ListBox.ItemTemplate>
-                                                </ListBox>
+                                                <StackPanel MinWidth="180" Spacing="6">
+                                                    <Button Content="+ New list..." Click="OnNewListAndAdd" HorizontalAlignment="Stretch"
+                                                            HorizontalContentAlignment="Left"
+                                                            ToolTip.Tip="Create a new list and add this dungeon to it" />
+                                                    <ListBox x:CompileBindings="False"
+                                                             ItemsSource="{Binding $parent[Window].DataContext.UserLists}"
+                                                             SelectionChanged="OnAddToListPicked">
+                                                        <ListBox.ItemTemplate>
+                                                            <DataTemplate x:DataType="entities:DungeonList">
+                                                                <TextBlock Text="{Binding Name}" />
+                                                            </DataTemplate>
+                                                        </ListBox.ItemTemplate>
+                                                    </ListBox>
+                                                </StackPanel>
                                             </Flyout>
                                         </Button.Flyout>
                                     </Button>
@@ -309,14 +322,14 @@
                                     IsEnabled="{Binding HasLoadedSave}"
                                     ToolTip.Tip="Generate a dungeon by area, variant and layout" />
                             <Button Grid.Column="1" Content="Fill all" Command="{Binding FillAllSlotsCommand}"
-                                    IsEnabled="{Binding HasLoadedSave}"
+                                    IsEnabled="{Binding CanPlaceDungeon}"
                                     ToolTip.Tip="Put the selected dungeon in every slot at once (makeshift + the six stored, e.g. to farm the same gems). Save to write to disk." />
                             <Button Grid.Column="2" Content="Apply list" Click="OnApplyList"
-                                    IsEnabled="{Binding HasLoadedSave}"
-                                    ToolTip.Tip="Write the current list's dungeons onto the altar (first 7, in order). Save to write to disk." />
+                                    IsEnabled="{Binding CanApplyList}"
+                                    ToolTip.Tip="Write the current list's dungeons onto the real six slots (then the makeshift altar). Save to write to disk." />
                             <Button Grid.Column="3" Classes="primary" Content="PLACE IN SELECTED SLOT"
                                     Command="{Binding ApplyDungeonCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                                    IsEnabled="{Binding HasLoadedSave}"
+                                    IsEnabled="{Binding CanPlaceDungeon}"
                                     ToolTip.Tip="Stage the selected dungeon in the chosen slot. Click Save changes to write it to disk." />
                         </Grid>
                     </Grid>
@@ -672,7 +685,7 @@
                                         <TextBlock Classes="caption" Text="{Binding SelectedBackup.FilePath}" TextWrapping="Wrap" />
                                     </StackPanel>
                                     <StackPanel Spacing="8" Margin="0,4,0,0">
-                                        <Button Classes="primary" Content="Restore this backup" Command="{Binding RestoreBackupCommand}"
+                                        <Button Classes="primary" Content="Restore this backup" Click="OnRestoreBackup"
                                                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                                                 ToolTip.Tip="Replace the current save with this backup (the current state is backed up first)" />
                                         <Button Classes="danger" Content="Delete" Click="OnDeleteBackup"

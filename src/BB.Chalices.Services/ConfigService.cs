@@ -2,7 +2,8 @@ using System.Text.Json;
 
 namespace BB.Chalices.Services;
 
-// Loads and saves user settings in <LocalAppData>/BBChalices/settings.json.
+// Loads and saves user settings as settings.json in the app's data folder (see
+// AppPaths - a data/ folder next to the app, so it is portable).
 public class ConfigService
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };

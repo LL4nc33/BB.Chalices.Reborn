@@ -272,8 +272,17 @@ public class MainViewModel : ViewModelBase
     public bool HasLoadedSave
     {
         get => _hasLoadedSave;
-        private set => this.RaiseAndSetIfChanged(ref _hasLoadedSave, value);
+        private set
+        {
+            this.RaiseAndSetIfChanged(ref _hasLoadedSave, value);
+            this.RaisePropertyChanged(nameof(CanPlaceDungeon));
+            this.RaisePropertyChanged(nameof(CanApplyList));
+        }
     }
+
+    // Gate the primary buttons so they aren't clickable when they'd only print a hint.
+    public bool CanPlaceDungeon => HasLoadedSave && HasSelectedDungeon;
+    public bool CanApplyList => HasLoadedSave && SelectedListHasItems;
 
     public string StatusMessage
     {
@@ -296,8 +305,16 @@ public class MainViewModel : ViewModelBase
     public DungeonViewModel? SelectedDungeon
     {
         get => _selectedDungeon;
-        set => this.RaiseAndSetIfChanged(ref _selectedDungeon, value);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _selectedDungeon, value);
+            this.RaisePropertyChanged(nameof(HasSelectedDungeon));
+            this.RaisePropertyChanged(nameof(CanPlaceDungeon));
+        }
     }
+
+    // Gates the place/fill buttons so they aren't clickable when they'd just no-op.
+    public bool HasSelectedDungeon => _selectedDungeon is not null;
 
     public SlotViewModel? SelectedSlot
     {
@@ -617,7 +634,10 @@ public class MainViewModel : ViewModelBase
         {
             this.RaiseAndSetIfChanged(ref _selectedList, value);
             this.RaisePropertyChanged(nameof(ShowNoxDownloadPrompt));
+            this.RaisePropertyChanged(nameof(ShowEmptyListHint));
             this.RaisePropertyChanged(nameof(CanEditSelectedList));
+            this.RaisePropertyChanged(nameof(SelectedListHasItems));
+            this.RaisePropertyChanged(nameof(CanApplyList));
             RebuildCategories();
         }
     }
@@ -625,11 +645,18 @@ public class MainViewModel : ViewModelBase
     // Built-in lists (Nox, Community) can't be edited; only the user's own can.
     public bool CanEditSelectedList => SelectedList?.Source == ListSource.User;
 
+    public bool SelectedListHasItems => SelectedList is { } list && list.Items.Count > 0;
+
     // The user's own lists, for the "add to list" menu.
     public IEnumerable<DungeonList> UserLists => Lists.Where(l => l.Source == ListSource.User);
 
     // Show the "download Nox's dungeons" prompt when the empty Nox list is selected.
     public bool ShowNoxDownloadPrompt => SelectedList?.Source == ListSource.Nox && SelectedList.Items.Count == 0;
+
+    // A gentle hint for any other empty list (e.g. a list you just created), telling
+    // the user how to fill it. Not shown for the empty Nox list (that has its own prompt).
+    public bool ShowEmptyListHint =>
+        SelectedList is { } list && list.Items.Count == 0 && list.Source != ListSource.Nox;
 
     // The dungeons that belong to the selected list (matched by catalogue id).
     private IEnumerable<DungeonViewModel> CurrentListDungeons()
@@ -721,6 +748,7 @@ public class MainViewModel : ViewModelBase
             _undoBytes = null;
             CanUndo = false;
             LoadSelectedSlot();
+            RefreshSoundFixStatus(); // the opened save's folder may need the shadPS4 sound fix
             StatusMessage = $"Loaded {System.IO.Path.GetFileName(path)} (Hunter {save.CharacterName}).";
         }
         catch (Exception ex)
@@ -734,7 +762,7 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
-            ApplyCharacterEdits();
+            var rejected = ApplyCharacterEdits();
 
             // With auto-backup on, keep the managed timestamped backup as the single copy;
             // otherwise fall back to the rolling .bak next to the save. Never both.
@@ -744,7 +772,9 @@ public class MainViewModel : ViewModelBase
 
             _saves.Save(createBackup: !autoBackup);
             SnapshotBaselines();
-            StatusMessage = $"Saved as {CharacterName}. A backup was written first.";
+            StatusMessage = rejected.Count == 0
+                ? $"Saved as {CharacterName}. A backup was written first."
+                : $"Saved (backup written), but these were invalid and not applied: {string.Join(", ", rejected)}.";
         }
         catch (Exception ex)
         {
@@ -762,7 +792,7 @@ public class MainViewModel : ViewModelBase
         _saves.SetSlot(SelectedSlot.Number, SelectedDungeon.Bytes);
         RefreshSlot(SelectedSlot);
         LoadSelectedSlot();
-        StatusMessage = $"Placed {SelectedDungeon.Glyph} in slot {SelectedSlot.Number}. Save to write it to disk.";
+        StatusMessage = $"Placed {SelectedDungeon.Glyph} in {SlotName(SelectedSlot.Number)}. Save to write it to disk.";
     }
 
     // Place the selected catalogue dungeon into all six slots at once (farming).
@@ -788,7 +818,7 @@ public class MainViewModel : ViewModelBase
         _saves.ClearSlot(SelectedSlot.Number);
         RefreshSlot(SelectedSlot);
         LoadSelectedSlot();
-        StatusMessage = $"Cleared slot {SelectedSlot.Number}. Save to write it to disk.";
+        StatusMessage = $"Cleared {SlotName(SelectedSlot.Number)}. Save to write it to disk.";
     }
 
     public void PlaceBuiltDungeon(byte[]? record)
@@ -808,8 +838,11 @@ public class MainViewModel : ViewModelBase
         _saves.SetSlot(SelectedSlot.Number, record);
         RefreshSlot(SelectedSlot);
         LoadSelectedSlot();
-        StatusMessage = $"Built dungeon placed in slot {SelectedSlot.Number}. Save to write it to disk.";
+        StatusMessage = $"Built dungeon placed in {SlotName(SelectedSlot.Number)}. Save to write it to disk.";
     }
+
+    // Friendly slot name for status messages: slot 0 is the makeshift altar ("M").
+    private static string SlotName(int number) => number == 0 ? "the makeshift altar" : $"slot {number}";
 
     // Write a run of altar slots and refresh them, then reload the selected slot once.
     // Used by fill-all, altar paste and apply-list so the loop lives in one place.
@@ -933,6 +966,21 @@ public class MainViewModel : ViewModelBase
         await _lists.DeleteListAsync(list.Id);
         await LoadListsAsync();
         StatusMessage = $"Deleted list \"{name}\".";
+    }
+
+    // Create a new list and add the currently selected dungeon to it (from the flyout's
+    // "New list..." entry, so a fresh install isn't a dead end).
+    public async Task CreateListAndAddSelectedAsync(string name)
+    {
+        if (SelectedDungeon is null)
+        {
+            StatusMessage = "Pick a dungeon first.";
+            return;
+        }
+        var list = await _lists.CreateListAsync(name);
+        await _lists.AddDungeonAsync(list.Id, SelectedDungeon.Id);
+        await LoadListsAsync();
+        StatusMessage = $"Created \"{name}\" and added {SelectedDungeon.Glyph}.";
     }
 
     // Add the selected catalogue dungeon to one of the user's lists.
@@ -1106,31 +1154,47 @@ public class MainViewModel : ViewModelBase
     }
 
     // Applies the name typed in the box to the in-memory save; written on Save.
-    private void ApplyPendingRename()
+    // Applies the name, insight, echoes and level from the boxes to the in-memory save.
+    // Returns the labels of any fields whose input was invalid, so Save can say so
+    // instead of silently dropping them.
+    private List<string> ApplyCharacterEdits()
     {
+        var rejected = new List<string>();
         if (!HasLoadedSave)
-            return;
+            return rejected;
 
         string name = (EditableName ?? string.Empty).Trim();
-        if (name.Length is >= 1 and <= 16 && name != CharacterName)
+        if (name != CharacterName)
         {
-            _saves.SetCharacterName(name);
-            CharacterName = name;
+            if (name.Length is >= 1 and <= 16)
+            {
+                _saves.SetCharacterName(name);
+                CharacterName = name;
+            }
+            else
+            {
+                rejected.Add("name (1-16 characters)");
+            }
         }
+
+        ApplyUInt(EditableInsight, "Insight", _saves.Insight, _saves.SetInsight, rejected);
+        ApplyUInt(EditableEchoes, "Echoes", _saves.Echoes, _saves.SetEchoes, rejected);
+        ApplyUInt(EditableLevel, "Level", _saves.Level, _saves.SetLevel, rejected);
+        return rejected;
     }
 
-    // Applies the name, insight and blood echoes from the boxes to the in-memory save.
-    private void ApplyCharacterEdits()
+    private static void ApplyUInt(string text, string label, uint current, Action<uint> set, List<string> rejected)
     {
-        ApplyPendingRename();
-        if (!HasLoadedSave)
-            return;
-        if (uint.TryParse(EditableInsight, out uint insight) && insight != _saves.Insight)
-            _saves.SetInsight(insight);
-        if (uint.TryParse(EditableEchoes, out uint echoes) && echoes != _saves.Echoes)
-            _saves.SetEchoes(echoes);
-        if (uint.TryParse(EditableLevel, out uint level) && level != _saves.Level)
-            _saves.SetLevel(level);
+        string trimmed = (text ?? "").Trim();
+        if (uint.TryParse(trimmed, out uint value))
+        {
+            if (value != current)
+                set(value);
+        }
+        else if (trimmed.Length > 0)
+        {
+            rejected.Add(label);
+        }
     }
 
     // Applies the shadPS4 sound-crash workaround (Nexus mod 165) to every save
@@ -1181,9 +1245,19 @@ public class MainViewModel : ViewModelBase
     // Flags the sidebar fix button when any save folder's options file is unpatched.
     private void RefreshSoundFixStatus()
     {
-        string? root = ResolveShadRoot();
         bool needed = false;
-        if (root is not null)
+
+        // The folder of the save that's actually open - covers saves opened by hand from
+        // a non-standard location where auto-detect finds no shadPS4 root.
+        if (_saves.CurrentPath is { } path && System.IO.Path.GetDirectoryName(path) is { } saveFolder)
+        {
+            string? system = _locator.FindSystemFile(saveFolder);
+            if (system is not null && !_locator.IsSoundFixApplied(system))
+                needed = true;
+        }
+
+        // Otherwise scan every detected save folder under the shadPS4 root.
+        if (!needed && ResolveShadRoot() is { } root)
         {
             foreach (var folder in _locator.FindSaveFolders(root))
             {
@@ -1195,6 +1269,7 @@ public class MainViewModel : ViewModelBase
                 }
             }
         }
+
         SoundFixNeeded = needed;
     }
 
@@ -1227,6 +1302,7 @@ public class MainViewModel : ViewModelBase
         if (_suppressEdits || !HasLoadedSave || SelectedSlot is null)
             return;
 
+        CaptureUndo();
         _saves.SetRite(SelectedSlot.Number, index, rite);
         AfterEdit($"Rite {index + 1}: {rite}.");
     }
@@ -1236,6 +1312,7 @@ public class MainViewModel : ViewModelBase
         if (_suppressEdits || !HasLoadedSave || SelectedSlot is null || !PoisonPossible)
             return;
 
+        CaptureUndo();
         _saves.SetPoison(SelectedSlot.Number, enabled);
         AfterEdit(enabled ? "Poison on." : "Poison off.");
     }
@@ -1245,6 +1322,7 @@ public class MainViewModel : ViewModelBase
         if (_suppressEdits || !HasLoadedSave || SelectedSlot is null || !FourthLayerPossible)
             return;
 
+        CaptureUndo();
         _saves.SetFourthLayer(SelectedSlot.Number, open);
         AfterEdit(open ? "4th layer opened." : "4th layer closed.");
     }
@@ -1254,6 +1332,7 @@ public class MainViewModel : ViewModelBase
         if (_suppressEdits || !HasLoadedSave || SelectedSlot is null || !DifficultyPossible)
             return;
 
+        CaptureUndo();
         _saves.SetDifficulty(SelectedSlot.Number, up);
         AfterEdit(up ? "Difficulty up." : "Difficulty normal.");
     }
@@ -1263,6 +1342,7 @@ public class MainViewModel : ViewModelBase
         if (_suppressEdits || !HasLoadedSave || SelectedSlot is null || option is null)
             return;
 
+        CaptureUndo();
         _saves.SetSpecialEnemy(SelectedSlot.Number, option.Value);
         AfterEdit("Special enemy set.");
     }
@@ -1271,6 +1351,7 @@ public class MainViewModel : ViewModelBase
     {
         if (_suppressEdits || !HasLoadedSave || SelectedSlot is null)
             return;
+        CaptureUndo();
         if (!_saves.TrySetField(SelectedSlot.Number, field, hex))
             return;
 

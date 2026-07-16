@@ -104,7 +104,10 @@ public partial class MainWindow : Window
             viewModel.ApplyDungeonCommand.Execute().Subscribe();
     }
 
-    private async void OnBackupDoubleTapped(object? sender, TappedEventArgs e)
+    private void OnBackupDoubleTapped(object? sender, TappedEventArgs e) => ConfirmRestore();
+    private void OnRestoreBackup(object? sender, RoutedEventArgs e) => ConfirmRestore();
+
+    private async void ConfirmRestore()
     {
         if (DataContext is not MainViewModel { SelectedBackup: { } backup } viewModel)
             return;
@@ -213,6 +216,15 @@ public partial class MainWindow : Window
 
     // The Add-to-list button just opens its flyout; the pick happens in OnAddToListPicked.
     private void OnAddToList(object? sender, RoutedEventArgs e) { }
+
+    private async void OnNewListAndAdd(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel viewModel)
+            return;
+        string? name = await new PromptWindow("Name your new list:", "My list").ShowDialog<string?>(this);
+        if (!string.IsNullOrWhiteSpace(name))
+            await viewModel.CreateListAndAddSelectedAsync(name);
+    }
 
     private async void OnAddToListPicked(object? sender, Avalonia.Controls.SelectionChangedEventArgs e)
     {
