@@ -190,6 +190,21 @@
             <Setter Property="Background" Value="{DynamicResource Blood}" />
         </Style>
 
+        <!-- Selectable chips: bordered buttons in a wrap panel, the chosen one in blood -->
+        <Style Selector="ListBox.chips ListBoxItem">
+            <Setter Property="Margin" Value="0,0,6,6" />
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Edge}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="ListBox.chips ListBoxItem:selected">
+            <Setter Property="BorderBrush" Value="{DynamicResource BloodBright}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="ListBox.chips ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Blood}" />
+        </Style>
+
         <!-- ===== Tabs ===== -->
         <Style Selector="TabItem">
             <Setter Property="FontFamily" Value="{DynamicResource GothicFont}" />

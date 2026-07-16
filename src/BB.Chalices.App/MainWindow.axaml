@@ -346,26 +346,42 @@
 
                             <StackPanel Spacing="6">
                                 <TextBlock Classes="section" Text="AREA AND DEPTH" />
-                                <ComboBox ItemsSource="{Binding Areas}" SelectedItem="{Binding SelectedArea}" HorizontalAlignment="Stretch"
-                                          ToolTip.Tip="Area and depth (Pthumeru/Hintertomb/Loran/Isz, 1-5). A valid base is drawn from the catalogue." />
+                                <ListBox Classes="plain chips" ItemsSource="{Binding Areas}" SelectedItem="{Binding SelectedArea}"
+                                         ToolTip.Tip="Pick the region and depth. A valid base for it is drawn from the catalogue.">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                </ListBox>
+                                <TextBlock Classes="caption" TextWrapping="Wrap"
+                                           Text="Deeper (a higher number) means tougher enemies and better gems. Isz 5 is the usual gem-farming area." />
                             </StackPanel>
 
                             <StackPanel Spacing="6">
                                 <TextBlock Classes="section" Text="VARIANT" />
-                                <ComboBox ItemsSource="{Binding Variants}" SelectedItem="{Binding SelectedVariant}" HorizontalAlignment="Stretch"
-                                          ToolTip.Tip="Defiled is a harder cursed version; Sinister can be invaded and has no 4th layer." />
+                                <ListBox Classes="plain chips" ItemsSource="{Binding Variants}" SelectedItem="{Binding SelectedVariant}"
+                                         ToolTip.Tip="The curse variant of the dungeon.">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                </ListBox>
+                                <TextBlock Classes="caption" TextWrapping="Wrap"
+                                           Text="Normal is the standard dungeon. Defiled is the harder cursed version with halved health. Sinister can be invaded by other players and has no 4th layer." />
                                 <CheckBox Content="Use the second hundred layouts (depth 4 and 5)"
-                                          IsChecked="{Binding SecondMap}" IsEnabled="{Binding SecondMapPossible}" />
+                                          IsChecked="{Binding SecondMap}" IsEnabled="{Binding SecondMapPossible}"
+                                          ToolTip.Tip="Depth 4 and 5 have two sets of 100 layouts. Tick this to build from the second set." />
                             </StackPanel>
 
                             <StackPanel Spacing="6">
                                 <TextBlock Classes="section" Text="LAYOUT" />
                                 <Grid ColumnDefinitions="Auto,*,Auto">
                                     <NumericUpDown Grid.Column="0" Minimum="0" Maximum="99" Increment="1" FormatString="0"
-                                                   Value="{Binding DungeonNumber}" Width="150" />
+                                                   Value="{Binding DungeonNumber}" Width="150"
+                                                   ToolTip.Tip="The layout number (0-99) picks the whole dungeon, and with it the coffin item and gem pool below. Try a few to find the loot you want." />
                                     <Button Grid.Column="2" Content="Random" Click="OnBuilderRandom"
                                             ToolTip.Tip="Jump to a random layout to roll through coffins and gems" />
                                 </Grid>
+                                <TextBlock Classes="caption" TextWrapping="Wrap"
+                                           Text="Each layout is a different dungeon. Watch the coffin and gem pool below change as you roll." />
                             </StackPanel>
 
                             <Border Classes="card">
