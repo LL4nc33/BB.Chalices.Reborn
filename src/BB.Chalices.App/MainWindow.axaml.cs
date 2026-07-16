@@ -145,6 +145,19 @@ public partial class MainWindow : Window
             viewModel.OpenSettings();
     }
 
+    private void OnShowGuide(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.CurrentView = AppView.Guide;
+    }
+
+    // Table-of-contents jump: the button's Tag names the chapter anchor to scroll to.
+    private void OnGuideNavigate(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Control control && control.Tag is string anchor)
+            this.FindControl<Control>(anchor)?.BringIntoView();
+    }
+
     private async void OnNewList(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not MainViewModel viewModel)
