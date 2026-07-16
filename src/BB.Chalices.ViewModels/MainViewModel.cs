@@ -1073,6 +1073,16 @@ public class MainViewModel : ViewModelBase
             : $"Applied {count} dungeons to the altar. Save to write.";
     }
 
+    // The selected catalogue dungeon as a one-item share code (for right-click "copy code").
+    public string? SelectedDungeonCode()
+    {
+        if (SelectedDungeon is not { } d)
+            return null;
+        StatusMessage = $"Copied {d.Glyph} as a share code.";
+        return DungeonShare.Encode(new ShareSet(DungeonShare.CurrentVersion,
+            new[] { new ShareItem(d.DisplayName, d.Category, d.Bytes) }));
+    }
+
     // The selected list as a share code, or null (with a message) if it's empty.
     public string? BuildSelectedListCode()
     {

@@ -226,6 +226,98 @@ public partial class MainWindow : Window
             await viewModel.CreateListAndAddSelectedAsync(name);
     }
 
+    // --- Right-click context menus (built in code to keep the dynamic lists reliable) ---
+
+    private static MenuItem MenuAction(string header, Action action, bool enabled = true)
+    {
+        var item = new MenuItem { Header = header, IsEnabled = enabled };
+        item.Click += (_, _) => action();
+        return item;
+    }
+
+    private void OnCatalogueContextRequested(object? sender, ContextRequestedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || e.Source is not Control src
+            || src.DataContext is not DungeonViewModel dungeon)
+            return;
+        vm.SelectedDungeon = dungeon;
+
+        var menu = new ContextMenu();
+        menu.Items.Add(MenuAction("Place in selected slot", () => vm.ApplyDungeonCommand.Execute().Subscribe(), vm.CanPlaceDungeon));
+        menu.Items.Add(MenuAction("Fill all slots", () => vm.FillAllSlotsCommand.Execute().Subscribe(), vm.CanPlaceDungeon));
+
+        var addTo = new MenuItem { Header = "Add to list" };
+        addTo.Items.Add(MenuAction("+ New list...", () => OnNewListAndAdd(this, new RoutedEventArgs())));
+        foreach (var list in vm.UserLists.ToList())
+        {
+            int id = list.Id;
+            addTo.Items.Add(MenuAction(list.Name, async () => await vm.AddSelectedDungeonToListAsync(id)));
+        }
+        menu.Items.Add(addTo);
+
+        if (vm.CanEditSelectedList)
+            menu.Items.Add(MenuAction("Remove from this list", async () => await vm.RemoveSelectedFromListAsync()));
+
+        menu.Items.Add(new Separator());
+        menu.Items.Add(MenuAction("Copy as code", async () =>
+        {
+            if (vm.SelectedDungeonCode() is { } code && Clipboard is { } cb)
+                await cb.SetTextAsync(code);
+        }));
+
+        menu.Open(src);
+        e.Handled = true;
+    }
+
+    private void OnSlotContextRequested(object? sender, ContextRequestedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || e.Source is not Control src
+            || src.DataContext is not SlotViewModel slot)
+            return;
+        vm.SelectedSlot = slot;
+
+        var menu = new ContextMenu();
+        menu.Items.Add(MenuAction("Copy", async () =>
+        {
+            if (vm.CopySelectedSlotHex() is { } hex && Clipboard is { } cb)
+                await cb.SetTextAsync(hex);
+        }));
+        menu.Items.Add(MenuAction("Paste", async () =>
+        {
+            if (Clipboard is { } cb)
+                vm.PasteSlotHex(await cb.TryGetTextAsync());
+        }));
+        menu.Items.Add(MenuAction("Save to My dungeons", async () =>
+        {
+            string? name = await new PromptWindow("Save this dungeon to your catalogue. Name it:", "My dungeon")
+                .ShowDialog<string?>(this);
+            if (!string.IsNullOrWhiteSpace(name))
+                await vm.SaveCurrentSlotAsCustomAsync(name);
+        }));
+        menu.Items.Add(new Separator());
+        menu.Items.Add(MenuAction("Clear slot", () => vm.ClearSlotCommand.Execute().Subscribe()));
+
+        menu.Open(src);
+        e.Handled = true;
+    }
+
+    private void OnBackupContextRequested(object? sender, ContextRequestedEventArgs e)
+    {
+        if (DataContext is not MainViewModel vm || e.Source is not Control src
+            || src.DataContext is not BackupInfo backup)
+            return;
+        vm.SelectedBackup = backup;
+
+        var menu = new ContextMenu();
+        menu.Items.Add(MenuAction("Restore this backup", ConfirmRestore));
+        menu.Items.Add(MenuAction("Delete", () => OnDeleteBackup(src, new RoutedEventArgs())));
+        menu.Items.Add(new Separator());
+        menu.Items.Add(MenuAction("Open folder", () => OnOpenBackupFolder(src, new RoutedEventArgs())));
+
+        menu.Open(src);
+        e.Handled = true;
+    }
+
     private async void OnAddToListPicked(object? sender, Avalonia.Controls.SelectionChangedEventArgs e)
     {
         if (sender is Avalonia.Controls.ListBox { SelectedItem: BB.Chalices.Data.Entities.DungeonList list } box

@@ -120,7 +120,7 @@
                         <TextBlock Classes="section" Text="TEXT SIZE" Margin="0,4,0,0" />
                         <ComboBox ItemsSource="{Binding ZoomTargets}" SelectedItem="{Binding SelectedZoomTargetOption}"
                                   HorizontalAlignment="Stretch" Margin="0,0,0,4"
-                                  ToolTip.Tip="Which column the - / + buttons resize. All resizes the whole window.">
+                                  ToolTip.Tip="Which column the - / + buttons resize. All resizes all three columns at once.">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate x:DataType="vm:ZoomTargetOption">
                                     <TextBlock Text="{Binding Label}" />
@@ -225,7 +225,7 @@
                                       HorizontalAlignment="Stretch" ToolTip.Tip="Show only one category" />
                         </Grid>
                         <ListBox Grid.Row="2" Classes="plain" ItemsSource="{Binding Dungeons}" SelectedItem="{Binding SelectedDungeon}"
-                                 DoubleTapped="OnCatalogueDoubleTapped">
+                                 DoubleTapped="OnCatalogueDoubleTapped" ContextRequested="OnCatalogueContextRequested">
                             <ListBox.KeyBindings>
                                 <KeyBinding Gesture="Enter" Command="{Binding ApplyDungeonCommand}" />
                             </ListBox.KeyBindings>
@@ -350,8 +350,8 @@
                                 <TextBlock Grid.Column="0" Classes="section" Text="ALTAR SLOT"
                                            VerticalAlignment="Center" Margin="0,0,12,0" />
                                 <ListBox Grid.Column="1" Classes="slots plain" ItemsSource="{Binding Slots}" SelectedItem="{Binding SelectedSlot}"
-                                         HorizontalAlignment="Stretch"
-                                         ToolTip.Tip="M = the makeshift altar (ritual setup), 1-6 = the stored slots. A dot marks an occupied slot.">
+                                         HorizontalAlignment="Stretch" ContextRequested="OnSlotContextRequested"
+                                         ToolTip.Tip="M = the makeshift altar (ritual setup), 1-6 = the stored slots. A dot marks an occupied slot. Right-click a slot for quick actions.">
                                     <ListBox.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <UniformGrid Columns="7" />
@@ -371,9 +371,9 @@
                                 </ListBox>
                                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="12,0,0,0">
                                     <Button Classes="link" Content="export" Click="OnCopyAltar"
-                                            ToolTip.Tip="Copy all 6 altar slots as one code, to share or back up the whole loadout" />
+                                            ToolTip.Tip="Copy the whole altar (makeshift + the six slots) as one hex string, to back up or share the loadout" />
                                     <Button Classes="link" Content="import" Click="OnPasteAltar"
-                                            ToolTip.Tip="Replace all 6 altar slots from a loadout code on the clipboard. Save to write to disk." />
+                                            ToolTip.Tip="Replace the whole altar from a loadout hex string on the clipboard. Save to write to disk." />
                                 </StackPanel>
                                 </Grid>
                                 <TextBlock Classes="heading accent" Text="{Binding SelectedSlotType}" Margin="0,8,0,0"
@@ -629,6 +629,7 @@
                                     <TextBlock Grid.Column="3" Classes="section" Text="NOTE" Margin="0" />
                                 </Grid>
                                 <ListBox Grid.Row="1" Classes="plain table" ItemsSource="{Binding BackupItems}" SelectedItem="{Binding SelectedBackup}"
+                                         ContextRequested="OnBackupContextRequested"
                                          DoubleTapped="OnBackupDoubleTapped">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate x:DataType="services:BackupInfo">
