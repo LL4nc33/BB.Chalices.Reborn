@@ -719,15 +719,20 @@
             </Panel>
         </Grid>
 
-        <!-- status bar -->
+        <!-- status bar (scales with the catalogue/main-content zoom, so "All" grows it too) -->
         <Border Grid.Row="1" Background="{DynamicResource BgPanel}"
                 BorderBrush="{DynamicResource Edge}" BorderThickness="0,1,0,0" Padding="20,8">
-            <Grid ColumnDefinitions="*,Auto">
-                <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" FontSize="14"
-                           Foreground="{DynamicResource Parchment}" VerticalAlignment="Center" />
-                <TextBlock Grid.Column="1" Classes="caption" Text="{Binding Dungeons.Count, StringFormat='{}{0} shown'}"
-                           VerticalAlignment="Center" />
-            </Grid>
+            <LayoutTransformControl>
+                <LayoutTransformControl.LayoutTransform>
+                    <ScaleTransform ScaleX="{Binding CatalogueScale}" ScaleY="{Binding CatalogueScale}" />
+                </LayoutTransformControl.LayoutTransform>
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" FontSize="14"
+                               Foreground="{DynamicResource Parchment}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Classes="caption" Text="{Binding Dungeons.Count, StringFormat='{}{0} shown'}"
+                               VerticalAlignment="Center" />
+                </Grid>
+            </LayoutTransformControl>
         </Border>
     </Grid>
 </Window>
