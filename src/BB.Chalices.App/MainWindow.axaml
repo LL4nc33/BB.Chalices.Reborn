@@ -162,7 +162,8 @@
                         <LayoutTransformControl.LayoutTransform>
                             <ScaleTransform ScaleX="{Binding CatalogueScale}" ScaleY="{Binding CatalogueScale}" />
                         </LayoutTransformControl.LayoutTransform>
-                    <Grid Margin="20" RowDefinitions="Auto,Auto,*,Auto,Auto">
+                    <Panel>
+                    <Grid Margin="20" RowDefinitions="Auto,Auto,*,Auto,Auto" IsVisible="{Binding !ShowBuilder}">
                         <StackPanel Grid.Row="0">
                             <Border Classes="accent" IsVisible="{Binding !HasLoadedSave}" Padding="16" Margin="0,0,0,16">
                                 <StackPanel Spacing="8">
@@ -333,6 +334,80 @@
                                     ToolTip.Tip="Stage the selected dungeon in the chosen slot. Click Save changes to write it to disk." />
                         </Grid>
                     </Grid>
+
+                    <!-- Dungeon builder, inline in the middle column (the editor stays on the right) -->
+                    <ScrollViewer IsVisible="{Binding ShowBuilder}">
+                        <StackPanel Margin="20" Spacing="14" DataContext="{Binding Builder}" x:DataType="vm:DungeonBuilderViewModel">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Classes="title" Text="Build a dungeon" VerticalAlignment="Center" />
+                                <Button Grid.Column="1" Classes="link" Content="back to catalogue" Click="OnCloseBuilder"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
+
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="section" Text="AREA AND DEPTH" />
+                                <ComboBox ItemsSource="{Binding Areas}" SelectedItem="{Binding SelectedArea}" HorizontalAlignment="Stretch"
+                                          ToolTip.Tip="Area and depth (Pthumeru/Hintertomb/Loran/Isz, 1-5). A valid base is drawn from the catalogue." />
+                            </StackPanel>
+
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="section" Text="VARIANT" />
+                                <ComboBox ItemsSource="{Binding Variants}" SelectedItem="{Binding SelectedVariant}" HorizontalAlignment="Stretch"
+                                          ToolTip.Tip="Defiled is a harder cursed version; Sinister can be invaded and has no 4th layer." />
+                                <CheckBox Content="Use the second hundred layouts (depth 4 and 5)"
+                                          IsChecked="{Binding SecondMap}" IsEnabled="{Binding SecondMapPossible}" />
+                            </StackPanel>
+
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="section" Text="LAYOUT" />
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <NumericUpDown Grid.Column="0" Minimum="0" Maximum="99" Increment="1" FormatString="0"
+                                                   Value="{Binding DungeonNumber}" Width="150" />
+                                    <Button Grid.Column="2" Content="Random" Click="OnBuilderRandom"
+                                            ToolTip.Tip="Jump to a random layout to roll through coffins and gems" />
+                                </Grid>
+                            </StackPanel>
+
+                            <Border Classes="card">
+                                <StackPanel Spacing="6" Margin="4">
+                                    <TextBlock Classes="section" Text="THIS DUNGEON" />
+                                    <TextBlock Classes="body accent" Text="{Binding Status}" TextWrapping="Wrap" />
+                                    <TextBlock Classes="body accent" FontWeight="SemiBold" TextWrapping="Wrap"
+                                               Text="{Binding PreviewCoffin, StringFormat='Coffin: {0}'}"
+                                               IsVisible="{Binding PreviewCoffin, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                    <TextBlock Classes="caption" TextWrapping="Wrap"
+                                               Text="{Binding PreviewGems, StringFormat='Gem pool: {0}'}"
+                                               IsVisible="{Binding PreviewGems, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                    <TextBlock Classes="caption" Text="{Binding PreviewRequires, StringFormat='Requires: {0} chalice'}" />
+                                    <TextBlock Classes="caption"
+                                               Text="No base for this area is in the catalogue yet."
+                                               IsVisible="{Binding !CanPlace}" />
+                                </StackPanel>
+                            </Border>
+
+                            <WrapPanel>
+                                <Button Classes="primary" Content="Place in slot" IsEnabled="{Binding CanPlace}" Margin="0,0,8,8"
+                                        ToolTip.Tip="Write this dungeon into an altar slot (the editor jumps there)">
+                                    <Button.Flyout>
+                                        <MenuFlyout>
+                                            <MenuItem Header="Makeshift (M)" Click="OnBuilderPlaceSlot" Tag="0" />
+                                            <MenuItem Header="Slot 1" Click="OnBuilderPlaceSlot" Tag="1" />
+                                            <MenuItem Header="Slot 2" Click="OnBuilderPlaceSlot" Tag="2" />
+                                            <MenuItem Header="Slot 3" Click="OnBuilderPlaceSlot" Tag="3" />
+                                            <MenuItem Header="Slot 4" Click="OnBuilderPlaceSlot" Tag="4" />
+                                            <MenuItem Header="Slot 5" Click="OnBuilderPlaceSlot" Tag="5" />
+                                            <MenuItem Header="Slot 6" Click="OnBuilderPlaceSlot" Tag="6" />
+                                        </MenuFlyout>
+                                    </Button.Flyout>
+                                </Button>
+                                <Button Content="Add to list" Click="OnBuilderAddToList" IsEnabled="{Binding CanPlace}" Margin="0,0,8,8"
+                                        ToolTip.Tip="Add this built dungeon to one of your lists" />
+                                <Button Content="Save to My dungeons" Click="OnBuilderSave" IsEnabled="{Binding CanPlace}" Margin="0,0,8,8"
+                                        ToolTip.Tip="Save this built dungeon to My dungeons to reuse later" />
+                            </WrapPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                    </Panel>
                     </LayoutTransformControl>
 
                     <GridSplitter Grid.Column="1" Width="5" ResizeDirection="Columns"

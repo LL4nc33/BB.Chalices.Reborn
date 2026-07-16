@@ -76,6 +76,27 @@ public class DungeonBuilderViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref _status, value);
     }
 
+    // --- Readable preview: what this dungeon actually is, decoded from the built bytes ---
+
+    private byte[]? _record;
+    public byte[]? Record => _record;
+    public bool CanPlace => _record is not null;
+
+    private string _previewType = string.Empty;
+    public string PreviewType { get => _previewType; private set => this.RaiseAndSetIfChanged(ref _previewType, value); }
+
+    private string? _previewCoffin;
+    public string? PreviewCoffin { get => _previewCoffin; private set => this.RaiseAndSetIfChanged(ref _previewCoffin, value); }
+
+    private string? _previewGems;
+    public string? PreviewGems { get => _previewGems; private set => this.RaiseAndSetIfChanged(ref _previewGems, value); }
+
+    private string _previewRequires = string.Empty;
+    public string PreviewRequires { get => _previewRequires; private set => this.RaiseAndSetIfChanged(ref _previewRequires, value); }
+
+    // Jump to a random layout number so farmers can roll through coffins/gems quickly.
+    public void RandomLayout() => DungeonNumber = System.Random.Shared.Next(0, 100);
+
     // Pick one normal dungeon (layout map 00 or 01) per area as the base.
     public async Task InitAsync()
     {
@@ -101,51 +122,25 @@ public class DungeonBuilderViewModel : ViewModelBase
     private void UpdatePreview()
     {
         var record = Build();
+        _record = record;
+        this.RaisePropertyChanged(nameof(CanPlace));
+
         if (record is null)
         {
             PreviewHex = string.Empty;
+            PreviewType = PreviewRequires = string.Empty;
+            PreviewCoffin = PreviewGems = null;
             Status = $"No base dungeon for {SelectedArea.Name} is in the catalogue yet.";
             return;
         }
 
         PreviewHex = Headstone.HexDump(record, 0, DungeonStructure.Size);
+        PreviewType = Headstone.DungeonType(record);
+        PreviewCoffin = record.Length > 3 ? DungeonGroups.UniqueItem(record[1], record[2], record[3]) : null;
+        PreviewGems = GemPool.Favoured(record) is { Length: > 0 } gems ? gems : null;
+        PreviewRequires = Headstone.JoinRequirementsLabel(Headstone.JoinRequirementsHex(record));
+
         string map = SelectedArea.HasTwoMaps ? (SecondMap ? ", map 2" : ", map 1") : string.Empty;
         Status = $"{SelectedArea.Name} ({SelectedVariant}){map}, layout {DungeonNumber}";
-    }
-
-    // --- Wizard steps -------------------------------------------------------
-    // 0 = pick area and depth, 1 = pick the layout, 2 = review and place.
-
-    private int _step;
-    public int Step
-    {
-        get => _step;
-        private set
-        {
-            this.RaiseAndSetIfChanged(ref _step, value);
-            this.RaisePropertyChanged(nameof(IsAreaStep));
-            this.RaisePropertyChanged(nameof(IsLayoutStep));
-            this.RaisePropertyChanged(nameof(IsPlaceStep));
-            this.RaisePropertyChanged(nameof(CanGoBack));
-            this.RaisePropertyChanged(nameof(StepLabel));
-        }
-    }
-
-    public bool IsAreaStep => Step == 0;
-    public bool IsLayoutStep => Step == 1;
-    public bool IsPlaceStep => Step == 2;
-    public bool CanGoBack => Step > 0;
-    public string StepLabel => $"Step {Step + 1} of 3";
-
-    public void Next()
-    {
-        if (Step < 2)
-            Step++;
-    }
-
-    public void Back()
-    {
-        if (Step > 0)
-            Step--;
     }
 }

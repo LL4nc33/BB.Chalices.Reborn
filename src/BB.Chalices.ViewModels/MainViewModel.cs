@@ -52,6 +52,7 @@ public class MainViewModel : ViewModelBase
         _backups = backups;
         _online = online;
         _lists = lists;
+        Builder = new DungeonBuilderViewModel(dungeons);
 
         Dungeons = new ObservableCollection<DungeonViewModel>();
         Lists = new ObservableCollection<DungeonList>();
@@ -626,6 +627,75 @@ public class MainViewModel : ViewModelBase
     // user's own. Everything is a list now; there is no separate catalogue.
     public ObservableCollection<DungeonList> Lists { get; }
 
+    // The dungeon builder, shown inline in the middle column (the editor stays on the
+    // right) instead of a separate window.
+    public DungeonBuilderViewModel Builder { get; }
+
+    private bool _showBuilder;
+    public bool ShowBuilder
+    {
+        get => _showBuilder;
+        private set => this.RaiseAndSetIfChanged(ref _showBuilder, value);
+    }
+
+    public void OpenBuilder() => ShowBuilder = true;
+    public void CloseBuilder() => ShowBuilder = false;
+
+    // Write the built dungeon into a chosen altar slot (selecting it so the editor
+    // jumps there). The builder stays open so you can roll and place another.
+    public void PlaceBuiltInSlot(int slotNumber)
+    {
+        if (Builder.Record is not { } record)
+        {
+            StatusMessage = "Build a dungeon first.";
+            return;
+        }
+        var slot = Slots.FirstOrDefault(s => s.Number == slotNumber);
+        if (slot is not null)
+            SelectedSlot = slot;
+        PlaceBuiltDungeon(record);
+    }
+
+    public async Task SaveBuiltAsCustomAsync(string name)
+    {
+        if (Builder.Record is not { } record)
+        {
+            StatusMessage = "Build a dungeon first.";
+            return;
+        }
+        int listId = await EnsureMyDungeonsListId();
+        await _lists.AddNewDungeonAsync(listId, name, null, record);
+        await LoadDungeonsAsync();
+        StatusMessage = $"Saved \"{name}\" to My dungeons.";
+    }
+
+    public async Task AddBuiltToListAsync(int listId)
+    {
+        if (Builder.Record is not { } record)
+        {
+            StatusMessage = "Build a dungeon first.";
+            return;
+        }
+        await _lists.AddNewDungeonAsync(listId, BuiltDungeonName(), null, record);
+        await LoadListsAsync();
+        StatusMessage = "Added the built dungeon to the list.";
+    }
+
+    public async Task CreateListAndAddBuiltAsync(string name)
+    {
+        if (Builder.Record is not { } record)
+        {
+            StatusMessage = "Build a dungeon first.";
+            return;
+        }
+        var list = await _lists.CreateListAsync(name);
+        await _lists.AddNewDungeonAsync(list.Id, BuiltDungeonName(), null, record);
+        await LoadListsAsync();
+        StatusMessage = $"Created \"{name}\" and added the built dungeon.";
+    }
+
+    private string BuiltDungeonName() => $"{Builder.SelectedArea.Name} layout {Builder.DungeonNumber}";
+
     private DungeonList? _selectedList;
     public DungeonList? SelectedList
     {
@@ -672,6 +742,7 @@ public class MainViewModel : ViewModelBase
         var all = await _dungeons.GetAllAsync();
         _all = all.Select(d => new DungeonViewModel(d)).ToList();
         await LoadListsAsync();
+        await Builder.InitAsync();
         StatusMessage = $"{_all.Count} dungeons ready.";
     }
 

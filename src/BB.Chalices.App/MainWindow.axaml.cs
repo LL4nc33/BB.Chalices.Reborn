@@ -408,14 +408,58 @@ public partial class MainWindow : Window
             await Launcher.LaunchUriAsync(new System.Uri(url));
     }
 
-    private async void OnBuilderClick(object? sender, RoutedEventArgs e)
+    private void OnBuilderClick(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is not MainViewModel main || Services is not { } services)
+        if (DataContext is MainViewModel viewModel)
+            viewModel.OpenBuilder();
+    }
+
+    private void OnCloseBuilder(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.CloseBuilder();
+    }
+
+    private void OnBuilderRandom(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.Builder.RandomLayout();
+    }
+
+    private void OnBuilderPlaceSlot(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel && sender is MenuItem { Tag: string tag } && int.TryParse(tag, out int slot))
+            viewModel.PlaceBuiltInSlot(slot);
+    }
+
+    private void OnBuilderAddToList(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel viewModel || sender is not Control src)
             return;
 
-        var viewModel = new DungeonBuilderViewModel(services.GetRequiredService<DungeonService>());
-        await viewModel.InitAsync();
-        await new DungeonBuilderWindow(main) { DataContext = viewModel }.ShowDialog(this);
+        var menu = new ContextMenu();
+        menu.Items.Add(MenuAction("+ New list...", async () =>
+        {
+            string? name = await new PromptWindow("Name your new list:", "My list").ShowDialog<string?>(this);
+            if (!string.IsNullOrWhiteSpace(name))
+                await viewModel.CreateListAndAddBuiltAsync(name);
+        }));
+        foreach (var list in viewModel.UserLists.ToList())
+        {
+            int id = list.Id;
+            menu.Items.Add(MenuAction(list.Name, async () => await viewModel.AddBuiltToListAsync(id)));
+        }
+        menu.Open(src);
+    }
+
+    private async void OnBuilderSave(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel viewModel)
+            return;
+        string? name = await new PromptWindow("Save this dungeon to your catalogue. Name it:", "My dungeon")
+            .ShowDialog<string?>(this);
+        if (!string.IsNullOrWhiteSpace(name))
+            await viewModel.SaveBuiltAsCustomAsync(name);
     }
 
     private void OnShowBackups(object? sender, RoutedEventArgs e)
