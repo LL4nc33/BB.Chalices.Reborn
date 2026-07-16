@@ -7,7 +7,6 @@ namespace BB.Chalices.ViewModels;
 public class SlotViewModel : ViewModelBase
 {
     private bool _occupied;
-    private string _headline = "empty";
 
     public SlotViewModel(int number) => Number = number;
 
@@ -16,27 +15,10 @@ public class SlotViewModel : ViewModelBase
     public bool IsMakeshift => Number == 0;
     public string ShortLabel => IsMakeshift ? "M" : Number.ToString();
     public string Label => IsMakeshift ? "Makeshift altar" : $"Slot {Number}";
-    public string Display => IsMakeshift
-        ? $"Makeshift altar:  {(_occupied ? _headline : "empty")}"
-        : $"Slot {Number}:  {(_occupied ? _headline : "empty")}";
 
     public bool Occupied
     {
         get => _occupied;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _occupied, value);
-            this.RaisePropertyChanged(nameof(Display));
-        }
-    }
-
-    public string Headline
-    {
-        get => _headline;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _headline, value);
-            this.RaisePropertyChanged(nameof(Display));
-        }
+        set => this.RaiseAndSetIfChanged(ref _occupied, value);
     }
 }

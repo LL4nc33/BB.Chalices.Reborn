@@ -62,6 +62,11 @@ public static class DungeonShare
         return CodePrefix + ToBase64Url(output.ToArray());
     }
 
+    // Strips everything that is not a hex digit, so pasted codes survive stray
+    // whitespace, newlines or separators. Shared by every hex paste/import path.
+    public static string CompactHex(string? input) =>
+        input is null ? string.Empty : new string(input.Where(Uri.IsHexDigit).ToArray());
+
     public static bool TryDecode(string? input, out ShareSet set)
     {
         set = new ShareSet(CurrentVersion, Array.Empty<ShareItem>());
@@ -73,7 +78,7 @@ public static class DungeonShare
             return TryDecodeCode(trimmed[CodePrefix.Length..], out set);
 
         // Legacy import: a raw hex string of one or more whole 125-byte records.
-        string compact = new string(trimmed.Where(Uri.IsHexDigit).ToArray());
+        string compact = CompactHex(trimmed);
         if (compact.Length == 0 || compact.Length % (DungeonStructure.Size * 2) != 0)
             return false;
 

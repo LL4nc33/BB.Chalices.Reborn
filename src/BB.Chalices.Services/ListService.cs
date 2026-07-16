@@ -72,8 +72,7 @@ public class ListService
         if (list is null || list.Items.Any(i => i.DungeonId == dungeonId))
             return false;
 
-        int position = list.Items.Count == 0 ? 0 : list.Items.Max(i => i.Position) + 1;
-        list.Items.Add(new DungeonListItem { DungeonId = dungeonId, Position = position });
+        list.Items.Add(new DungeonListItem { DungeonId = dungeonId, Position = NextPosition(list) });
         await db.SaveChangesAsync();
         return true;
     }
@@ -97,12 +96,15 @@ public class ListService
             .FirstOrDefaultAsync(l => l.Id == listId && l.Source == ListSource.User);
         if (list is not null)
         {
-            int position = list.Items.Count == 0 ? 0 : list.Items.Max(i => i.Position) + 1;
-            list.Items.Add(new DungeonListItem { DungeonId = dungeon.Id, Position = position });
+            list.Items.Add(new DungeonListItem { DungeonId = dungeon.Id, Position = NextPosition(list) });
             await db.SaveChangesAsync();
         }
         return dungeon;
     }
+
+    // The next free append position in a list (max existing + 1, or 0 when empty).
+    private static int NextPosition(DungeonList list) =>
+        list.Items.Count == 0 ? 0 : list.Items.Max(i => i.Position) + 1;
 
     // Import many dungeons into one new user list in a single transaction. Used by
     // list import, which can carry hundreds of dungeons; adding them one at a time

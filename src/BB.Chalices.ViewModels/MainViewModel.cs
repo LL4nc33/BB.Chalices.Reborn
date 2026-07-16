@@ -233,8 +233,6 @@ public class MainViewModel : ViewModelBase
     public IReadOnlyList<HeadstoneFieldViewModel> ShortFields => Fields.Where(f => f.Field.Length <= 8).ToList();
     public IReadOnlyList<HeadstoneFieldViewModel> LongFields => Fields.Where(f => f.Field.Length > 8).ToList();
 
-    public string? CurrentSavePath => _saves.CurrentPath;
-
     public string? CharacterName
     {
         get => _characterName;
@@ -952,7 +950,7 @@ public class MainViewModel : ViewModelBase
             return;
         }
 
-        string compact = hex is null ? "" : new string(hex.Where(Uri.IsHexDigit).ToArray());
+        string compact = DungeonShare.CompactHex(hex);
         if (compact.Length != DungeonStructure.Size * 2)
         {
             StatusMessage = $"Paste needs a {DungeonStructure.Size}-byte hex string " +
@@ -990,7 +988,7 @@ public class MainViewModel : ViewModelBase
             return;
         }
 
-        string compact = hex is null ? "" : new string(hex.Where(Uri.IsHexDigit).ToArray());
+        string compact = DungeonShare.CompactHex(hex);
         int bytes = compact.Length / 2;
 
         int[] targets;
@@ -1538,20 +1536,11 @@ public class MainViewModel : ViewModelBase
         try
         {
             var record = _saves.GetSlotBytes(slot.Number);
-            if (DungeonStructure.IsEmpty(record))
-            {
-                slot.Occupied = false;
-                slot.Headline = "empty";
-                return;
-            }
-
-            slot.Occupied = true;
-            slot.Headline = Headstone.DungeonType(record);
+            slot.Occupied = !DungeonStructure.IsEmpty(record);
         }
         catch
         {
             slot.Occupied = false;
-            slot.Headline = "?";
         }
     }
 

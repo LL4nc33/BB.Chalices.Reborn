@@ -227,9 +227,6 @@ public partial class MainWindow : Window
         viewModel.Notify($"Saved the list to {file.Name}.");
     }
 
-    // The Add-to-list button just opens its flyout; the pick happens in OnAddToListPicked.
-    private void OnAddToList(object? sender, RoutedEventArgs e) { }
-
     private async void OnNewListAndAdd(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not MainViewModel viewModel)

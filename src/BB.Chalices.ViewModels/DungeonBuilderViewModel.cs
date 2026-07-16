@@ -62,13 +62,6 @@ public class DungeonBuilderViewModel : ViewModelBase
         set { this.RaiseAndSetIfChanged(ref _dungeonNumber, Math.Clamp(value, 0, 99)); UpdatePreview(); }
     }
 
-    private string _previewHex = string.Empty;
-    public string PreviewHex
-    {
-        get => _previewHex;
-        private set => this.RaiseAndSetIfChanged(ref _previewHex, value);
-    }
-
     private string _status = string.Empty;
     public string Status
     {
@@ -81,9 +74,6 @@ public class DungeonBuilderViewModel : ViewModelBase
     private byte[]? _record;
     public byte[]? Record => _record;
     public bool CanPlace => _record is not null;
-
-    private string _previewType = string.Empty;
-    public string PreviewType { get => _previewType; private set => this.RaiseAndSetIfChanged(ref _previewType, value); }
 
     private string? _previewCoffin;
     public string? PreviewCoffin { get => _previewCoffin; private set => this.RaiseAndSetIfChanged(ref _previewCoffin, value); }
@@ -127,15 +117,12 @@ public class DungeonBuilderViewModel : ViewModelBase
 
         if (record is null)
         {
-            PreviewHex = string.Empty;
-            PreviewType = PreviewRequires = string.Empty;
+            PreviewRequires = string.Empty;
             PreviewCoffin = PreviewGems = null;
             Status = $"No base dungeon for {SelectedArea.Name} is in the catalogue yet.";
             return;
         }
 
-        PreviewHex = Headstone.HexDump(record, 0, DungeonStructure.Size);
-        PreviewType = Headstone.DungeonType(record);
         PreviewCoffin = record.Length > 3 ? DungeonGroups.UniqueItem(record[1], record[2], record[3]) : null;
         PreviewGems = GemPool.Favoured(record) is { Length: > 0 } gems ? gems : null;
         PreviewRequires = Headstone.JoinRequirementsLabel(Headstone.JoinRequirementsHex(record));

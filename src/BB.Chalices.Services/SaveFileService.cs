@@ -9,9 +9,7 @@ public class SaveFileService
     private SaveFile? _save;
     private string? _path;
 
-    public SaveFile? CurrentSave => _save;
     public string? CurrentPath => _path;
-    public bool HasLoadedSave => _save is not null;
 
     public SaveFile Load(string path)
     {
@@ -31,15 +29,6 @@ public class SaveFileService
         if (createBackup)
             SaveFile.CreateBackup(_path);
         _save.SaveToFile(_path);
-    }
-
-    public void SaveAs(string path)
-    {
-        if (_save is null)
-            throw new InvalidOperationException("No save file loaded");
-
-        _save.SaveToFile(path);
-        _path = path;
     }
 
     // Reads just the hunter's name from a save file without making it the current
@@ -88,18 +77,6 @@ public class SaveFileService
     {
         if (_save is null) throw new InvalidOperationException("No save file loaded");
         _save.SetLevel(value);
-    }
-
-    public DungeonStructure GetSlot(int slot)
-    {
-        if (_save is null) throw new InvalidOperationException("No save file loaded");
-        return _save.GetSlot(slot);
-    }
-
-    public void SetSlot(int slot, DungeonStructure dungeon)
-    {
-        if (_save is null) throw new InvalidOperationException("No save file loaded");
-        _save.SetSlot(slot, dungeon);
     }
 
     public void SetSlot(int slot, byte[] dungeonBytes)
@@ -173,11 +150,5 @@ public class SaveFileService
         bytes.CopyTo(record, field.Offset);
         Loaded.WriteSlotRaw(slot, record);
         return true;
-    }
-
-    public void Close()
-    {
-        _save = null;
-        _path = null;
     }
 }

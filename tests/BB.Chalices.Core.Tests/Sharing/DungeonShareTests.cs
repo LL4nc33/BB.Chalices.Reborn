@@ -13,6 +13,17 @@ public class DungeonShareTests
         return data;
     }
 
+    [Theory]
+    [InlineData(null, "")]
+    [InlineData("", "")]
+    [InlineData("00ff", "00ff")]
+    [InlineData("  00 FF\r\n1a-2b  ", "00FF1a2b")]
+    [InlineData("xyz!?", "")]
+    public void CompactHex_KeepsOnlyHexDigits(string? input, string expected)
+    {
+        Assert.Equal(expected, DungeonShare.CompactHex(input));
+    }
+
     [Fact]
     public void Encode_ProducesPrefixedUrlSafeCode()
     {

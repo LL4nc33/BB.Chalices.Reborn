@@ -295,7 +295,7 @@
                                     <TextBlock Classes="body" Text="{Binding Description}" TextWrapping="Wrap" />
                                 </ScrollViewer>
                                 <StackPanel Orientation="Horizontal" Spacing="12">
-                                    <Button Classes="link" Content="add to list" Click="OnAddToList"
+                                    <Button Classes="link" Content="add to list"
                                             HorizontalAlignment="Left"
                                             ToolTip.Tip="Add this dungeon to one of your lists">
                                         <Button.Flyout>
