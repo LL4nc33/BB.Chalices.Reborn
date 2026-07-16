@@ -100,6 +100,34 @@ public class ListService
         return dungeon;
     }
 
+    // Import many dungeons into one new user list in a single transaction. Used by
+    // list import, which can carry hundreds of dungeons; adding them one at a time
+    // (a context and two saves each) would hang the UI.
+    public async Task<DungeonList> ImportIntoNewListAsync(string listName,
+        IReadOnlyList<(string Name, string? Category, byte[] Bytes)> items)
+    {
+        await using var db = await _factory.CreateDbContextAsync();
+        var list = new DungeonList { Name = listName, Source = ListSource.User };
+        db.Lists.Add(list);
+
+        int position = 0;
+        foreach (var (name, category, bytes) in items)
+        {
+            var dungeon = new DungeonEntity
+            {
+                Glyph = "my-" + Guid.NewGuid().ToString("N")[..8],
+                Category = category ?? DungeonCategories.CustomCategory,
+                Description = name,
+                Bytes = bytes,
+            };
+            db.Dungeons.Add(dungeon);
+            list.Items.Add(new DungeonListItem { Dungeon = dungeon, Position = position++ });
+        }
+
+        await db.SaveChangesAsync();
+        return list;
+    }
+
     public async Task RemoveItemAsync(int listId, int dungeonId)
     {
         await using var db = await _factory.CreateDbContextAsync();

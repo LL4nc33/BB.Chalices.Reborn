@@ -63,8 +63,8 @@ public partial class MainWindow : Window
         if (file?.TryGetLocalPath() is not { } path)
             return;
 
-        // A .bbchalice file imports as a list; anything else opens as a save.
-        if (path.EndsWith(".bbchalice", StringComparison.OrdinalIgnoreCase))
+        // A .bbc file imports as a list; anything else opens as a save.
+        if (path.EndsWith(".bbc", StringComparison.OrdinalIgnoreCase))
             await viewModel.ImportSharedAsync(await File.ReadAllTextAsync(path));
         else
             await viewModel.LoadSaveCommand.Execute(path);
@@ -199,8 +199,8 @@ public partial class MainWindow : Window
         var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = "Save the list as a dungeon file",
-            SuggestedFileName = "list.bbchalice",
-            DefaultExtension = "bbchalice",
+            SuggestedFileName = "list.bbc",
+            DefaultExtension = "bbc",
         });
         if (file is null)
             return;

@@ -1044,13 +1044,13 @@ public class MainViewModel : ViewModelBase
         try { set = ListSharing.Import(code); }
         catch (FormatException) { StatusMessage = "That is not a dungeon share code."; return; }
 
-        var list = await _lists.CreateListAsync("Imported list");
-        foreach (var item in set.Items)
-            await _lists.AddNewDungeonAsync(list.Id,
-                string.IsNullOrWhiteSpace(item.Name) ? "Imported" : item.Name, item.Category, item.Bytes);
+        var items = set.Items
+            .Select(i => (string.IsNullOrWhiteSpace(i.Name) ? "Imported" : i.Name, i.Category, i.Bytes))
+            .ToList();
+        var list = await _lists.ImportIntoNewListAsync("Imported list", items);
         await LoadDungeonsAsync();
         SelectedList = Lists.FirstOrDefault(l => l.Id == list.Id) ?? SelectedList;
-        StatusMessage = $"Imported {set.Items.Count} dungeon(s) into a new list.";
+        StatusMessage = $"Imported {items.Count} dungeon(s) into a new list.";
     }
 
     private async Task<int> EnsureMyDungeonsListId()

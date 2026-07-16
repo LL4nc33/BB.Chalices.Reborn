@@ -207,9 +207,9 @@
                                     <Button Content="Share" Click="OnShareList" Margin="0,0,6,4"
                                             ToolTip.Tip="Copy this list as a share code to paste anywhere" />
                                     <Button Content="Save file" Click="OnExportListFile" Margin="0,0,6,4"
-                                            ToolTip.Tip="Save this list as a .bbchalice file to share or back up" />
+                                            ToolTip.Tip="Save this list as a .bbc file to share or back up" />
                                     <Button Content="Import" Click="OnImportList" Margin="0,0,6,4"
-                                            ToolTip.Tip="Import a shared list from a copied code (or drop a .bbchalice file onto the window)" />
+                                            ToolTip.Tip="Import a shared list from a copied code (or drop a .bbc file onto the window)" />
                                     <Button Content="Rename" Click="OnRenameList" IsVisible="{Binding CanEditSelectedList}" Margin="0,0,6,4"
                                             ToolTip.Tip="Rename this list" />
                                     <Button Classes="danger" Content="Delete" Click="OnDeleteList" IsVisible="{Binding CanEditSelectedList}" Margin="0,0,0,4"
