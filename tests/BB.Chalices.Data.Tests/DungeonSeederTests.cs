@@ -1,3 +1,5 @@
+using BB.Chalices.Data.Entities;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace BB.Chalices.Data.Tests;
@@ -8,6 +10,22 @@ public class DungeonSeederTests
         new(new DbContextOptionsBuilder<ChaliceDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options);
+
+    // A real SQLite context (in-memory) so foreign-key cascades behave like production.
+    private static ChaliceDbContext NewSqliteDb(SqliteConnection connection)
+    {
+        var db = new ChaliceDbContext(new DbContextOptionsBuilder<ChaliceDbContext>()
+            .UseSqlite(connection).Options);
+        db.Database.EnsureCreated();
+        return db;
+    }
+
+    private static string CategoryJson(string category, params (string glyph, string desc)[] items)
+    {
+        var entries = items.Select(i =>
+            $"{{\"glyph\":\"{i.glyph}\",\"desc\":\"{i.desc}\",\"bytes\":[\"FF\",\"FF\",\"FF\",\"FF\"]}}");
+        return $"{{\"{category}\":[{string.Join(",", entries)}]}}";
+    }
 
     [Fact]
     public async Task ImportAsync_DeduplicatesGlyphsAndPadsToOneRecord()
@@ -109,5 +127,48 @@ public class DungeonSeederTests
 
         using var ctx = NewContext();
         await Assert.ThrowsAsync<FormatException>(() => DungeonSeeder.ImportAsync(ctx, json));
+    }
+
+    [Fact]
+    public async Task Reseed_PreservesDungeonIds_SoUserListItemsSurvive()
+    {
+        var connection = new SqliteConnection("Data Source=:memory:");
+        connection.Open();
+        await using var db = NewSqliteDb(connection);
+
+        await DungeonSeeder.ImportAsync(db, CategoryJson("Pthumeru", ("g1", "old")), replaceExisting: true);
+        int id = db.Dungeons.Single(d => d.Glyph == "g1").Id;
+
+        // A user adds the catalogue dungeon to their own list.
+        var list = new DungeonList { Name = "Mine", Source = ListSource.User };
+        list.Items.Add(new DungeonListItem { DungeonId = id, Position = 0 });
+        db.Lists.Add(list);
+        await db.SaveChangesAsync();
+
+        // Reseed the same category (an app update) with a changed description.
+        await DungeonSeeder.ImportAsync(db, CategoryJson("Pthumeru", ("g1", "new")), replaceExisting: true);
+
+        var reseeded = db.Dungeons.Single(d => d.Glyph == "g1");
+        Assert.Equal(id, reseeded.Id);
+        Assert.Equal("new", reseeded.Description);
+
+        var mine = db.Lists.Include(l => l.Items).Single();
+        Assert.Single(mine.Items); // the list reference survived the reseed
+        Assert.Equal(id, mine.Items[0].DungeonId);
+    }
+
+    [Fact]
+    public async Task Import_CrossCategoryGlyphCollision_DoesNotThrow()
+    {
+        var connection = new SqliteConnection("Data Source=:memory:");
+        connection.Open();
+        await using var db = NewSqliteDb(connection);
+
+        await DungeonSeeder.ImportAsync(db, CategoryJson("Pthumeru", ("shared", "a")), replaceExisting: true);
+        await DungeonSeeder.ImportAsync(db, CategoryJson("farming", ("shared", "b")), replaceExisting: true);
+
+        var rows = db.Dungeons.Where(d => d.Glyph == "shared").ToList();
+        Assert.Single(rows); // no duplicate, no unique-constraint crash
+        Assert.Equal("farming", rows[0].Category);
     }
 }

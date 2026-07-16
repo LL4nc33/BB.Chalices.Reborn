@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using BB.Chalices.Data;
+using BB.Chalices.Data.Entities;
 using BB.Chalices.Services;
 using BB.Chalices.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +47,8 @@ public partial class App : Application
                 await db.Database.EnsureCreatedAsync();
 
                 bool seeded = await db.Dungeons.AnyAsync();
-                if (!seeded || config.Settings.CatalogueVersion != catalogueVersion)
+                bool reseeded = !seeded || config.Settings.CatalogueVersion != catalogueVersion;
+                if (reseeded)
                 {
                     // 1) Our bundled by-area catalogue (the "All" view) - always available,
                     //    works fully offline. Embedded in the executable.
@@ -60,7 +62,7 @@ public partial class App : Application
                     }
 
                     // 2) Nox's curated categories, only if a consented copy was downloaded.
-                    //    Per-category replace keeps the bundled set and any custom dungeons.
+                    //    Upsert-by-glyph keeps the bundled set and any custom dungeons.
                     if (File.Exists(config.CatalogueCachePath))
                         await DungeonSeeder.ImportAsync(db, await File.ReadAllTextAsync(config.CatalogueCachePath), replaceExisting: true);
 
@@ -68,12 +70,21 @@ public partial class App : Application
                     config.Save();
                 }
 
-                // Lists live in the same database; make sure their tables exist, the
-                // built-in lists match the current catalogue, and old custom dungeons
-                // have moved into a My dungeons list.
+                // Lists live in the same database. Always make sure their tables exist,
+                // but only rebuild the built-in lists when the catalogue actually changed
+                // (or they don't exist yet) - rebuilding churns thousands of rows.
                 await ListBootstrapper.EnsureSchemaAsync(db);
-                await ListBootstrapper.RebuildBuiltInListsAsync(db);
-                await ListBootstrapper.MigrateCustomAsync(db);
+                if (reseeded || !await db.Lists.AnyAsync(l => l.Source != ListSource.User))
+                    await ListBootstrapper.RebuildBuiltInListsAsync(db);
+
+                // Migrate old custom dungeons into a list once, so a removed one isn't
+                // resurrected on the next launch.
+                if (!config.Settings.CustomMigrated)
+                {
+                    await ListBootstrapper.MigrateCustomAsync(db);
+                    config.Settings.CustomMigrated = true;
+                    config.Save();
+                }
             }
 
             var viewModel = Services!.GetRequiredService<MainViewModel>();

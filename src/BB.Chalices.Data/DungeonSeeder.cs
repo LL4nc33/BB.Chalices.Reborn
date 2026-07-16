@@ -18,9 +18,13 @@ public static class DungeonSeeder
         await ImportAsync(context, await File.ReadAllTextAsync(jsonPath));
     }
 
-    // Parse a catalogue JSON string and load it. With replaceExisting only the
-    // categories present in this JSON are swapped out - the other catalogue source
-    // (bundled vs Nox's gist) and the player's own saved dungeons are left intact.
+    // Parse a catalogue JSON string and load it. With replaceExisting the import is
+    // identity-preserving: existing rows are matched by their stable Glyph and updated
+    // in place (their Id, and therefore any list references to them, survive), new
+    // glyphs are inserted, and only glyphs that vanish from a re-imported category are
+    // deleted. Other catalogue sources and the player's own saved dungeons are left
+    // intact. Keeping Ids stable is what stops a reseed from cascade-deleting the
+    // dungeons users added to their lists.
     public static async Task ImportAsync(ChaliceDbContext context, string json, bool replaceExisting = false)
     {
         if (context.Dungeons.Any() && !replaceExisting)
@@ -28,7 +32,7 @@ public static class DungeonSeeder
 
         using var doc = JsonDocument.Parse(json);
 
-        var dungeons = new List<DungeonEntity>();
+        var incoming = new List<DungeonEntity>();
         var seenGlyphs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var category in doc.RootElement.EnumerateObject())
@@ -54,25 +58,46 @@ public static class DungeonSeeder
                 if (bytes.Length < DungeonByteLength)
                     Array.Resize(ref bytes, DungeonByteLength); // pad the rest with zeros
 
-                dungeons.Add(new DungeonEntity
+                incoming.Add(new DungeonEntity
                 {
                     Glyph = glyph,
                     Category = category.Name,
                     Description = description,
-                    Bytes = bytes
+                    Bytes = bytes,
                 });
             }
         }
 
-        // Parsing succeeded, so swap out only the categories this import provides.
-        if (context.Dungeons.Any())
+        // Fresh database: just insert everything.
+        if (!context.Dungeons.Any())
         {
-            var incoming = new HashSet<string>(dungeons.Select(d => d.Category), StringComparer.OrdinalIgnoreCase);
-            var stale = context.Dungeons.AsEnumerable().Where(d => incoming.Contains(d.Category)).ToList();
-            context.Dungeons.RemoveRange(stale);
+            context.Dungeons.AddRange(incoming);
+            await context.SaveChangesAsync();
+            return;
         }
 
-        context.Dungeons.AddRange(dungeons);
+        // Upsert by glyph so existing rows keep their Id (list references stay valid).
+        var byGlyph = incoming.ToDictionary(d => d.Glyph, StringComparer.OrdinalIgnoreCase);
+        var incomingCategories = new HashSet<string>(incoming.Select(d => d.Category), StringComparer.OrdinalIgnoreCase);
+
+        foreach (var existing in context.Dungeons.ToList())
+        {
+            if (byGlyph.Remove(existing.Glyph, out var updated))
+            {
+                existing.Category = updated.Category;
+                existing.Description = updated.Description;
+                existing.Bytes = updated.Bytes;
+            }
+            else if (incomingCategories.Contains(existing.Category))
+            {
+                // Was part of a re-imported category but is gone from the new data.
+                context.Dungeons.Remove(existing);
+            }
+            // Otherwise it belongs to another source/category: leave it alone.
+        }
+
+        // Whatever glyphs are left are genuinely new.
+        context.Dungeons.AddRange(byGlyph.Values);
         await context.SaveChangesAsync();
     }
 }

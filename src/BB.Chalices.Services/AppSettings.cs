@@ -23,6 +23,10 @@ public class AppSettings
     // Bumped when the bundled catalogue changes, to trigger a one-time reseed.
     public int CatalogueVersion { get; set; }
 
+    // Set once the old Custom-category dungeons have been migrated into a list, so a
+    // later launch doesn't resurrect ones the user has since removed.
+    public bool CustomMigrated { get; set; }
+
     // Per-column zoom factor (1.0 = 100% = the column's default size), adjustable with
     // the +/- buttons. The actual scale is this factor times the column's baseline.
     public double SidebarZoom { get; set; } = 1.0;
