@@ -243,7 +243,20 @@ public partial class MainWindow : Window
         vm.SelectedDungeon = dungeon;
 
         var menu = new ContextMenu();
-        menu.Items.Add(MenuAction("Place in selected slot", () => vm.ApplyDungeonCommand.Execute().Subscribe(), vm.CanPlaceDungeon));
+
+        // Place directly into a chosen altar slot; selecting the slot also jumps the
+        // editor over to it so you see the result.
+        var placeIn = new MenuItem { Header = "Place in slot", IsEnabled = vm.CanPlaceDungeon };
+        foreach (var s in vm.Slots)
+        {
+            SlotViewModel slotRef = s;
+            placeIn.Items.Add(MenuAction(s.Number == 0 ? "Makeshift (M)" : $"Slot {s.Number}", () =>
+            {
+                vm.SelectedSlot = slotRef;
+                vm.ApplyDungeonCommand.Execute().Subscribe();
+            }));
+        }
+        menu.Items.Add(placeIn);
         menu.Items.Add(MenuAction("Fill all slots", () => vm.FillAllSlotsCommand.Execute().Subscribe(), vm.CanPlaceDungeon));
 
         var addTo = new MenuItem { Header = "Add to list" };
@@ -414,18 +427,6 @@ public partial class MainWindow : Window
     private async void OnLegendClick(object? sender, RoutedEventArgs e)
         => await new LegendWindow().ShowDialog(this);
 
-    private async void OnCopySlotHex(object? sender, RoutedEventArgs e)
-    {
-        if (DataContext is MainViewModel viewModel && viewModel.CopySelectedSlotHex() is { } hex && Clipboard is { } clipboard)
-            await clipboard.SetTextAsync(hex);
-    }
-
-    private async void OnPasteSlotHex(object? sender, RoutedEventArgs e)
-    {
-        if (DataContext is MainViewModel viewModel && Clipboard is { } clipboard)
-            viewModel.PasteSlotHex(await clipboard.TryGetTextAsync());
-    }
-
     private async void OnCopyAltar(object? sender, RoutedEventArgs e)
     {
         if (DataContext is MainViewModel viewModel && viewModel.CopyAltarHex() is { } hex && Clipboard is { } clipboard)
@@ -436,17 +437,6 @@ public partial class MainWindow : Window
     {
         if (DataContext is MainViewModel viewModel && Clipboard is { } clipboard)
             viewModel.PasteAltarHex(await clipboard.TryGetTextAsync());
-    }
-
-    private async void OnSaveCustom(object? sender, RoutedEventArgs e)
-    {
-        if (DataContext is not MainViewModel viewModel)
-            return;
-
-        string? name = await new PromptWindow("Save this dungeon to your catalogue. Name it:", "My dungeon")
-            .ShowDialog<string?>(this);
-        if (!string.IsNullOrWhiteSpace(name))
-            await viewModel.SaveCurrentSlotAsCustomAsync(name);
     }
 
     private async void OnDeleteBackup(object? sender, RoutedEventArgs e)

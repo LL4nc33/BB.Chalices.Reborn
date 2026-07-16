@@ -484,12 +484,8 @@
                                 <Grid ColumnDefinitions="*,Auto">
                                     <TextBlock Grid.Column="0" Classes="section" Text="LIVE BYTES" Margin="0" VerticalAlignment="Center" />
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="14">
-                                        <Button Classes="link" Content="copy" Click="OnCopySlotHex"
-                                                ToolTip.Tip="Copy this whole dungeon as a 125-byte hex string to the clipboard" />
-                                        <Button Classes="link" Content="paste" Click="OnPasteSlotHex"
-                                                ToolTip.Tip="Replace this slot with a 125-byte hex string from the clipboard. Save to write it to disk." />
-                                        <Button Classes="link" Content="save" Click="OnSaveCustom"
-                                                ToolTip.Tip="Save this dungeon to your own catalogue (My dungeons) to reuse later" />
+                                        <TextBlock Classes="caption" Text="right-click a slot to copy / paste / save"
+                                                   VerticalAlignment="Center" />
                                         <Button Classes="link" Content="colour legend" Click="OnLegendClick"
                                                 ToolTip.Tip="What the byte colours mean" />
                                     </StackPanel>
