@@ -47,6 +47,9 @@ public readonly struct DungeonStructure
         return new DungeonStructure(data);
     }
 
-    public bool IsEmpty() =>
-        Data[0] == 0xFF && Data[1] == 0xFF && Data[2] == 0xFF && Data[3] == 0xFF;
+    public bool IsEmpty() => IsEmpty(Data);
+
+    // An empty slot is marked by the 0xFFFFFFFF map at the start of the record.
+    public static bool IsEmpty(ReadOnlySpan<byte> record) =>
+        record.Length >= 4 && record[0] == 0xFF && record[1] == 0xFF && record[2] == 0xFF && record[3] == 0xFF;
 }

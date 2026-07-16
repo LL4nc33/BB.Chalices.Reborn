@@ -80,6 +80,17 @@ public class MainViewModel : ViewModelBase
         ZoomInCommand = ReactiveCommand.Create(() => Adjust(ZoomStep));
         ZoomOutCommand = ReactiveCommand.Create(() => Adjust(-ZoomStep));
 
+        // Route any unhandled command error to the status bar instead of letting it
+        // bubble out of the command and crash the app.
+        foreach (var command in new IReactiveCommand[]
+        {
+            LoadDungeonsCommand, LoadSaveCommand, SaveCommand, ApplyDungeonCommand,
+            FillAllSlotsCommand, DetectSavesCommand, UpdateDungeonsCommand, ClearSlotCommand,
+            UndoSlotCommand, CreateBackupCommand, RestoreBackupCommand, ApplySoundFixCommand,
+            ZoomInCommand, ZoomOutCommand,
+        })
+            command.ThrownExceptions.Subscribe(ex => StatusMessage = $"Something went wrong: {ex.Message}");
+
         _sidebarFactor = InitFactor(_config.Settings.SidebarZoom);
         _catalogueFactor = InitFactor(_config.Settings.CatalogueZoom);
         _editorFactor = InitFactor(_config.Settings.EditorZoom);
@@ -964,7 +975,13 @@ public class MainViewModel : ViewModelBase
         StatusMessage = $"Saved \"{name}\" to My dungeons.";
     }
 
-    // Save the whole altar (its non-empty slots) as a new user list.
+    // The altar in the order lists map to it: the six real stored slots first, then the
+    // makeshift altar (slot 0). So a shared six-dungeon list fills the six real slots
+    // rather than wasting the first entry on the makeshift altar, and save<->apply
+    // round-trips.
+    private static readonly int[] AltarOrder = { 1, 2, 3, 4, 5, 6, 0 };
+
+    // Save the altar (its non-empty slots) as a new user list.
     public async Task SaveAltarAsListAsync(string name)
     {
         if (!HasLoadedSave)
@@ -973,19 +990,20 @@ public class MainViewModel : ViewModelBase
             return;
         }
         var list = await _lists.CreateListAsync(name);
-        foreach (var slot in Slots)
+        foreach (int number in AltarOrder)
         {
-            var bytes = _saves.GetSlotBytes(slot.Number);
-            if (IsEmptyRecord(bytes))
+            var bytes = _saves.GetSlotBytes(number);
+            if (DungeonStructure.IsEmpty(bytes))
                 continue;
-            await _lists.AddNewDungeonAsync(list.Id, $"Slot {slot.Number}", null, bytes);
+            await _lists.AddNewDungeonAsync(list.Id, $"Slot {number}", null, bytes);
         }
         await LoadDungeonsAsync();
         SelectedList = Lists.FirstOrDefault(l => l.Id == list.Id) ?? SelectedList;
         StatusMessage = $"Saved the altar as list \"{name}\".";
     }
 
-    // Write the selected list's dungeons onto the altar (first 7, in order).
+    // Write the selected list's dungeons onto the altar: the real slots 1-6 first, then
+    // the makeshift altar for a seventh entry.
     public void ApplyListToAltar()
     {
         if (!HasLoadedSave)
@@ -999,12 +1017,11 @@ public class MainViewModel : ViewModelBase
             return;
         }
 
-        int[] slots = Slots.Select(s => s.Number).ToArray();
-        int count = Math.Min(slots.Length, SelectedList.Items.Count);
+        int count = Math.Min(AltarOrder.Length, SelectedList.Items.Count);
         for (int i = 0; i < count; i++)
         {
-            _saves.SetSlot(slots[i], SelectedList.Items[i].Dungeon.Bytes);
-            SlotViewModel? target = Slots.FirstOrDefault(s => s.Number == slots[i]);
+            _saves.SetSlot(AltarOrder[i], SelectedList.Items[i].Dungeon.Bytes);
+            SlotViewModel? target = Slots.FirstOrDefault(s => s.Number == AltarOrder[i]);
             if (target is not null)
                 RefreshSlot(target);
         }
@@ -1061,9 +1078,6 @@ public class MainViewModel : ViewModelBase
         var created = await _lists.CreateListAsync(MyDungeonsListName);
         return created.Id;
     }
-
-    private static bool IsEmptyRecord(byte[] bytes) =>
-        bytes.Length >= 4 && bytes[0] == 0xFF && bytes[1] == 0xFF && bytes[2] == 0xFF && bytes[3] == 0xFF;
 
     private int? _undoSlot;
     private byte[]? _undoBytes;
@@ -1322,7 +1336,7 @@ public class MainViewModel : ViewModelBase
             for (int i = 0; i < Fields.Count; i++)
                 Fields[i].Set(Headstone.ReadFieldHex(record, Fields[i].Field));
 
-            if (IsEmpty(record))
+            if (DungeonStructure.IsEmpty(record))
             {
                 SelectedSlotType = "empty";
                 SelectedSlotJoin = "";
@@ -1366,7 +1380,7 @@ public class MainViewModel : ViewModelBase
         try
         {
             var record = _saves.GetSlotBytes(slot.Number);
-            if (IsEmpty(record))
+            if (DungeonStructure.IsEmpty(record))
             {
                 slot.Occupied = false;
                 slot.Headline = "empty";
@@ -1383,6 +1397,4 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    private static bool IsEmpty(byte[] record) =>
-        record.Length >= 4 && record[0] == 0xFF && record[1] == 0xFF && record[2] == 0xFF && record[3] == 0xFF;
 }

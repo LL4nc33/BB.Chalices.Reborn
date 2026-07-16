@@ -107,6 +107,8 @@ public static class DungeonShare
             var items = new List<ShareItem>(dto.I.Count);
             foreach (var raw in dto.I)
             {
+                if (string.IsNullOrEmpty(raw.H))
+                    return false;
                 byte[] bytes = Convert.FromHexString(raw.H);
                 if (bytes.Length != DungeonStructure.Size)
                     return false;
@@ -116,7 +118,7 @@ public static class DungeonShare
             set = new ShareSet(dto.V == 0 ? CurrentVersion : dto.V, items);
             return true;
         }
-        catch (Exception ex) when (ex is FormatException or InvalidDataException or JsonException)
+        catch (Exception ex) when (ex is FormatException or InvalidDataException or JsonException or ArgumentException)
         {
             return false;
         }

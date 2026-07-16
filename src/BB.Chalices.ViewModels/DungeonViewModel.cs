@@ -1,6 +1,5 @@
 using BB.Chalices.Core.Binary;
 using BB.Chalices.Data.Entities;
-using BB.Chalices.Services;
 
 namespace BB.Chalices.ViewModels;
 
@@ -48,9 +47,6 @@ public class DungeonViewModel : ViewModelBase
     // The gem effects this dungeon's gem pool favours (for farmers).
     public string? FavouredGems =>
         GemPool.Favoured(Bytes) is { Length: > 0 } gems ? gems : null;
-
-    // True for the player's own saved dungeons (removable from the catalogue).
-    public bool IsCustom => Category == DungeonService.CustomCategory;
 
     public string DisplayName =>
         string.IsNullOrEmpty(Description) ? Glyph : $"{Glyph} - {Description}";
