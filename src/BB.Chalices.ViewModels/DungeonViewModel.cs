@@ -50,4 +50,11 @@ public class DungeonViewModel : ViewModelBase
 
     public string DisplayName =>
         string.IsNullOrEmpty(Description) ? Glyph : $"{Glyph} - {Description}";
+
+    // A lowercased blob of the searchable fields, computed once and cached. Search runs
+    // over ~2000 dungeons on every keystroke, so recomputing Type/UniqueItem/FavouredGems
+    // (which allocate) each time was the hot spot; this makes a keystroke a substring scan.
+    private string? _searchBlob;
+    public string SearchBlob => _searchBlob ??=
+        string.Join('\n', Glyph, Description, Type, UniqueItem, FavouredGems).ToLowerInvariant();
 }

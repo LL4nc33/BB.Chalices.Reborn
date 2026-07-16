@@ -22,8 +22,12 @@ public class ListService
 
     public async Task<List<DungeonList>> GetListsAsync()
     {
+        // Read-only, no change tracking, and a split query so the built-in lists (which
+        // reference nearly the whole catalogue) don't materialise as one giant join.
         await using var db = await _factory.CreateDbContextAsync();
         return await db.Lists
+            .AsNoTracking()
+            .AsSplitQuery()
             .Include(l => l.Items.OrderBy(i => i.Position)).ThenInclude(i => i.Dungeon)
             .OrderBy(l => l.Source).ThenBy(l => l.Name)
             .ToListAsync();

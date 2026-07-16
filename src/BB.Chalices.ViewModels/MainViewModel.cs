@@ -692,12 +692,10 @@ public class MainViewModel : ViewModelBase
 
         var search = SearchText?.Trim();
         if (!string.IsNullOrEmpty(search))
-            query = query.Where(d =>
-                d.Glyph.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                (d.Description?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                d.Type.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                (d.UniqueItem?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false) ||
-                (d.FavouredGems?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false));
+        {
+            string needle = search.ToLowerInvariant();
+            query = query.Where(d => d.SearchBlob.Contains(needle, StringComparison.Ordinal));
+        }
 
         Dungeons.Clear();
         foreach (var dungeon in query)
