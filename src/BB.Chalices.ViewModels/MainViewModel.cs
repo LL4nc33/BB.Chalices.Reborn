@@ -771,12 +771,8 @@ public class MainViewModel : ViewModelBase
         if (!HasLoadedSave) { StatusMessage = "Open a save first."; return; }
         if (SelectedDungeon is null) { StatusMessage = "Pick a dungeon from the list first."; return; }
 
-        foreach (var target in Slots)
-        {
-            _saves.SetSlot(target.Number, SelectedDungeon.Bytes);
-            RefreshSlot(target);
-        }
-        LoadSelectedSlot();
+        byte[] bytes = SelectedDungeon.Bytes;
+        WriteSlots(Slots.Select(s => s.Number).ToList(), _ => bytes);
         StatusMessage = $"Filled all {Slots.Count} slots with {SelectedDungeon.Glyph}. Save to write to disk.";
     }
 
@@ -813,6 +809,20 @@ public class MainViewModel : ViewModelBase
         RefreshSlot(SelectedSlot);
         LoadSelectedSlot();
         StatusMessage = $"Built dungeon placed in slot {SelectedSlot.Number}. Save to write it to disk.";
+    }
+
+    // Write a run of altar slots and refresh them, then reload the selected slot once.
+    // Used by fill-all, altar paste and apply-list so the loop lives in one place.
+    private void WriteSlots(IReadOnlyList<int> targets, Func<int, byte[]> recordFor)
+    {
+        for (int i = 0; i < targets.Count; i++)
+        {
+            _saves.SetSlot(targets[i], recordFor(i));
+            SlotViewModel? slot = Slots.FirstOrDefault(s => s.Number == targets[i]);
+            if (slot is not null)
+                RefreshSlot(slot);
+        }
+        LoadSelectedSlot();
     }
 
     // Copy the selected slot's 125-byte record as a hex string for the clipboard.
@@ -890,15 +900,7 @@ public class MainViewModel : ViewModelBase
         }
 
         byte[] all = Convert.FromHexString(compact);
-        for (int i = 0; i < targets.Length; i++)
-        {
-            byte[] record = all[(i * DungeonStructure.Size)..((i + 1) * DungeonStructure.Size)];
-            _saves.SetSlot(targets[i], record);
-            SlotViewModel? target = Slots.FirstOrDefault(s => s.Number == targets[i]);
-            if (target is not null)
-                RefreshSlot(target);
-        }
-        LoadSelectedSlot();
+        WriteSlots(targets, i => all[(i * DungeonStructure.Size)..((i + 1) * DungeonStructure.Size)]);
         StatusMessage = $"Pasted {targets.Length} altar slots. Save to write them to disk.";
     }
 
@@ -1016,14 +1018,8 @@ public class MainViewModel : ViewModelBase
         }
 
         int count = Math.Min(AltarOrder.Length, SelectedList.Items.Count);
-        for (int i = 0; i < count; i++)
-        {
-            _saves.SetSlot(AltarOrder[i], SelectedList.Items[i].Dungeon.Bytes);
-            SlotViewModel? target = Slots.FirstOrDefault(s => s.Number == AltarOrder[i]);
-            if (target is not null)
-                RefreshSlot(target);
-        }
-        LoadSelectedSlot();
+        var items = SelectedList.Items;
+        WriteSlots(AltarOrder[..count], i => items[i].Dungeon.Bytes);
         StatusMessage = count < SelectedList.Items.Count
             ? $"Applied the first {count} of {SelectedList.Items.Count} to the altar. Save to write."
             : $"Applied {count} dungeons to the altar. Save to write.";
