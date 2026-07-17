@@ -822,7 +822,7 @@
                     <Border Grid.Column="0" Width="250" Background="{DynamicResource BgPanel}"
                             BorderBrush="{DynamicResource Edge}" BorderThickness="0,0,1,0">
                         <ScrollViewer>
-                            <StackPanel Margin="20" Spacing="1" TextElement.FontFamily="Georgia, Cambria, 'Times New Roman', serif">
+                            <StackPanel Margin="20" Spacing="5" TextElement.FontFamily="Georgia, Cambria, 'Times New Roman', serif">
                                 <TextBlock Classes="section" Text="CONTENTS" />
                                 <Button Classes="toc" Tag="Ch1" Click="OnGuideNavigate" Content="1  Before you begin" />
                                 <Button Classes="toc" Tag="Ch2" Click="OnGuideNavigate" Content="2  Getting started" />
@@ -842,7 +842,7 @@
 
                     <!-- The manual itself -->
                     <ScrollViewer Grid.Column="1">
-                        <StackPanel Margin="40,28,40,60" MaxWidth="840" HorizontalAlignment="Left" Spacing="0"
+                        <StackPanel Margin="56,36,56,72" MaxWidth="720" HorizontalAlignment="Left" Spacing="0"
                                     TextElement.FontFamily="Georgia, Cambria, 'Times New Roman', serif">
 
                             <TextBlock Classes="manualH1" Text="BB.Chalices Reborn" />
@@ -850,6 +850,7 @@
                             <TextBlock Classes="manualLede" TextWrapping="Wrap"
                                        Text="This book is here to keep your chalice dungeons alive. It walks you from opening a save through placing, building and sharing dungeons, and it never assumes you have done any of this before. Read it front to back the first time, or jump to a chapter from the list on the left. Nothing you do here touches your game until you press Save changes, and a backup is always made first. So relax, and let us get to work." />
 
+                            <Border Classes="chapterRule" />
                             <TextBlock x:Name="Ch1" Classes="manualH2" Text="1  Before you begin" />
                             <TextBlock Classes="manualH3" Text="What this tool is" />
                             <TextBlock Classes="manualBody"
@@ -862,6 +863,7 @@
                                            Text="Golden rule: the app only writes to your save when you press Save changes, and it copies the old save into Backups first. If a change ever looks wrong, you can put the old one back in two clicks (Chapter 9)." />
                             </Border>
 
+                            <Border Classes="chapterRule" />
                             <TextBlock x:Name="Ch2" Classes="manualH2" Text="2  Getting started" />
                             <TextBlock Classes="manualH3" Text="Opening your save" />
                             <TextBlock Classes="manualBody"
@@ -877,6 +879,7 @@
                             <TextBlock Classes="manualBody"
                                        Text="The window has three columns. The left is the sidebar: navigation, text size, and the save controls. The middle is your workspace: the catalogue, or the dungeon builder. The right is the editor, showing whichever altar slot you are working on. You can drag the dividers between columns to resize them, and set the text size of each column independently in the sidebar under TEXT SIZE." />
 
+                            <Border Classes="chapterRule" />
                             <TextBlock x:Name="Ch3" Classes="manualH2" Text="3  Bloodborne in five minutes" />
                             <TextBlock Classes="manualBody"
                                        Text="If you already know your Depth 5 root chalices from your Fetid rites, skip ahead. If not, here is everything the rest of this book leans on." />
@@ -899,6 +902,7 @@
                             <TextBlock Classes="manualBody"
                                        Text="Every shared dungeon in the game has a glyph, a short code like 8pwunh82. In the catalogue you can search by glyph to find a specific known dungeon in an instant." />
 
+                            <Border Classes="chapterRule" />
                             <TextBlock x:Name="Ch4" Classes="manualH2" Text="4  The catalogue and your lists" />
                             <TextBlock Classes="manualBody"
                                        Text="The middle column is your catalogue: a browsable shelf of dungeons. Above it sits the list picker, which decides which shelf you are looking at." />
@@ -916,6 +920,7 @@
                             <TextBlock Classes="manualBody"
                                        Text="Apply list (below the catalogue) writes a list's dungeons onto your altar in order: the six stored slots first, then the makeshift slot. It is the fastest way to load a whole farming set at once. As always, nothing reaches disk until you Save changes." />
 
+                            <Border Classes="chapterRule" />
                             <TextBlock x:Name="Ch5" Classes="manualH2" Text="5  Placing dungeons on the altar" />
                             <TextBlock Classes="manualBody" Text="There are three ways to get a dungeon into a slot. Pick whichever suits the moment." />
                             <TextBlock Classes="manualH3" Text="Into one chosen slot" />
@@ -929,6 +934,7 @@
                             <TextBlock Classes="manualBody"
                                        Text="Right-click any altar slot to copy it, paste another dungeon over it, clear it, or Save to My dungeons so you can find that exact dungeon again later. When you place a dungeon, the editor jumps to that slot so you can see what landed." />
 
+                            <Border Classes="chapterRule" />
                             <TextBlock x:Name="Ch6" Classes="manualH2" Text="6  Building your own dungeon" />
                             <TextBlock Classes="manualBody"
                                        Text="Press Build new (below the catalogue) and the middle column becomes a workbench. The editor stays on the right, so you can place what you build straight away." />
@@ -943,6 +949,7 @@
                                            Text="Farming tip: fix the area and variant, then spin Random and watch the gem pool. When it names your gem, place it and go. This is the quickest path to a farming dungeon." />
                             </Border>
 
+                            <Border Classes="chapterRule" />
                             <TextBlock x:Name="Ch7" Classes="manualH2" Text="7  The editor" />
                             <TextBlock Classes="manualBody"
                                        Text="The right column edits whichever slot is selected. It has two tabs." />
@@ -956,6 +963,7 @@
                             <TextBlock Classes="manualBody"
                                        Text="At the bottom the editor shows the raw 125 bytes of the slot, updating as you change things. It is a window onto the truth of the save. To copy, paste or save those bytes, right-click the slot (Chapter 5); the old on-screen buttons were retired in favour of that menu." />
 
+                            <Border Classes="chapterRule" />
                             <TextBlock x:Name="Ch8" Classes="manualH2" Text="8  Sharing dungeons and lists" />
                             <TextBlock Classes="manualBody"
                                        Text="Sharing works entirely offline. No server, no account: a dungeon or a whole list turns into a short code you can send by any means, and back again." />
@@ -968,6 +976,7 @@
                             <TextBlock Classes="manualBody"
                                        Text="Imported dungeons are just data; they cannot harm your save. They sit in a list until you choose to place them." />
 
+                            <Border Classes="chapterRule" />
                             <TextBlock x:Name="Ch9" Classes="manualH2" Text="9  Backups and safety" />
                             <TextBlock Classes="manualBody"
                                        Text="This is the chapter that lets you experiment without fear. Open the Backups tab from the sidebar." />
@@ -981,6 +990,7 @@
                             <TextBlock Classes="manualBody"
                                        Text="By default backups live in a Backups folder inside the app's data folder, so they travel with the portable app. You can point them elsewhere with Browse if you prefer." />
 
+                            <Border Classes="chapterRule" />
                             <TextBlock x:Name="Ch10" Classes="manualH2" Text="10  Settings" />
                             <TextBlock Classes="manualBody"
                                        Text="The Settings tab holds the few things you set once and forget." />
@@ -988,6 +998,7 @@
                             <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">-</Run><Run Text="  Dungeon catalogue: the source the catalogue is seeded from. Most people never touch this." /></TextBlock>
                             <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">-</Run><Run Text="  Text size lives in the sidebar, not here: the drop-down chooses which column the minus and plus buttons resize, or All for every column at once." /></TextBlock>
 
+                            <Border Classes="chapterRule" />
                             <TextBlock x:Name="Ch11" Classes="manualH2" Text="11  If something goes wrong" />
                             <TextBlock Classes="manualH3" Text="Detect finds nothing" />
                             <TextBlock Classes="manualBody"
@@ -1002,6 +1013,7 @@
                             <TextBlock Classes="manualBody"
                                        Text="Make sure you copied the whole code, including its prefix. A partial code cannot be read. For big sets, ask for the .bbc file and drag it onto the window instead." />
 
+                            <Border Classes="chapterRule" />
                             <TextBlock x:Name="Ch12" Classes="manualH2" Text="12  A word on the numbers" />
                             <TextBlock Classes="manualBody"
                                        Text="Under every friendly name in this app is a small, exact piece of the save: each dungeon is 125 bytes, each slot a fixed place in the file. This tool's whole job is to change those bytes correctly and leave the rest untouched. That is why it always backs up first, why it writes only when you tell it to, and why it shows you the live bytes: so you can trust what it does. Treat your saves kindly, keep a backup, and enjoy the hunt." />
