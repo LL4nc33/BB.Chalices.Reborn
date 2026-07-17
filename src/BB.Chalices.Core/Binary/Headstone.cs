@@ -232,6 +232,35 @@ public static class Headstone
         return result;
     }
 
+    // --- Record-level field writers -----------------------------------------
+    // One place that stamps a rite or effect into a 125-byte record. Both the
+    // slot editor (via SaveFileService) and the dungeon builder call these, so
+    // the byte math lives here once. Each is a no-op when the field isn't valid
+    // for this dungeon type, matching what the editor allows.
+    public static void ApplyRite(byte[] record, int index, Rite rite) =>
+        RiteBytes(rite).CopyTo(record, RiteSlotOffsets[index]);
+
+    public static void ApplyPoison(byte[] record, bool enabled) =>
+        SmartPoison(record, enabled).CopyTo(record, PoisonOffset);
+
+    public static void ApplyFourthLayer(byte[] record, bool open)
+    {
+        var (possible, openByte, closedByte) = FourthLayerControl(record);
+        if (!possible)
+            return;
+        FourthLayerBytes(open ? openByte : closedByte).CopyTo(record, FourthLayerOffset);
+    }
+
+    public static void ApplyDifficulty(byte[] record, bool up)
+    {
+        if (!DifficultyPossible(record))
+            return;
+        DifficultyBytes(up).CopyTo(record, GemEffectOffset);
+    }
+
+    public static void ApplySpecialEnemy(byte[] record, SpecialEnemy option) =>
+        SmartSpecialEnemy(record, option).CopyTo(record, SpecialEnemyOffset);
+
     // The chalice an edited dungeon claims to require, decoded from its join hex
     // (from the Tomb Prospectors Hex Research Central join-requirements table).
     public static string JoinRequirementsLabel(string joinHex) => joinHex switch

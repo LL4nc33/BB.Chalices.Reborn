@@ -275,13 +275,11 @@ public class MainViewModel : ViewModelBase
         {
             this.RaiseAndSetIfChanged(ref _hasLoadedSave, value);
             this.RaisePropertyChanged(nameof(CanPlaceDungeon));
-            this.RaisePropertyChanged(nameof(CanApplyList));
         }
     }
 
     // Gate the primary buttons so they aren't clickable when they'd only print a hint.
     public bool CanPlaceDungeon => HasLoadedSave && HasSelectedDungeon;
-    public bool CanApplyList => HasLoadedSave && SelectedListHasItems;
 
     public string StatusMessage
     {
@@ -707,7 +705,6 @@ public class MainViewModel : ViewModelBase
             this.RaisePropertyChanged(nameof(ShowEmptyListHint));
             this.RaisePropertyChanged(nameof(CanEditSelectedList));
             this.RaisePropertyChanged(nameof(SelectedListHasItems));
-            this.RaisePropertyChanged(nameof(CanApplyList));
             RebuildCategories();
         }
     }
@@ -1119,29 +1116,6 @@ public class MainViewModel : ViewModelBase
         await LoadDungeonsAsync();
         SelectedList = Lists.FirstOrDefault(l => l.Id == list.Id) ?? SelectedList;
         StatusMessage = $"Saved the altar as list \"{name}\".";
-    }
-
-    // Write the selected list's dungeons onto the altar: the real slots 1-6 first, then
-    // the makeshift altar for a seventh entry.
-    public void ApplyListToAltar()
-    {
-        if (!HasLoadedSave)
-        {
-            StatusMessage = "Open a save first.";
-            return;
-        }
-        if (SelectedList is null || SelectedList.Items.Count == 0)
-        {
-            StatusMessage = "Pick a non-empty list.";
-            return;
-        }
-
-        int count = Math.Min(AltarOrder.Length, SelectedList.Items.Count);
-        var items = SelectedList.Items;
-        WriteSlots(AltarOrder[..count], i => items[i].Dungeon.Bytes);
-        StatusMessage = count < SelectedList.Items.Count
-            ? $"Applied the first {count} of {SelectedList.Items.Count} to the altar. Save to write."
-            : $"Applied {count} dungeons to the altar. Save to write.";
     }
 
     // The selected catalogue dungeon as a one-item share code (for right-click "copy code").

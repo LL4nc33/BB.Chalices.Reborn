@@ -6,18 +6,22 @@ using ReactiveUI;
 namespace BB.Chalices.ViewModels;
 
 // Builds a fresh dungeon from friendly parameters. It draws a known-good base for
-// the chosen area from the catalogue, so the result keeps a valid serial, and only
-// the structural bytes are changed. Rites and effects are then set in the editor.
+// the chosen area from the catalogue, so the result keeps a valid serial, then sets
+// the structural bytes plus any rites and effects you pick, all before it is placed.
 public class DungeonBuilderViewModel : ViewModelBase
 {
     private readonly DungeonService _dungeons;
     private Dictionary<byte, byte[]> _basesByArea = new();
+    // Guards UpdatePreview from re-entering itself while it refreshes effect state.
+    private bool _applying;
 
     public DungeonBuilderViewModel(DungeonService dungeons)
     {
         _dungeons = dungeons;
         Areas = new ObservableCollection<DungeonBuilder.Area>(DungeonBuilder.Areas);
         Variants = new ObservableCollection<DungeonBuilder.Variant>(Enum.GetValues<DungeonBuilder.Variant>());
+        RiteSlots = new ObservableCollection<RiteSlotViewModel>(
+            Enumerable.Range(0, 4).Select(i => new RiteSlotViewModel(i, (_, __) => UpdatePreview())));
         _selectedArea = Areas[^1]; // Isz 5, the usual gem-farming area
         _selectedVariant = DungeonBuilder.Variant.Normal;
     }
@@ -84,6 +88,29 @@ public class DungeonBuilderViewModel : ViewModelBase
     private string _previewRequires = string.Empty;
     public string PreviewRequires { get => _previewRequires; private set => this.RaiseAndSetIfChanged(ref _previewRequires, value); }
 
+    // --- Rites and effects: stamped onto the built record before it is placed ---
+
+    public ObservableCollection<RiteSlotViewModel> RiteSlots { get; }
+
+    private bool _poisonPossible;
+    public bool PoisonPossible { get => _poisonPossible; private set => this.RaiseAndSetIfChanged(ref _poisonPossible, value); }
+    private bool _poisonEnabled;
+    public bool PoisonEnabled { get => _poisonEnabled; set { this.RaiseAndSetIfChanged(ref _poisonEnabled, value); if (!_applying) UpdatePreview(); } }
+
+    private bool _fourthLayerPossible;
+    public bool FourthLayerPossible { get => _fourthLayerPossible; private set => this.RaiseAndSetIfChanged(ref _fourthLayerPossible, value); }
+    private bool _fourthLayerOpen;
+    public bool FourthLayerOpen { get => _fourthLayerOpen; set { this.RaiseAndSetIfChanged(ref _fourthLayerOpen, value); if (!_applying) UpdatePreview(); } }
+
+    private bool _difficultyPossible;
+    public bool DifficultyPossible { get => _difficultyPossible; private set => this.RaiseAndSetIfChanged(ref _difficultyPossible, value); }
+    private bool _difficultyUp;
+    public bool DifficultyUp { get => _difficultyUp; set { this.RaiseAndSetIfChanged(ref _difficultyUp, value); if (!_applying) UpdatePreview(); } }
+
+    public ObservableCollection<Headstone.SpecialEnemy> SpecialEnemyOptions { get; } = new();
+    private Headstone.SpecialEnemy? _selectedSpecialEnemy;
+    public Headstone.SpecialEnemy? SelectedSpecialEnemy { get => _selectedSpecialEnemy; set { this.RaiseAndSetIfChanged(ref _selectedSpecialEnemy, value); if (!_applying) UpdatePreview(); } }
+
     // Jump to a random layout number so farmers can roll through coffins/gems quickly.
     public void RandomLayout() => DungeonNumber = System.Random.Shared.Next(0, 100);
 
@@ -112,16 +139,46 @@ public class DungeonBuilderViewModel : ViewModelBase
     private void UpdatePreview()
     {
         var record = Build();
-        _record = record;
-        this.RaisePropertyChanged(nameof(CanPlace));
 
         if (record is null)
         {
+            _record = null;
+            this.RaisePropertyChanged(nameof(CanPlace));
             PreviewRequires = string.Empty;
             PreviewCoffin = PreviewGems = null;
+            PoisonPossible = FourthLayerPossible = DifficultyPossible = false;
+            SpecialEnemyOptions.Clear();
             Status = $"No base dungeon for {SelectedArea.Name} is in the catalogue yet.";
             return;
         }
+
+        // Stamp the chosen rites first, so the effect options match the rited dungeon.
+        foreach (var rite in RiteSlots)
+            Headstone.ApplyRite(record, rite.Index, rite.Rite);
+
+        // Refresh which effects this dungeon supports, and its special-enemy choices.
+        _applying = true;
+        PoisonPossible = Headstone.PoisonPossible(record);
+        FourthLayerPossible = Headstone.FourthLayerPossible(record);
+        DifficultyPossible = Headstone.DifficultyPossible(record);
+
+        var natural = Headstone.ReadSpecialEnemy(record);
+        SpecialEnemyOptions.Clear();
+        foreach (var option in Headstone.SpecialEnemyOptions(record))
+            SpecialEnemyOptions.Add(option);
+        if (SelectedSpecialEnemy is null || !SpecialEnemyOptions.Contains(SelectedSpecialEnemy.Value))
+            SelectedSpecialEnemy = SpecialEnemyOptions.Contains(natural) ? natural
+                : SpecialEnemyOptions.Count > 0 ? SpecialEnemyOptions[0] : null;
+        _applying = false;
+
+        // Stamp the effect choices (each a no-op when not valid for this dungeon).
+        if (PoisonPossible) Headstone.ApplyPoison(record, PoisonEnabled);
+        if (FourthLayerPossible) Headstone.ApplyFourthLayer(record, FourthLayerOpen);
+        if (DifficultyPossible) Headstone.ApplyDifficulty(record, DifficultyUp);
+        if (SelectedSpecialEnemy is not null) Headstone.ApplySpecialEnemy(record, SelectedSpecialEnemy.Value);
+
+        _record = record;
+        this.RaisePropertyChanged(nameof(CanPlace));
 
         PreviewCoffin = record.Length > 3 ? DungeonGroups.UniqueItem(record[1], record[2], record[3]) : null;
         PreviewGems = GemPool.Favoured(record) is { Length: > 0 } gems ? gems : null;

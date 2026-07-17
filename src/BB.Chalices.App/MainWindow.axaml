@@ -324,17 +324,14 @@
                                 </StackPanel>
                             </StackPanel>
                         </Border>
-                        <Grid Grid.Row="4" ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="8" Margin="0,16,0,0">
+                        <Grid Grid.Row="4" ColumnDefinitions="Auto,Auto,*" ColumnSpacing="8" Margin="0,16,0,0">
                             <Button Grid.Column="0" Content="Build new" Click="OnBuilderClick"
                                     IsEnabled="{Binding HasLoadedSave}"
                                     ToolTip.Tip="Generate a dungeon by area, variant and layout" />
                             <Button Grid.Column="1" Content="Fill all" Command="{Binding FillAllSlotsCommand}"
                                     IsEnabled="{Binding CanPlaceDungeon}"
                                     ToolTip.Tip="Put the selected dungeon in every slot at once (makeshift + the six stored, e.g. to farm the same gems). Save to write to disk." />
-                            <Button Grid.Column="2" Content="Apply list" Click="OnApplyList"
-                                    IsEnabled="{Binding CanApplyList}"
-                                    ToolTip.Tip="Write the current list's dungeons onto the real six slots (then the makeshift altar). Save to write to disk." />
-                            <Button Grid.Column="3" Classes="primary" Content="PLACE IN SELECTED SLOT"
+                            <Button Grid.Column="2" Classes="primary" Content="PLACE IN SELECTED SLOT"
                                     Command="{Binding ApplyDungeonCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                                     IsEnabled="{Binding CanPlaceDungeon}"
                                     ToolTip.Tip="Stage the selected dungeon in the chosen slot. Click Save changes to write it to disk." />
@@ -404,6 +401,59 @@
                                     <TextBlock Classes="caption"
                                                Text="No base for this area is in the catalogue yet."
                                                IsVisible="{Binding !CanPlace}" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Rites and effects, stamped onto the dungeon before it is placed -->
+                            <Border Classes="card" IsVisible="{Binding CanPlace}">
+                                <StackPanel Spacing="6" Margin="8">
+                                    <TextBlock Classes="section" Text="RITES AND EFFECTS (OPTIONAL)"
+                                               ToolTip.Tip="Set rites and modifiers now, so the dungeon is ready the moment you place it." />
+                                    <ItemsControl ItemsSource="{Binding RiteSlots}" Margin="0,0,0,8">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Columns="2" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:RiteSlotViewModel">
+                                                <Border BorderThickness="3,0,0,0" Margin="0,0,12,8" Padding="8,0,0,0"
+                                                        BorderBrush="{Binding Index, Converter={x:Static app:RiteColorConverter.Instance}}"
+                                                        ToolTip.Tip="Set a rite (Fetid, Rotted, Cursed or Sinister), or None to remove it">
+                                                    <Grid ColumnDefinitions="44,*">
+                                                        <TextBlock Grid.Column="0" Classes="caption" Text="{Binding Label}" VerticalAlignment="Center" />
+                                                        <ComboBox Grid.Column="1" ItemsSource="{Binding Options}"
+                                                                  SelectedItem="{Binding Rite}" HorizontalAlignment="Stretch" />
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock Classes="section" Text="MODIFIERS"
+                                               ToolTip.Tip="Only certain dungeon types support poison, a 4th layer or a difficulty buff." />
+                                    <WrapPanel>
+                                        <CheckBox Content="Poison" IsChecked="{Binding PoisonEnabled}" IsEnabled="{Binding PoisonPossible}"
+                                                  VerticalAlignment="Center" Margin="0,0,16,0"
+                                                  ToolTip.Tip="Toggle the poison mist (only some dungeon types)" />
+                                        <CheckBox Content="Open 4th layer" IsChecked="{Binding FourthLayerOpen}" IsEnabled="{Binding FourthLayerPossible}"
+                                                  VerticalAlignment="Center" Margin="0,0,16,0"
+                                                  ToolTip.Tip="Open or close the optional 4th layer (only some dungeons)" />
+                                        <CheckBox Content="Difficulty up" IsChecked="{Binding DifficultyUp}" IsEnabled="{Binding DifficultyPossible}"
+                                                  VerticalAlignment="Center"
+                                                  ToolTip.Tip="Pthumeru 5 only: buffs enemy HP, damage and defence." />
+                                    </WrapPanel>
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" Margin="0,4,0,0">
+                                        <TextBlock Grid.Column="0" Classes="caption" Text="Special enemy" VerticalAlignment="Center" />
+                                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
+                                                  ItemsSource="{Binding SpecialEnemyOptions}" SelectedItem="{Binding SelectedSpecialEnemy}"
+                                                  ToolTip.Tip="Bath messengers, Patches the Spider or Beast-Possessed Souls. Sinister chalices can't spawn BPS.">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:CompileBindings="False">
+                                                    <TextBlock Text="{Binding Converter={x:Static app:SpecialEnemyLabelConverter.Instance}}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </Grid>
                                 </StackPanel>
                             </Border>
 
@@ -916,9 +966,9 @@
                             <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">1</Run><Run Text="  Press the + button next to the list picker to create a new, empty list and name it." /></TextBlock>
                             <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">2</Run><Run Text="  With one of your own lists chosen, Rename and Delete appear. Built-in lists never show them." /></TextBlock>
                             <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">3</Run><Run Text="  To add the selected dungeon to a list, use its add to list link, or right-click it in the catalogue. You can create a new list on the spot from the same menu." /></TextBlock>
-                            <TextBlock Classes="manualH3" Text="Applying a list to your altar" />
+                            <TextBlock Classes="manualH3" Text="Saving your altar as a list" />
                             <TextBlock Classes="manualBody"
-                                       Text="Apply list (below the catalogue) writes a list's dungeons onto your altar in order: the six stored slots first, then the makeshift slot. It is the fastest way to load a whole farming set at once. As always, nothing reaches disk until you Save changes." />
+                                       Text="Save altar (next to the list picker) turns your current altar - the dungeons in its filled slots - into a new list, so you can keep a loadout, share it, or come back to it later. To put dungeons onto the altar, place them from the catalogue (Chapter 5) or build them (Chapter 6)." />
 
                             <Border Classes="chapterRule" />
                             <TextBlock x:Name="Ch5" Classes="manualH2" Text="5  Placing dungeons on the altar" />
@@ -943,7 +993,8 @@
                             <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">2</Run><Run Text="  Pick a Variant: Normal, Defiled or Sinister. On Depth 4 and 5 you can also tick the second layout set for a hundred more dungeons." /></TextBlock>
                             <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">3</Run><Run Text="  Set the Layout number, or press Random. This is the dial that changes the whole dungeon, and with it the coffin and gem pool shown in the preview." /></TextBlock>
                             <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">4</Run><Run Text="  Read the preview card. Watch the Coffin and Gem pool lines. Roll Random until you see the loot you want." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">5</Run><Run Text="  Send it out: Place in slot puts it on the altar, Add to list files it away, and Save to My dungeons keeps it under a name. Use back to catalogue when you are done." /></TextBlock>
+                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">5</Run><Run Text="  Optionally set rites and effects in the card below the preview: up to four rites, plus poison, the 4th layer, a difficulty buff and a special enemy. Options that this dungeon type does not support are greyed out. They are stamped on before you place, so the dungeon is ready to go." /></TextBlock>
+                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">6</Run><Run Text="  Send it out: Place in slot puts it on the altar, Add to list files it away, and Save to My dungeons keeps it under a name. Use back to catalogue when you are done." /></TextBlock>
                             <Border Classes="manualNote">
                                 <TextBlock Classes="manualBody" Margin="0"
                                            Text="Farming tip: fix the area and variant, then spin Random and watch the gem pool. When it names your gem, place it and go. This is the quickest path to a farming dungeon." />
@@ -955,7 +1006,7 @@
                                        Text="The right column edits whichever slot is selected. It has two tabs." />
                             <TextBlock Classes="manualH3" Text="Rites" />
                             <TextBlock Classes="manualBody"
-                                       Text="Rites are the modifiers stamped on a dungeon: cursed, fetid, rotted and the rest. Toggle them here to change how a placed dungeon behaves without rebuilding it from scratch." />
+                                       Text="Rites are the modifiers stamped on a dungeon: cursed, fetid, rotted and the rest, plus poison, the 4th layer, a difficulty buff and the special enemy. Toggle them here to change how an already placed dungeon behaves without rebuilding it. (The builder offers the same controls if you would rather set them before placing.)" />
                             <TextBlock Classes="manualH3" Text="Strings" />
                             <TextBlock Classes="manualBody"
                                        Text="The Strings tab shows the readable text fields tied to the slot. Most players never need it, but it is there when you do." />

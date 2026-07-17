@@ -357,11 +357,6 @@ public partial class MainWindow : Window
             await viewModel.RemoveSelectedFromListAsync();
     }
 
-    private void OnApplyList(object? sender, RoutedEventArgs e)
-    {
-        if (DataContext is MainViewModel viewModel)
-            viewModel.ApplyListToAltar();
-    }
 
     private void OnSaveSettings(object? sender, RoutedEventArgs e)
     {

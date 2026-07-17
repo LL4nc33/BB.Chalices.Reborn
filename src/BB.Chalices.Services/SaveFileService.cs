@@ -98,41 +98,35 @@ public class SaveFileService
     public void SetRite(int slot, int riteIndex, Headstone.Rite rite)
     {
         var record = Loaded.GetSlotBytes(slot);
-        Headstone.RiteBytes(rite).CopyTo(record, Headstone.RiteSlotOffsets[riteIndex]);
+        Headstone.ApplyRite(record, riteIndex, rite);
         Loaded.WriteSlotRaw(slot, record);
     }
 
     public void SetPoison(int slot, bool enabled)
     {
         var record = Loaded.GetSlotBytes(slot);
-        Headstone.SmartPoison(record, enabled).CopyTo(record, Headstone.PoisonOffset);
+        Headstone.ApplyPoison(record, enabled);
         Loaded.WriteSlotRaw(slot, record);
     }
 
     public void SetFourthLayer(int slot, bool open)
     {
         var record = Loaded.GetSlotBytes(slot);
-        var (possible, openByte, closedByte) = Headstone.FourthLayerControl(record);
-        if (!possible)
-            return;
-
-        Headstone.FourthLayerBytes(open ? openByte : closedByte).CopyTo(record, Headstone.FourthLayerOffset);
+        Headstone.ApplyFourthLayer(record, open);
         Loaded.WriteSlotRaw(slot, record);
     }
 
     public void SetSpecialEnemy(int slot, Headstone.SpecialEnemy option)
     {
         var record = Loaded.GetSlotBytes(slot);
-        Headstone.SmartSpecialEnemy(record, option).CopyTo(record, Headstone.SpecialEnemyOffset);
+        Headstone.ApplySpecialEnemy(record, option);
         Loaded.WriteSlotRaw(slot, record);
     }
 
     public void SetDifficulty(int slot, bool difficultyUp)
     {
         var record = Loaded.GetSlotBytes(slot);
-        if (!Headstone.DifficultyPossible(record))
-            return;
-        Headstone.DifficultyBytes(difficultyUp).CopyTo(record, Headstone.GemEffectOffset);
+        Headstone.ApplyDifficulty(record, difficultyUp);
         Loaded.WriteSlotRaw(slot, record);
     }
 
