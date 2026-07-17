@@ -117,8 +117,8 @@
                         <Grid>
                             <Border Width="3" HorizontalAlignment="Left" Background="{DynamicResource Blood}"
                                     IsVisible="{Binding IsGuideView}" />
-                            <Button Classes="nav" Classes.active="{Binding IsGuideView}" Content="User guide" Click="OnShowGuide"
-                                    ToolTip.Tip="The full manual: what everything is and how to do it, step by step" />
+                            <Button Classes="nav" Classes.active="{Binding IsGuideView}" Content="Quick start" Click="OnShowGuide"
+                                    ToolTip.Tip="A short cheat sheet: the essentials on one screen" />
                         </Grid>
 
                         <Border Height="1" Background="{DynamicResource Edge}" Margin="0,8,0,0" />
@@ -861,217 +861,62 @@
                 </Grid>
                 </LayoutTransformControl>
 
-                <!-- User guide: a full workshop-style manual, contents on the left -->
+                <!-- Quick start: a compact one-screen cheat sheet -->
                 <LayoutTransformControl IsVisible="{Binding IsGuideView}">
                     <LayoutTransformControl.LayoutTransform>
                         <ScaleTransform ScaleX="{Binding CatalogueScale}" ScaleY="{Binding CatalogueScale}" />
                     </LayoutTransformControl.LayoutTransform>
-                <Grid ColumnDefinitions="Auto,*">
+                    <ScrollViewer>
+                        <StackPanel Margin="32,28,32,48" MaxWidth="680" HorizontalAlignment="Left" Spacing="18">
 
-                    <!-- Contents -->
-                    <Border Grid.Column="0" Width="250" Background="{DynamicResource BgPanel}"
-                            BorderBrush="{DynamicResource Edge}" BorderThickness="0,0,1,0">
-                        <ScrollViewer>
-                            <StackPanel Margin="20" Spacing="5" TextElement.FontFamily="Georgia, Cambria, 'Times New Roman', serif">
-                                <TextBlock Classes="section" Text="CONTENTS" />
-                                <Button Classes="toc" Tag="Ch1" Click="OnGuideNavigate" Content="1  Before you begin" />
-                                <Button Classes="toc" Tag="Ch2" Click="OnGuideNavigate" Content="2  Getting started" />
-                                <Button Classes="toc" Tag="Ch3" Click="OnGuideNavigate" Content="3  Bloodborne in five minutes" />
-                                <Button Classes="toc" Tag="Ch4" Click="OnGuideNavigate" Content="4  The catalogue and your lists" />
-                                <Button Classes="toc" Tag="Ch5" Click="OnGuideNavigate" Content="5  Placing dungeons on the altar" />
-                                <Button Classes="toc" Tag="Ch6" Click="OnGuideNavigate" Content="6  Building your own dungeon" />
-                                <Button Classes="toc" Tag="Ch7" Click="OnGuideNavigate" Content="7  The editor" />
-                                <Button Classes="toc" Tag="Ch8" Click="OnGuideNavigate" Content="8  Sharing dungeons and lists" />
-                                <Button Classes="toc" Tag="Ch9" Click="OnGuideNavigate" Content="9  Backups and safety" />
-                                <Button Classes="toc" Tag="Ch10" Click="OnGuideNavigate" Content="10  Settings" />
-                                <Button Classes="toc" Tag="Ch11" Click="OnGuideNavigate" Content="11  If something goes wrong" />
-                                <Button Classes="toc" Tag="Ch12" Click="OnGuideNavigate" Content="12  A word on the numbers" />
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="title" Text="Quick start" />
+                                <TextBlock Classes="caption" TextWrapping="Wrap"
+                                           Text="Everything you do here is staged only. Nothing touches your save until you press Save changes, and a backup is made first." />
                             </StackPanel>
-                        </ScrollViewer>
-                    </Border>
 
-                    <!-- The manual itself -->
-                    <ScrollViewer Grid.Column="1">
-                        <StackPanel Margin="56,36,56,72" MaxWidth="720" HorizontalAlignment="Left" Spacing="0"
-                                    TextElement.FontFamily="Georgia, Cambria, 'Times New Roman', serif">
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="section" Text="OPEN YOUR SAVE" />
+                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Detect finds your shadPS4 characters, or Open (Ctrl+O) picks a file." />
+                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  If a red Fix sound crash button appears, press it once. It patches the shadPS4 audio crash and backs up first." />
+                            </StackPanel>
 
-                            <TextBlock Classes="manualH1" Text="BB.Chalices Reborn" />
-                            <TextBlock Classes="section" Text="OWNER'S MANUAL AND WORKSHOP GUIDE" Margin="0,4,0,14" />
-                            <TextBlock Classes="manualLede" TextWrapping="Wrap"
-                                       Text="This book is here to keep your chalice dungeons alive. It walks you from opening a save through placing, building and sharing dungeons, and it never assumes you have done any of this before. Read it front to back the first time, or jump to a chapter from the list on the left. Nothing you do here touches your game until you press Save changes, and a backup is always made first. So relax, and let us get to work." />
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="section" Text="PLACE A DUNGEON" />
+                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Pick a dungeon, pick a slot (M or 1 to 6), then Place in selected slot. Or right-click a dungeon for a slot menu." />
+                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Fill all fills every slot. Right-click a slot to copy, paste, clear or save it. Save changes writes to disk." />
+                            </StackPanel>
 
-                            <Border Classes="chapterRule" />
-                            <TextBlock x:Name="Ch1" Classes="manualH2" Text="1  Before you begin" />
-                            <TextBlock Classes="manualH3" Text="What this tool is" />
-                            <TextBlock Classes="manualBody"
-                                       Text="BB.Chalices Reborn is an editor for the chalice-dungeon altar in a Bloodborne save. Your altar has six stored slots plus one makeshift slot. This tool lets you drop hand-picked dungeons into those slots, build fresh ones, keep them in named lists, and swap them with other players. It is meant for shadPS4, the PlayStation 4 emulator." />
-                            <TextBlock Classes="manualH3" Text="Where your files live" />
-                            <TextBlock Classes="manualBody"
-                                       Text="The app is portable. Everything it owns - its settings, the dungeon catalogue, and your backups - sits in a folder named data next to the program. Move the program folder to a USB stick and your whole setup travels with it. Nothing is written to hidden corners of your system." />
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="section" Text="BUILD YOUR OWN" />
+                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Build new: pick area, variant and layout (or Random) and watch the Coffin and Gem pool change." />
+                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Optionally set rites and effects, then Place in slot, Add to list, or Save to My dungeons." />
+                            </StackPanel>
+
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="section" Text="LISTS AND SHARING" />
+                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Nox and Community are built in; press + for your own list. Save altar keeps the current altar as a list." />
+                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Share copies a list as a code; Save file writes a .bbc. Import a code, or drag a .bbc onto the window." />
+                            </StackPanel>
+
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="section" Text="BACKUPS" />
+                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Every save is backed up first. Open the Backups tab to restore or delete, or Back up now anytime." />
+                            </StackPanel>
+
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="section" Text="JARGON" />
+                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Coffin: a dungeon's fixed reward. Gem pool: the blood gems it can drop." />
+                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Depth 1 to 5: deeper is harder and better. Variants: Normal, Defiled (harder, half health), Sinister (invadable, no 4th layer)." />
+                            </StackPanel>
+
                             <Border Classes="manualNote">
-                                <TextBlock Classes="manualBody" Margin="0"
-                                           Text="Golden rule: the app only writes to your save when you press Save changes, and it copies the old save into Backups first. If a change ever looks wrong, you can put the old one back in two clicks (Chapter 9)." />
+                                <TextBlock Classes="body" Margin="0" TextWrapping="Wrap"
+                                           Text="Safety net: nothing is written until Save changes, and every save is backed up first, so you can always roll back from the Backups tab." />
                             </Border>
-
-                            <Border Classes="chapterRule" />
-                            <TextBlock x:Name="Ch2" Classes="manualH2" Text="2  Getting started" />
-                            <TextBlock Classes="manualH3" Text="Opening your save" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Look at the bottom-left of the window, under CURRENT SAVE. You have two ways in:" />
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">1</Run><Run Text="  Detect finds your shadPS4 characters by itself. Press it, then pick a character from the drop-down. This is the easy road." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">2</Run><Run Text="  Open (Ctrl+O) lets you point straight at a save file if you keep it somewhere unusual." /></TextBlock>
-                            <TextBlock Classes="manualBody"
-                                       Text="Once a save is loaded, its hunter name, level, insight and blood echoes appear at the top-left. You can edit these too; like everything else, they are written only when you Save changes." />
-                            <TextBlock Classes="manualH3" Text="The sound-crash fix" />
-                            <TextBlock Classes="manualBody"
-                                       Text="shadPS4 can crash on the chalice-dungeon sound unless a small option file is patched. If your save's folder still needs it, a red Fix sound crash button appears at the top-left. Press it once. It patches the option file for every character it finds and backs each one up first. When the button disappears, you are done." />
-                            <TextBlock Classes="manualH3" Text="Reading the window" />
-                            <TextBlock Classes="manualBody"
-                                       Text="The window has three columns. The left is the sidebar: navigation, text size, and the save controls. The middle is your workspace: the catalogue, or the dungeon builder. The right is the editor, showing whichever altar slot you are working on. You can drag the dividers between columns to resize them, and set the text size of each column independently in the sidebar under TEXT SIZE." />
-
-                            <Border Classes="chapterRule" />
-                            <TextBlock x:Name="Ch3" Classes="manualH2" Text="3  Bloodborne in five minutes" />
-                            <TextBlock Classes="manualBody"
-                                       Text="If you already know your Depth 5 root chalices from your Fetid rites, skip ahead. If not, here is everything the rest of this book leans on." />
-                            <TextBlock Classes="manualH3" Text="The altar and its slots" />
-                            <TextBlock Classes="manualBody"
-                                       Text="In the game you place a chalice on an altar to open a dungeon. Your save keeps six of these altar slots plus one makeshift slot (shown as M here). This tool writes dungeons into those seven places. A slot can hold one dungeon or be empty." />
-                            <TextBlock Classes="manualH3" Text="Coffins - the loot" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Many dungeons have a special coffin holding a fixed reward: a rune, a weapon, a specific blood gem. When a dungeon has a known coffin, this tool names it for you, so you can hunt the exact item you want instead of guessing from raw numbers." />
-                            <TextBlock Classes="manualH3" Text="Blood gems and gem pools" />
-                            <TextBlock Classes="manualBody"
-                                       Text="The deep dungeons are where players farm blood gems to strengthen weapons. Each dungeon draws its gems from a pool, and the tool shows that pool as the gem pool. This is the heart of gem farming: pick a dungeon whose pool holds the gem you are chasing." />
-                            <TextBlock Classes="manualH3" Text="Depth and area" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Dungeons run from Depth 1 to Depth 5. Deeper means tougher enemies and better rewards. The area (Pthumeru, Hintertomb, Loran, Isz) sets the flavour and which gems appear. Isz Depth 5 is the classic gem-farming ground." />
-                            <TextBlock Classes="manualH3" Text="Variants: Normal, Defiled, Sinister" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Normal is the plain dungeon. Defiled is a cursed version: harder, and your health is halved throughout. Sinister dungeons can be invaded by other players and drop the fourth boss layer. The tool can build any of the three." />
-                            <TextBlock Classes="manualH3" Text="Glyphs" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Every shared dungeon in the game has a glyph, a short code like 8pwunh82. In the catalogue you can search by glyph to find a specific known dungeon in an instant." />
-
-                            <Border Classes="chapterRule" />
-                            <TextBlock x:Name="Ch4" Classes="manualH2" Text="4  The catalogue and your lists" />
-                            <TextBlock Classes="manualBody"
-                                       Text="The middle column is your catalogue: a browsable shelf of dungeons. Above it sits the list picker, which decides which shelf you are looking at." />
-                            <TextBlock Classes="manualH3" Text="Searching" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Type in the search box to filter by boss, loot, dungeon type or glyph. Clear it to see the whole list again. Click any dungeon to select it; its details (coffin, gem pool, requirements) appear below." />
-                            <TextBlock Classes="manualH3" Text="What the lists are" />
-                            <TextBlock Classes="manualBody"
-                                       Text="A list is just a named shelf of dungeons. Two lists are built in and always present: Nox (a curated farming set) and Community (the wider catalogue). You cannot edit those two, which keeps them safe. Every other list is yours to shape. My dungeons is where your own saved and built dungeons collect." />
-                            <TextBlock Classes="manualH3" Text="Making and managing lists" />
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">1</Run><Run Text="  Press the + button next to the list picker to create a new, empty list and name it." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">2</Run><Run Text="  With one of your own lists chosen, Rename and Delete appear. Built-in lists never show them." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">3</Run><Run Text="  To add the selected dungeon to a list, use its add to list link, or right-click it in the catalogue. You can create a new list on the spot from the same menu." /></TextBlock>
-                            <TextBlock Classes="manualH3" Text="Saving your altar as a list" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Save altar (next to the list picker) turns your current altar - the dungeons in its filled slots - into a new list, so you can keep a loadout, share it, or come back to it later. To put dungeons onto the altar, place them from the catalogue (Chapter 5) or build them (Chapter 6)." />
-
-                            <Border Classes="chapterRule" />
-                            <TextBlock x:Name="Ch5" Classes="manualH2" Text="5  Placing dungeons on the altar" />
-                            <TextBlock Classes="manualBody" Text="There are three ways to get a dungeon into a slot. Pick whichever suits the moment." />
-                            <TextBlock Classes="manualH3" Text="Into one chosen slot" />
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">1</Run><Run Text="  Select a dungeon in the catalogue." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">2</Run><Run Text="  On the right, click the slot you want (M or 1 to 6)." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">3</Run><Run Text="  Press PLACE IN SELECTED SLOT. Or skip the slot buttons and right-click the dungeon, then choose Place in slot for a slot menu." /></TextBlock>
-                            <TextBlock Classes="manualH3" Text="Into every slot at once" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Fill all drops the selected dungeon into all seven places. Handy when you want to farm the same gems and do not care which slot you enter." />
-                            <TextBlock Classes="manualH3" Text="Keeping a slot you like" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Right-click any altar slot to copy it, paste another dungeon over it, clear it, or Save to My dungeons so you can find that exact dungeon again later. When you place a dungeon, the editor jumps to that slot so you can see what landed." />
-
-                            <Border Classes="chapterRule" />
-                            <TextBlock x:Name="Ch6" Classes="manualH2" Text="6  Building your own dungeon" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Press Build new (below the catalogue) and the middle column becomes a workbench. The editor stays on the right, so you can place what you build straight away." />
-                            <TextBlock Classes="manualH3" Text="Step by step" />
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">1</Run><Run Text="  Pick an Area and depth from the chips. The chosen one lights up red." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">2</Run><Run Text="  Pick a Variant: Normal, Defiled or Sinister. On Depth 4 and 5 you can also tick the second layout set for a hundred more dungeons." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">3</Run><Run Text="  Set the Layout number, or press Random. This is the dial that changes the whole dungeon, and with it the coffin and gem pool shown in the preview." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">4</Run><Run Text="  Read the preview card. Watch the Coffin and Gem pool lines. Roll Random until you see the loot you want." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">5</Run><Run Text="  Optionally set rites and effects in the card below the preview: up to four rites, plus poison, the 4th layer, a difficulty buff and a special enemy. Options that this dungeon type does not support are greyed out. They are stamped on before you place, so the dungeon is ready to go." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">6</Run><Run Text="  Send it out: Place in slot puts it on the altar, Add to list files it away, and Save to My dungeons keeps it under a name. Use back to catalogue when you are done." /></TextBlock>
-                            <Border Classes="manualNote">
-                                <TextBlock Classes="manualBody" Margin="0"
-                                           Text="Farming tip: fix the area and variant, then spin Random and watch the gem pool. When it names your gem, place it and go. This is the quickest path to a farming dungeon." />
-                            </Border>
-
-                            <Border Classes="chapterRule" />
-                            <TextBlock x:Name="Ch7" Classes="manualH2" Text="7  The editor" />
-                            <TextBlock Classes="manualBody"
-                                       Text="The right column edits whichever slot is selected. It has two tabs." />
-                            <TextBlock Classes="manualH3" Text="Rites" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Rites are the modifiers stamped on a dungeon: cursed, fetid, rotted and the rest, plus poison, the 4th layer, a difficulty buff and the special enemy. Toggle them here to change how an already placed dungeon behaves without rebuilding it. (The builder offers the same controls if you would rather set them before placing.)" />
-                            <TextBlock Classes="manualH3" Text="Strings" />
-                            <TextBlock Classes="manualBody"
-                                       Text="The Strings tab shows the readable text fields tied to the slot. Most players never need it, but it is there when you do." />
-                            <TextBlock Classes="manualH3" Text="Live bytes" />
-                            <TextBlock Classes="manualBody"
-                                       Text="At the bottom the editor shows the raw 125 bytes of the slot, updating as you change things. It is a window onto the truth of the save. To copy, paste or save those bytes, right-click the slot (Chapter 5); the old on-screen buttons were retired in favour of that menu." />
-
-                            <Border Classes="chapterRule" />
-                            <TextBlock x:Name="Ch8" Classes="manualH2" Text="8  Sharing dungeons and lists" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Sharing works entirely offline. No server, no account: a dungeon or a whole list turns into a short code you can send by any means, and back again." />
-                            <TextBlock Classes="manualH3" Text="Sending" />
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">1</Run><Run Text="  Share copies the current list as a code to your clipboard. Paste it into a chat, a forum, anywhere. To share a single dungeon, right-click it and choose Copy as code." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">2</Run><Run Text="  Save file writes the list to a .bbc file instead, good for a permanent copy or a large set." /></TextBlock>
-                            <TextBlock Classes="manualH3" Text="Receiving" />
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">1</Run><Run Text="  Press Import and paste a code someone sent you. The dungeons arrive as a fresh list." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">2</Run><Run Text="  Or simply drag a .bbc file onto the window. Same result, no dialog." /></TextBlock>
-                            <TextBlock Classes="manualBody"
-                                       Text="Imported dungeons are just data; they cannot harm your save. They sit in a list until you choose to place them." />
-
-                            <Border Classes="chapterRule" />
-                            <TextBlock x:Name="Ch9" Classes="manualH2" Text="9  Backups and safety" />
-                            <TextBlock Classes="manualBody"
-                                       Text="This is the chapter that lets you experiment without fear. Open the Backups tab from the sidebar." />
-                            <TextBlock Classes="manualH3" Text="How backups happen" />
-                            <TextBlock Classes="manualBody"
-                                       Text="With auto-backup on (the default), every save first tucks a timestamped copy into your Backups folder, listed in the table. With it off, a single rolling backup is kept next to the save instead. Either way you get exactly one backup per save, never two. You can also press Back up now at any time." />
-                            <TextBlock Classes="manualH3" Text="Restoring" />
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">1</Run><Run Text="  Pick a backup in the table. Its details show on the right." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">2</Run><Run Text="  Press Restore this backup. The current save is itself backed up first, then replaced. You can also right-click a row to restore or delete it." /></TextBlock>
-                            <TextBlock Classes="manualH3" Text="The backup folder" />
-                            <TextBlock Classes="manualBody"
-                                       Text="By default backups live in a Backups folder inside the app's data folder, so they travel with the portable app. You can point them elsewhere with Browse if you prefer." />
-
-                            <Border Classes="chapterRule" />
-                            <TextBlock x:Name="Ch10" Classes="manualH2" Text="10  Settings" />
-                            <TextBlock Classes="manualBody"
-                                       Text="The Settings tab holds the few things you set once and forget." />
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">-</Run><Run Text="  shadPS4 folder: where your emulator keeps its saves. Set it if auto-detect cannot find them; otherwise leave it be." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">-</Run><Run Text="  Dungeon catalogue: the source the catalogue is seeded from. Most people never touch this." /></TextBlock>
-                            <TextBlock Classes="manualBody"><Run FontWeight="Bold" Foreground="{DynamicResource BloodBright}">-</Run><Run Text="  Text size lives in the sidebar, not here: the drop-down chooses which column the minus and plus buttons resize, or All for every column at once." /></TextBlock>
-
-                            <Border Classes="chapterRule" />
-                            <TextBlock x:Name="Ch11" Classes="manualH2" Text="11  If something goes wrong" />
-                            <TextBlock Classes="manualH3" Text="Detect finds nothing" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Set the shadPS4 folder in Settings, then Detect again. Or use Open to point straight at the save file." />
-                            <TextBlock Classes="manualH3" Text="The game still crashes on dungeon sound" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Load a character and look for the red Fix sound crash button at the top-left. If it is showing, press it. If it is not, the fix is already in place." />
-                            <TextBlock Classes="manualH3" Text="A change looks wrong in-game" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Go to Backups, pick the copy from just before your change, and Restore this backup. Because every save is backed up, there is always a way back." />
-                            <TextBlock Classes="manualH3" Text="An import did nothing" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Make sure you copied the whole code, including its prefix. A partial code cannot be read. For big sets, ask for the .bbc file and drag it onto the window instead." />
-
-                            <Border Classes="chapterRule" />
-                            <TextBlock x:Name="Ch12" Classes="manualH2" Text="12  A word on the numbers" />
-                            <TextBlock Classes="manualBody"
-                                       Text="Under every friendly name in this app is a small, exact piece of the save: each dungeon is 125 bytes, each slot a fixed place in the file. This tool's whole job is to change those bytes correctly and leave the rest untouched. That is why it always backs up first, why it writes only when you tell it to, and why it shows you the live bytes: so you can trust what it does. Treat your saves kindly, keep a backup, and enjoy the hunt." />
 
                         </StackPanel>
                     </ScrollViewer>
-                </Grid>
                 </LayoutTransformControl>
             </Panel>
         </Grid>
