@@ -278,14 +278,5 @@
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="12" />
         </Style>
-
-        <!-- Quick-start callout: a blood left-bar note box -->
-        <Style Selector="Border.manualNote">
-            <Setter Property="Background" Value="{DynamicResource BgPanelAlt}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource Blood}" />
-            <Setter Property="BorderThickness" Value="3,0,0,0" />
-            <Setter Property="Padding" Value="14,10" />
-            <Setter Property="Margin" Value="0,8,0,4" />
-        </Style>
     </Application.Styles>
 </Application>

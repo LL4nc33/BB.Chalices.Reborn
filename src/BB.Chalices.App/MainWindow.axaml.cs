@@ -145,12 +145,6 @@ public partial class MainWindow : Window
             viewModel.OpenSettings();
     }
 
-    private void OnShowGuide(object? sender, RoutedEventArgs e)
-    {
-        if (DataContext is MainViewModel viewModel)
-            viewModel.CurrentView = AppView.Guide;
-    }
-
     private async void OnNewList(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not MainViewModel viewModel)

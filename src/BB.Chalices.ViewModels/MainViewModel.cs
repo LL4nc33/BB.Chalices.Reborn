@@ -9,7 +9,7 @@ using ReactiveUI;
 
 namespace BB.Chalices.ViewModels;
 
-public enum AppView { Catalogue, Settings, Backups, Guide }
+public enum AppView { Catalogue, Settings, Backups }
 
 public class MainViewModel : ViewModelBase
 {
@@ -357,7 +357,6 @@ public class MainViewModel : ViewModelBase
             this.RaisePropertyChanged(nameof(IsCatalogueView));
             this.RaisePropertyChanged(nameof(IsSettingsView));
             this.RaisePropertyChanged(nameof(IsBackupsView));
-            this.RaisePropertyChanged(nameof(IsGuideView));
             UpdateMiddleZoomLabel();
         }
     }
@@ -365,7 +364,6 @@ public class MainViewModel : ViewModelBase
     public bool IsCatalogueView => CurrentView == AppView.Catalogue;
     public bool IsSettingsView => CurrentView == AppView.Settings;
     public bool IsBackupsView => CurrentView == AppView.Backups;
-    public bool IsGuideView => CurrentView == AppView.Guide;
 
     private string _shadPs4Path = string.Empty;
     public string ShadPs4Path

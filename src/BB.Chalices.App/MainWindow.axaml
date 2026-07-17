@@ -114,12 +114,6 @@
                             <Button Classes="nav" Classes.active="{Binding IsBackupsView}" Content="Backups" Click="OnShowBackups"
                                     ToolTip.Tip="Browse, restore or delete backups" />
                         </Grid>
-                        <Grid>
-                            <Border Width="3" HorizontalAlignment="Left" Background="{DynamicResource Blood}"
-                                    IsVisible="{Binding IsGuideView}" />
-                            <Button Classes="nav" Classes.active="{Binding IsGuideView}" Content="Quick start" Click="OnShowGuide"
-                                    ToolTip.Tip="A short cheat sheet: the essentials on one screen" />
-                        </Grid>
 
                         <Border Height="1" Background="{DynamicResource Edge}" Margin="0,8,0,0" />
                         <StackPanel x:Name="ZoomControls" Spacing="8">
@@ -861,63 +855,6 @@
                 </Grid>
                 </LayoutTransformControl>
 
-                <!-- Quick start: a compact one-screen cheat sheet -->
-                <LayoutTransformControl IsVisible="{Binding IsGuideView}">
-                    <LayoutTransformControl.LayoutTransform>
-                        <ScaleTransform ScaleX="{Binding CatalogueScale}" ScaleY="{Binding CatalogueScale}" />
-                    </LayoutTransformControl.LayoutTransform>
-                    <ScrollViewer>
-                        <StackPanel Margin="32,28,32,48" MaxWidth="680" HorizontalAlignment="Left" Spacing="18">
-
-                            <StackPanel Spacing="4">
-                                <TextBlock Classes="title" Text="Quick start" />
-                                <TextBlock Classes="caption" TextWrapping="Wrap"
-                                           Text="Everything you do here is staged only. Nothing touches your save until you press Save changes, and a backup is made first." />
-                            </StackPanel>
-
-                            <StackPanel Spacing="4">
-                                <TextBlock Classes="section" Text="OPEN YOUR SAVE" />
-                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Detect finds your shadPS4 characters, or Open (Ctrl+O) picks a file." />
-                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  If a red Fix sound crash button appears, press it once. It patches the shadPS4 audio crash and backs up first." />
-                            </StackPanel>
-
-                            <StackPanel Spacing="4">
-                                <TextBlock Classes="section" Text="PLACE A DUNGEON" />
-                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Pick a dungeon, pick a slot (M or 1 to 6), then Place in selected slot. Or right-click a dungeon for a slot menu." />
-                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Fill all fills every slot. Right-click a slot to copy, paste, clear or save it. Save changes writes to disk." />
-                            </StackPanel>
-
-                            <StackPanel Spacing="4">
-                                <TextBlock Classes="section" Text="BUILD YOUR OWN" />
-                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Build new: pick area, variant and layout (or Random) and watch the Coffin and Gem pool change." />
-                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Optionally set rites and effects, then Place in slot, Add to list, or Save to My dungeons." />
-                            </StackPanel>
-
-                            <StackPanel Spacing="4">
-                                <TextBlock Classes="section" Text="LISTS AND SHARING" />
-                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Nox and Community are built in; press + for your own list. Save altar keeps the current altar as a list." />
-                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Share copies a list as a code; Save file writes a .bbc. Import a code, or drag a .bbc onto the window." />
-                            </StackPanel>
-
-                            <StackPanel Spacing="4">
-                                <TextBlock Classes="section" Text="BACKUPS" />
-                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Every save is backed up first. Open the Backups tab to restore or delete, or Back up now anytime." />
-                            </StackPanel>
-
-                            <StackPanel Spacing="4">
-                                <TextBlock Classes="section" Text="JARGON" />
-                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Coffin: a dungeon's fixed reward. Gem pool: the blood gems it can drop." />
-                                <TextBlock Classes="body" TextWrapping="Wrap" Text="&#8226;  Depth 1 to 5: deeper is harder and better. Variants: Normal, Defiled (harder, half health), Sinister (invadable, no 4th layer)." />
-                            </StackPanel>
-
-                            <Border Classes="manualNote">
-                                <TextBlock Classes="body" Margin="0" TextWrapping="Wrap"
-                                           Text="Safety net: nothing is written until Save changes, and every save is backed up first, so you can always roll back from the Backups tab." />
-                            </Border>
-
-                        </StackPanel>
-                    </ScrollViewer>
-                </LayoutTransformControl>
             </Panel>
         </Grid>
 
