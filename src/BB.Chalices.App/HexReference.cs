@@ -120,6 +120,7 @@ public static class HexReference
                 R("25", "Hintertomb 3  -  100%"),
                 R("26", "Loran 5  -  100%"),
                 R("27", "Isz 5  -  100%"),
+                Note("The maps in a chalice are split into groups of 15 to 30, each tied to one unique coffin item. Looting that item locks its group out of your next dungeon, which is why a glyph can feel used up (and, in Isz, causes the Isz Glitch where only some maps generate)."),
             }),
 
         new HexSection("7  Gem effect",
@@ -156,6 +157,16 @@ public static class HexReference
                 R("0F", "No poison  (Isz 5)  -  100%"),
             }),
 
+        new HexSection("Gem pools",
+            "Deep dungeons draw blood gems from a pool. Each chalice has a common Native pool and a rare OOE (out-of-effect) pool; the effect bytes above each add a group of gem effects (a GemCategory) into it. A dropped gem fills its non-fixed slots from that pool - primaries first, then secondaries, then curses, and never the same effect twice. Best farming is a Depth 5 Root Chalice with Fetid and Cursed; stacking Curse drops no gems, and droplet gems never drop from enemies.",
+            new[]
+            {
+                R("Pthumeru", "Radial gems. Tempering / physical primaries, Add Physical secondaries."),
+                R("Loran", "Waning gems. Fire, Bolt, Poison, Tempering primaries; Add Fire/Bolt and poison secondaries."),
+                R("Isz", "Triangle gems. Physical, Arcane, Fire, Bolt primaries; Add Arcane and Fire/Bolt secondaries."),
+                Note("The exact effect list for each GemCategory lives in the Tomb Prospectors gem-pool research and is too large to reproduce here."),
+            }),
+
         new HexSection("10-13  Riteslots  (the SFRC rites)",
             "Effects the player can change. A rite is applied to one of these four slots; FF disables a slot. Fetid strengthens some enemies (red aura, better loot). Rotted spawns extra enemies and better treasure. Cursed curses your gems but strengthens their effects, halves your and your allies' HP, and adds a x1.2 echoes multiplier. Sinister adds a Bell-Ringing Woman on sinister chalices.",
             new[]
@@ -165,6 +176,7 @@ public static class HexReference
                 R("2D", "Rotted, shared fixed  (slot 2)"),
                 R("49", "Cursed  (slot 3)"),
                 R("28", "Sinister  (slot 4, sinister chalices)"),
+                Note("You can stack the same rite for a bigger effect, but two gotchas: multiple Fetid rites can corrupt enemy attack data and crash the game, and a dungeon with multiple Curse rites drops no gems at all."),
             }),
 
         new HexSection("Rotted variants",
