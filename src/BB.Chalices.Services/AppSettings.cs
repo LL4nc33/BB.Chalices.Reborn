@@ -6,6 +6,10 @@ public class AppSettings
     // Where shadPS4 is unpacked (overrides auto-detection when set).
     public string? ShadPs4FolderPath { get; set; }
 
+    // The shadPS4 program to launch (overrides auto-detection when set). Lets the
+    // user point at the exact file when the build's name or location is unusual.
+    public string? ShadPs4ExePath { get; set; }
+
     // The save that was open last, for convenience.
     public string? LastSavePath { get; set; }
 

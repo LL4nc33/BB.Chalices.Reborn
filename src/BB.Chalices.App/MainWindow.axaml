@@ -680,6 +680,16 @@
                                     <Button Grid.Column="1" Content="Browse" Click="OnBrowseShad" />
                                 </Grid>
                                 <TextBlock Classes="caption" Text="{Binding DetectedShadInfo}" TextWrapping="Wrap" />
+
+                                <TextBlock Classes="section" Text="SHADPS4 PROGRAM (OPTIONAL)" Margin="0,8,0,0" />
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBox Grid.Column="0" Text="{Binding ShadPs4Exe}" Margin="0,0,8,0"
+                                             PlaceholderText="leave empty to find it automatically"
+                                             ToolTip.Tip="The shadPS4 program to start with the Launch button. Leave empty to find it near your save folder." />
+                                    <Button Grid.Column="1" Content="Browse" Click="OnBrowseShadExe" />
+                                </Grid>
+                                <TextBlock Classes="caption" TextWrapping="Wrap"
+                                           Text="Only needed if the Launch button can't find it - point it at shadPS4.exe / shadPS4QtLauncher.exe (Windows), the shadPS4.app (macOS), or the binary/AppImage (Linux)." />
                             </StackPanel>
 
                             <StackPanel Spacing="6">

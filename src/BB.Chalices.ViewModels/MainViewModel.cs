@@ -389,6 +389,15 @@ public class MainViewModel : ViewModelBase
         }
     }
 
+    private string _shadPs4Exe = string.Empty;
+    // The exact shadPS4 program to launch, set in Settings. Overrides the search
+    // near the save folder when the build's name or location is unusual.
+    public string ShadPs4Exe
+    {
+        get => _shadPs4Exe;
+        set => this.RaiseAndSetIfChanged(ref _shadPs4Exe, value);
+    }
+
     private string _backupPath = string.Empty;
     public string BackupPath
     {
@@ -415,12 +424,14 @@ public class MainViewModel : ViewModelBase
     public void OpenSettings()
     {
         ShadPs4Path = _config.Settings.ShadPs4FolderPath ?? string.Empty;
+        ShadPs4Exe = _config.Settings.ShadPs4ExePath ?? string.Empty;
         CurrentView = AppView.Settings;
     }
 
     public void SaveSettings()
     {
         _config.Settings.ShadPs4FolderPath = string.IsNullOrWhiteSpace(ShadPs4Path) ? null : ShadPs4Path;
+        _config.Settings.ShadPs4ExePath = string.IsNullOrWhiteSpace(ShadPs4Exe) ? null : ShadPs4Exe;
         _config.Save();
         CurrentView = AppView.Catalogue;
     }
@@ -1297,20 +1308,31 @@ public class MainViewModel : ViewModelBase
             : _locator.GuessShadPs4Root();
     }
 
-    // Starts the shadPS4 emulator found next to the save folder (or one level up).
+    // Starts shadPS4: the program set in Settings if any, otherwise the one found
+    // next to the save folder (or the usual install locations).
     private void LaunchShadPs4()
     {
-        string? root = ResolveShadRoot();
-        if (root is null)
+        string? program = null;
+
+        string? configured = _config.Settings.ShadPs4ExePath;
+        if (!string.IsNullOrWhiteSpace(configured) && (System.IO.File.Exists(configured) || System.IO.Directory.Exists(configured)))
         {
-            StatusMessage = "Couldn't find a shadPS4 folder. Set it in Settings.";
-            return;
+            program = configured;
+        }
+        else
+        {
+            string? root = ResolveShadRoot();
+            if (root is null)
+            {
+                StatusMessage = "Couldn't find a shadPS4 folder. Set the program in Settings.";
+                return;
+            }
+            program = _locator.FindProgram(root);
         }
 
-        string? program = _locator.FindProgram(root);
         if (program is null)
         {
-            StatusMessage = "Found the shadPS4 save folder but not the program next to it. Start shadPS4 yourself, or point the folder at the install in Settings.";
+            StatusMessage = "Couldn't find the shadPS4 program. Pick it in Settings, under the shadPS4 folder.";
             return;
         }
 

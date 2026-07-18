@@ -357,6 +357,21 @@ public partial class MainWindow : Window
             viewModel.ShadPs4Path = path;
     }
 
+    private async void OnBrowseShadExe(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel viewModel)
+            return;
+
+        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Select the shadPS4 program",
+            AllowMultiple = false,
+        });
+
+        if (files.Count > 0)
+            viewModel.ShadPs4Exe = files[0].Path.LocalPath;
+    }
+
     private async void OnBrowseBackup(object? sender, RoutedEventArgs e)
     {
         if (await PickFolderAsync() is { } path && DataContext is MainViewModel viewModel)
