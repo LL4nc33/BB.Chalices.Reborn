@@ -463,6 +463,9 @@ public partial class MainWindow : Window
     private async void OnLegendClick(object? sender, RoutedEventArgs e)
         => await new LegendWindow().ShowDialog(this);
 
+    private async void OnHexReferenceClick(object? sender, RoutedEventArgs e)
+        => await new HexReferenceWindow().ShowDialog(this);
+
     private async void OnCopyAltar(object? sender, RoutedEventArgs e)
     {
         if (DataContext is MainViewModel viewModel && viewModel.CopyAltarHex() is { } hex && Clipboard is { } clipboard)

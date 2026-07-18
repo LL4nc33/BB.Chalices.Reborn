@@ -329,8 +329,12 @@
                         <StackPanel Margin="20" Spacing="14" DataContext="{Binding Builder}" x:DataType="vm:DungeonBuilderViewModel">
                             <Grid ColumnDefinitions="*,Auto">
                                 <TextBlock Grid.Column="0" Classes="title" Text="Build a dungeon" VerticalAlignment="Center" />
-                                <Button Grid.Column="1" Classes="link" Content="back to catalogue" Click="OnCloseBuilder"
-                                        HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <Button Classes="link" Content="hex reference" Click="OnHexReferenceClick"
+                                            ToolTip.Tip="What every byte and string does (Tomb Prospectors byte map)" />
+                                    <Button Classes="link" Content="back to catalogue" Click="OnCloseBuilder" />
+                                </StackPanel>
                             </Grid>
 
                             <StackPanel Spacing="6">
@@ -621,6 +625,8 @@
                                                    VerticalAlignment="Center" />
                                         <Button Classes="link" Content="colour legend" Click="OnLegendClick"
                                                 ToolTip.Tip="What the byte colours mean" />
+                                        <Button Classes="link" Content="hex reference" Click="OnHexReferenceClick"
+                                                ToolTip.Tip="What every byte and string does (Tomb Prospectors byte map)" />
                                     </StackPanel>
                                 </Grid>
                                 <Border Classes="hexPanel">

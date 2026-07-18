@@ -1,0 +1,55 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:app="using:BB.Chalices.App"
+        x:Class="BB.Chalices.App.HexReferenceWindow"
+        Width="660" Height="800" MinWidth="520" MinHeight="460"
+        WindowStartupLocation="CenterOwner"
+        RequestedThemeVariant="Dark"
+        FontFamily="{DynamicResource GothicFont}"
+        Background="{DynamicResource WindowBg}"
+        Icon="/Assets/favicon.png"
+        Title="Hex reference">
+
+    <Grid RowDefinitions="*,Auto">
+        <ScrollViewer Grid.Row="0" x:Name="Sv"
+                      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="24" Spacing="0" HorizontalAlignment="Left" MaxWidth="600">
+                <TextBlock Classes="title" Text="Hex reference" />
+                <TextBlock Classes="caption" TextWrapping="Wrap" Margin="0,6,0,4"
+                           Text="How a dungeon's 125-byte record is built, transcribed from the Tomb Prospectors research (DrAnger, with Trin and Kazin). A byte is two hex characters (00 to FF). The record starts with the byte 1D. In strings 5-13 only the last byte does anything; FF usually means default or disabled." />
+
+                <ItemsControl ItemsSource="{Binding}" x:CompileBindings="False">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="app:HexSection">
+                            <StackPanel Spacing="3" Margin="0,18,0,0">
+                                <TextBlock Classes="heading" FontSize="17" Text="{Binding Heading}" />
+                                <TextBlock Classes="caption" TextWrapping="Wrap" Margin="0,0,0,4"
+                                           Text="{Binding Body}"
+                                           IsVisible="{Binding Body, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                <ItemsControl ItemsSource="{Binding Rows}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="app:HexRow">
+                                            <Grid ColumnDefinitions="150,*" Margin="0,2">
+                                                <TextBlock Grid.Column="0" Text="{Binding Code}" VerticalAlignment="Top"
+                                                           TextWrapping="Wrap" FontSize="13"
+                                                           FontFamily="Cascadia Mono,Consolas,Menlo,monospace"
+                                                           Foreground="{DynamicResource BloodBright}" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Meaning}" Classes="body"
+                                                           TextWrapping="Wrap" VerticalAlignment="Top" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Border Grid.Row="1" Background="{DynamicResource BgPanel}"
+                BorderBrush="{DynamicResource Edge}" BorderThickness="0,1,0,0" Padding="24,12">
+            <Button Classes="primary" Content="Close" Click="OnClose" HorizontalAlignment="Right" />
+        </Border>
+    </Grid>
+</Window>

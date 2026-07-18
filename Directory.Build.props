@@ -9,7 +9,7 @@
          (NU190x) from transitive packages we don't control break the build. -->
     <WarningsNotAsErrors>NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
 
-    <VersionPrefix>0.98.3</VersionPrefix>
+    <VersionPrefix>0.98.4</VersionPrefix>
     <Authors>LL4nc33</Authors>
     <Copyright>Copyright (c) 2026 LL4nc33</Copyright>
   </PropertyGroup>
