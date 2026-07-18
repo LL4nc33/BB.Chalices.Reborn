@@ -35,7 +35,7 @@ public static class HexReference
                 R("32", "Pthumeru 5"),
                 R("34", "Loran 5"),
                 R("35", "Isz 5"),
-                Note("These are every combination the game uses. Hintertomb only exists at depths 2 to 3, Loran at 4 to 5, and Isz at 5, so there is no Hintertomb 1 or Loran 1 to 3."),
+                Note("These are the combinations normal generation uses: Hintertomb only appears at depths 2 to 3, Loran at 4 to 5, and Isz at 5, so normal dungeons have no Hintertomb 1 or Loran 1 to 3. Edited and experimental dungeons can set other values though - Nox's testing dungeons use 01, for instance - so the byte is not limited to this list."),
             }),
 
         new HexSection("2  Layout seed  (bytes 2-3)",
@@ -49,7 +49,7 @@ public static class HexReference
                 R("14", "Map 1 sinister"),
                 R("15", "Map 2 sinister"),
                 Note("Second byte: 00 to 63, the dungeon within the map."),
-                Note("Curated and edited dungeons can use a first byte outside this set for a fixed, pre-made encounter that normal generation never makes - for example the Queen Yharnam fight (a Pthumeru Ihyll fixed shared dungeon) uses 5A. Byte 1 (area and depth), on the other hand, is always one of the standard values above."),
+                Note("Curated and edited dungeons can use a first byte outside this set for a fixed, pre-made encounter that normal generation never makes - for example the Queen Yharnam fight (a Pthumeru Ihyll fixed shared dungeon) uses 5A."),
             }),
 
         new HexSection("3  Dungeon ID on server",
@@ -85,6 +85,7 @@ public static class HexReference
                 R("00 00 19 8B", "Isz 5"),
                 R("00 00 19 82", "Isz 5 root"),
                 R("00 00 19 84", "Isz 5 sinister root"),
+                Note("The 3rd byte is the depth marker: 17 is depth 1, 18 depths 2 to 3, 19 depths 4 to 5. Edited dungeons can go beyond it - a 3rd byte of 1A (as in 00 00 1A 99) claims a cut depth-6-or-deeper chalice, which is how Nox's deeper-than-normal dungeons are made."),
             }),
 
         new HexSection("Dungeon effects (strings 5-13)",
