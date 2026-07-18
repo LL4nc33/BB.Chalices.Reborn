@@ -49,6 +49,7 @@ public static class HexReference
                 R("14", "Map 1 sinister"),
                 R("15", "Map 2 sinister"),
                 Note("Second byte: 00 to 63, the dungeon within the map."),
+                Note("Curated and edited dungeons can use a first byte outside this set for a fixed, pre-made encounter that normal generation never makes - for example the Queen Yharnam fight (a Pthumeru Ihyll fixed shared dungeon) uses 5A. Byte 1 (area and depth), on the other hand, is always one of the standard values above."),
             }),
 
         new HexSection("3  Dungeon ID on server",
