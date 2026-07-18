@@ -1,17 +1,28 @@
 # BB Chalices
 
 A small cross-platform editor for Bloodborne chalice dungeons. Drop a dungeon into
-any of your save's seven altar slots - the six stored slots plus the makeshift altar.
-Handy for farming runs, blood-gem setups, or just testing things without grinding the
+any of your save's seven altar slots - the six stored slots plus the makeshift altar -
+build your own, keep them in named lists, and share them with other players. Handy
+for farming runs, blood-gem setups, or just testing things without grinding the
 glyphs by hand.
 
-The catalogue has two parts. A large by-area set (compiled from the public Tomb
-Prospectors research) is bundled and works fully offline - that is the **Community**
-view. Nox's 200+ curated dungeons (the **Nox** view) are his work, so they are fetched
-once from his gist with your consent and cached locally. The app is fully usable
-offline either way.
+The catalogue is organised into lists. Two are built in: a large by-area set
+(compiled from the public Tomb Prospectors research) is bundled and works fully
+offline - the **Community** list - and Nox's 200+ curated dungeons (the **Nox** list)
+are his work, so they are fetched once from his gist with your consent and cached
+locally. You can also make your own named lists, save the current altar as a list,
+and add or remove dungeons freely. The app is fully usable offline either way.
 
 Built with Avalonia 12 and .NET 10, so it runs on Windows, Linux and macOS.
+
+## Building and sharing dungeons
+
+Beyond placing catalogue dungeons, you can **build** one from scratch: pick an area,
+variant and layout (or roll a random one) and watch the coffin item and gem pool
+update, then set rites, poison, the 4th layer and the special enemy before you place
+it. **Share** a dungeon or a whole list as a short code, or save a list as a `.bbc`
+file; others import it by pasting the code or dropping the file onto the window.
+Nothing touches your save until you press **Save changes**, and a backup is made first.
 
 ## Credits
 
@@ -39,19 +50,20 @@ Under the shadPS4 emulator, Bloodborne saves live at:
 ```
 
 The `CUSA` folder depends on your game's region/version, so the app doesn't
-hard-code it. Hit **Detect saves** and it walks your shadPS4 folder looking for the
+hard-code it. Hit **Detect** and it walks your shadPS4 folder looking for the
 `SPRJ0005` save directory and lists the characters it finds. You can also browse to
-a `userdata` file directly with **Open Save**, **drag-and-drop** one onto the window,
+a `userdata` file directly with **Open**, **drag-and-drop** one onto the window,
 or just relaunch - it reopens the last save automatically.
 
 The app is **portable**: settings, the database, the catalogue cache and backups
 all live in a `data/` folder right next to the executable, so moving or copying the
 app folder takes everything with it. (If that folder isn't writable, it falls back
-to your user profile.) You can also resize the UI any time with the **A- / A+**
-buttons (or Ctrl +/-).
+to your user profile.) You can resize each column any time with the **- / +** buttons
+(or Ctrl +/-), and drag the dividers between columns.
 
-Every time you save, the original file is copied to a `backup/` folder next to it
-first, so you can always roll back.
+Every save is backed up first, so you can always roll back. With auto-backup on
+(the default) a timestamped copy is kept in the **Backups** folder, listed in the
+**Backups** tab where you can restore or delete any of them.
 
 ## Download
 
