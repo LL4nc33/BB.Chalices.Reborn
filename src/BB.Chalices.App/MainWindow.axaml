@@ -48,6 +48,9 @@
                             <Button Grid.Column="1" Content="Detect" Command="{Binding DetectSavesCommand}"
                                     HorizontalAlignment="Stretch" ToolTip.Tip="Find your shadPS4 characters automatically" />
                         </Grid>
+                        <Button Classes="primary" Content="Launch shadPS4" Command="{Binding LaunchShadPs4Command}"
+                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                ToolTip.Tip="Start the shadPS4 emulator found next to your save folder" />
                         <ComboBox ItemsSource="{Binding DetectedSaves}" SelectedItem="{Binding SelectedDetectedSave}"
                                   HorizontalAlignment="Stretch" PlaceholderText="detected characters"
                                   ToolTip.Tip="Pick a detected character to load it">

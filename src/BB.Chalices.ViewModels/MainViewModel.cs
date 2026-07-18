@@ -78,6 +78,7 @@ public class MainViewModel : ViewModelBase
         CreateBackupCommand = ReactiveCommand.Create(CreateBackup);
         RestoreBackupCommand = ReactiveCommand.Create(RestoreSelectedBackup);
         ApplySoundFixCommand = ReactiveCommand.Create(ApplySoundFix);
+        LaunchShadPs4Command = ReactiveCommand.Create(LaunchShadPs4);
         ZoomInCommand = ReactiveCommand.Create(() => Adjust(ZoomStep));
         ZoomOutCommand = ReactiveCommand.Create(() => Adjust(-ZoomStep));
 
@@ -88,7 +89,7 @@ public class MainViewModel : ViewModelBase
             LoadDungeonsCommand, LoadSaveCommand, SaveCommand, ApplyDungeonCommand,
             FillAllSlotsCommand, DetectSavesCommand, UpdateDungeonsCommand, ClearSlotCommand,
             UndoSlotCommand, CreateBackupCommand, RestoreBackupCommand, ApplySoundFixCommand,
-            ZoomInCommand, ZoomOutCommand,
+            LaunchShadPs4Command, ZoomInCommand, ZoomOutCommand,
         })
             command.ThrownExceptions.Subscribe(ex => StatusMessage = $"Something went wrong: {ex.Message}");
 
@@ -602,6 +603,7 @@ public class MainViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> CreateBackupCommand { get; }
     public ReactiveCommand<Unit, Unit> RestoreBackupCommand { get; }
     public ReactiveCommand<Unit, Unit> ApplySoundFixCommand { get; }
+    public ReactiveCommand<Unit, Unit> LaunchShadPs4Command { get; }
 
     private bool _soundFixNeeded;
     // True when a shadPS4 save folder still needs the sound-crash workaround,
@@ -1293,6 +1295,34 @@ public class MainViewModel : ViewModelBase
         return !string.IsNullOrWhiteSpace(configured) && System.IO.Directory.Exists(configured)
             ? configured
             : _locator.GuessShadPs4Root();
+    }
+
+    // Starts the shadPS4 emulator found next to the save folder (or one level up).
+    private void LaunchShadPs4()
+    {
+        string? root = ResolveShadRoot();
+        if (root is null)
+        {
+            StatusMessage = "Couldn't find a shadPS4 folder. Set it in Settings.";
+            return;
+        }
+
+        string? program = _locator.FindProgram(root);
+        if (program is null)
+        {
+            StatusMessage = "Found the shadPS4 save folder but not the program next to it. Start shadPS4 yourself, or point the folder at the install in Settings.";
+            return;
+        }
+
+        try
+        {
+            _locator.Launch(program);
+            StatusMessage = "Launching shadPS4...";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Couldn't launch shadPS4: {ex.Message}";
+        }
     }
 
     // Flags the sidebar fix button when any save folder's options file is unpatched.

@@ -61,4 +61,44 @@ public class SaveLocatorServiceTests
             temp.Delete(recursive: true);
         }
     }
+
+    // The program name varies by build: shadPS4.exe (SDL), shadPS4QtLauncher.exe
+    // (Qt), a Linux binary, or a shadPS4.app bundle. FindProgram should still find it.
+    [Fact]
+    public void FindProgram_FindsTheProgramWhateverItsExactName()
+    {
+        var temp = Directory.CreateTempSubdirectory("bbchalices-launch");
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(temp.FullName, "user"));
+            // A plausible name for each platform, so the test passes on whichever OS runs it.
+            File.WriteAllBytes(Path.Combine(temp.FullName, "shadPS4QtLauncher.exe"), [0]);
+            File.WriteAllBytes(Path.Combine(temp.FullName, "shadps4"), [0]);
+            Directory.CreateDirectory(Path.Combine(temp.FullName, "shadPS4.app"));
+
+            string? program = new SaveLocatorService().FindProgram(temp.FullName);
+
+            Assert.NotNull(program);
+            Assert.StartsWith(temp.FullName, program);
+        }
+        finally
+        {
+            temp.Delete(recursive: true);
+        }
+    }
+
+    [Fact]
+    public void FindProgram_ReturnsNull_WhenNoProgramIsPresent()
+    {
+        var temp = Directory.CreateTempSubdirectory("bbchalices-launch");
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(temp.FullName, "user"));
+            Assert.Null(new SaveLocatorService().FindProgram(temp.FullName));
+        }
+        finally
+        {
+            temp.Delete(recursive: true);
+        }
+    }
 }

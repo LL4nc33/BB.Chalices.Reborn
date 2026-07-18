@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace BB.Chalices.Services;
 
 // Finds Bloodborne saves written by the shadPS4 emulator. The layout is
@@ -112,6 +114,131 @@ public class SaveLocatorService
         ];
 
         return Array.Find(candidates, c => Directory.Exists(Path.Combine(c, "user")));
+    }
+
+    // Passed to Launch() when the program is a Flatpak app rather than a file.
+    private const string FlatpakPrefix = "flatpak:";
+    private const string FlatpakAppId = "net.shadps4.shadPS4";
+
+    // Locates the shadPS4 program so it can be launched, or null if not found.
+    // Windows portable installs keep the program next to the user/ folder, but on
+    // macOS (Application Support) and Linux Flatpak the save data lives apart from
+    // the program, so we also check the usual install locations and the PATH, and
+    // fall back to launching the Flatpak app.
+    public string? FindProgram(string root)
+    {
+        // Flatpak keeps saves under ~/.var/app/<id>/...; launch via `flatpak run`.
+        if (OperatingSystem.IsLinux() && root.Replace('\\', '/').Contains("/.var/app/" + FlatpakAppId))
+            return FlatpakPrefix + FlatpakAppId;
+
+        foreach (var dir in new[] { root, Directory.GetParent(root)?.FullName })
+        {
+            if (dir is null || !Directory.Exists(dir))
+                continue;
+            string? hit = FindProgramIn(dir);
+            if (hit is not null)
+                return hit;
+        }
+
+        // Install locations the save folder doesn't cover (macOS .app, Linux bins).
+        foreach (string dir in InstallLocations())
+            if (Directory.Exists(dir) && FindProgramIn(dir) is { } hit)
+                return hit;
+
+        return OnPath();
+    }
+
+    // Common places the program is installed, separate from the save data.
+    private static IEnumerable<string> InstallLocations()
+    {
+        string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        if (OperatingSystem.IsMacOS())
+        {
+            yield return "/Applications";
+            yield return Path.Combine(home, "Applications");
+        }
+        else if (OperatingSystem.IsLinux())
+        {
+            yield return "/usr/bin";
+            yield return "/usr/local/bin";
+            yield return Path.Combine(home, ".local", "bin");
+            yield return Path.Combine(home, "Applications");
+            yield return Path.Combine(home, "Downloads");
+        }
+    }
+
+    // A shadPS4 binary on the PATH (Linux/macOS command-line installs).
+    private static string? OnPath()
+    {
+        if (OperatingSystem.IsWindows())
+            return null;
+        string[] dirs = (Environment.GetEnvironmentVariable("PATH") ?? "").Split(':', StringSplitOptions.RemoveEmptyEntries);
+        foreach (string dir in dirs)
+            foreach (string name in new[] { "shadps4", "Shadps4-qt", "shadPS4" })
+            {
+                string path = Path.Combine(dir, name);
+                if (File.Exists(path))
+                    return path;
+            }
+        return null;
+    }
+
+    // The name varies by build: shadPS4.exe (SDL), shadPS4QtLauncher.exe (Qt),
+    // Shadps4-qt, an AppImage, or a shadPS4.app bundle. Try the known names, then
+    // fall back to any shadPS4 program in the folder.
+    private static string? FindProgramIn(string dir)
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            foreach (string exact in new[] { "shadPS4.exe", "shadPS4QtLauncher.exe", "shadps4.exe" })
+            {
+                string path = Path.Combine(dir, exact);
+                if (File.Exists(path))
+                    return path;
+            }
+            return Directory.EnumerateFiles(dir, "shad*.exe").FirstOrDefault();
+        }
+
+        if (OperatingSystem.IsMacOS())
+        {
+            string bundle = Path.Combine(dir, "shadPS4.app");
+            if (Directory.Exists(bundle))
+                return bundle;
+            return Directory.EnumerateDirectories(dir, "shad*.app").FirstOrDefault();
+        }
+
+        // Linux: a named binary, an AppImage, or any shad* program.
+        foreach (string exact in new[] { "shadps4", "Shadps4-qt", "shadPS4" })
+        {
+            string path = Path.Combine(dir, exact);
+            if (File.Exists(path))
+                return path;
+        }
+        return Directory.EnumerateFiles(dir, "*.AppImage").FirstOrDefault()
+            ?? Directory.EnumerateFiles(dir, "shad*").FirstOrDefault(f => Path.GetExtension(f).Length == 0);
+    }
+
+    // Starts the shadPS4 program. A Flatpak app is run via `flatpak run`, a macOS
+    // .app bundle via `open`, and anything else directly.
+    public void Launch(string program)
+    {
+        if (program.StartsWith(FlatpakPrefix, StringComparison.Ordinal))
+        {
+            Process.Start(new ProcessStartInfo("flatpak", "run " + program[FlatpakPrefix.Length..]) { UseShellExecute = false });
+            return;
+        }
+
+        if (OperatingSystem.IsMacOS() && program.EndsWith(".app"))
+        {
+            Process.Start(new ProcessStartInfo("open", $"\"{program}\"") { UseShellExecute = false });
+            return;
+        }
+
+        Process.Start(new ProcessStartInfo(program)
+        {
+            UseShellExecute = true,
+            WorkingDirectory = Path.GetDirectoryName(program) ?? string.Empty,
+        });
     }
 
     // Iterative search that skips folders we can't read, rather than aborting the
