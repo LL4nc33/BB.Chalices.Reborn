@@ -35,6 +35,7 @@ public static class HexReference
                 R("32", "Pthumeru 5"),
                 R("34", "Loran 5"),
                 R("35", "Isz 5"),
+                Note("These are every combination the game uses. Hintertomb only exists at depths 2 to 3, Loran at 4 to 5, and Isz at 5, so there is no Hintertomb 1 or Loran 1 to 3."),
             }),
 
         new HexSection("2  Layout seed  (bytes 2-3)",
