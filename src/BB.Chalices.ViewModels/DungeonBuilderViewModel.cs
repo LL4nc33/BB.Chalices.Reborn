@@ -92,6 +92,9 @@ public class DungeonBuilderViewModel : ViewModelBase
 
     public ObservableCollection<RiteSlotViewModel> RiteSlots { get; }
 
+    // Warns about rite combinations that misbehave (shared with the slot editor).
+    public string? RiteWarning => RiteWarnings.For(RiteSlots.Select(r => r.Rite));
+
     private bool _poisonPossible;
     public bool PoisonPossible { get => _poisonPossible; private set => this.RaiseAndSetIfChanged(ref _poisonPossible, value); }
     private bool _poisonEnabled;
@@ -155,6 +158,7 @@ public class DungeonBuilderViewModel : ViewModelBase
         // Stamp the chosen rites first, so the effect options match the rited dungeon.
         foreach (var rite in RiteSlots)
             Headstone.ApplyRite(record, rite.Index, rite.Rite);
+        this.RaisePropertyChanged(nameof(RiteWarning));
 
         // Refresh which effects this dungeon supports, and its special-enemy choices.
         _applying = true;

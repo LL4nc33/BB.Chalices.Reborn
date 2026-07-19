@@ -229,6 +229,9 @@ public class MainViewModel : ViewModelBase
     public ObservableCollection<RiteSlotViewModel> RiteSlots { get; }
     public ObservableCollection<HeadstoneFieldViewModel> Fields { get; }
 
+    // Warns about rite combinations that misbehave (from the Tomb Prospectors research).
+    public string? RiteWarning => RiteWarnings.For(RiteSlots.Select(r => r.Rite));
+
     // The 8-byte-and-shorter fields go in two columns; the 16-byte creator and
     // character-name fields each get a full-width row of their own.
     public IReadOnlyList<HeadstoneFieldViewModel> ShortFields => Fields.Where(f => f.Field.Length <= 8).ToList();
@@ -1409,6 +1412,7 @@ public class MainViewModel : ViewModelBase
 
         CaptureUndo();
         _saves.SetRite(SelectedSlot.Number, index, rite);
+        this.RaisePropertyChanged(nameof(RiteWarning));
         AfterEdit($"Rite {index + 1}: {rite}.");
     }
 
@@ -1531,6 +1535,7 @@ public class MainViewModel : ViewModelBase
             SelectedSlotJoin = Headstone.JoinRequirementsLabel(Headstone.JoinRequirementsHex(record));
             for (int i = 0; i < RiteSlots.Count; i++)
                 RiteSlots[i].Set(Headstone.ReadRite(record, Headstone.RiteSlotOffsets[i]));
+            this.RaisePropertyChanged(nameof(RiteWarning));
 
             PoisonPossible = Headstone.PoisonPossible(record);
             PoisonEnabled = Headstone.IsPoisoned(record);

@@ -386,7 +386,8 @@
                                     <TextBlock Classes="body accent" Text="{Binding Status}" TextWrapping="Wrap" />
                                     <TextBlock Classes="body accent" FontWeight="SemiBold" TextWrapping="Wrap"
                                                Text="{Binding PreviewCoffin, StringFormat='Coffin: {0}'}"
-                                               IsVisible="{Binding PreviewCoffin, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                               IsVisible="{Binding PreviewCoffin, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                               ToolTip.Tip="The fixed reward in this dungeon's coffin. In-game, looting a coffin item locks its group of maps out of your next dungeon until you've collected the set." />
                                     <TextBlock Classes="caption" TextWrapping="Wrap"
                                                Text="{Binding PreviewGems, StringFormat='Gem pool: {0}'}"
                                                IsVisible="{Binding PreviewGems, Converter={x:Static ObjectConverters.IsNotNull}}" />
@@ -422,6 +423,9 @@
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
+                                    <TextBlock Classes="caption accent" TextWrapping="Wrap" Margin="0,0,0,4"
+                                               Text="{Binding RiteWarning, StringFormat='⚠  {0}'}"
+                                               IsVisible="{Binding RiteWarning, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                                     <TextBlock Classes="section" Text="MODIFIERS"
                                                ToolTip.Tip="Only certain dungeon types support poison, a 4th layer or a difficulty buff." />
                                     <WrapPanel>
@@ -546,6 +550,9 @@
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
 
+                                        <TextBlock Classes="caption accent" TextWrapping="Wrap" Margin="0,0,0,8"
+                                                   Text="{Binding RiteWarning, StringFormat='⚠  {0}'}"
+                                                   IsVisible="{Binding RiteWarning, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                                         <TextBlock Classes="section" Text="MODIFIERS"
                                                    ToolTip.Tip="Only certain dungeon types support poison, a 4th layer or a difficulty buff." />
                                         <Grid ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="16">
