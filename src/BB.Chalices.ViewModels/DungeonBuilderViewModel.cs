@@ -185,7 +185,7 @@ public class DungeonBuilderViewModel : ViewModelBase
         this.RaisePropertyChanged(nameof(CanPlace));
 
         PreviewCoffin = record.Length > 3 ? DungeonGroups.UniqueItem(record[1], record[2], record[3]) : null;
-        PreviewGems = GemPool.Favoured(record) is { Length: > 0 } gems ? gems : null;
+        PreviewGems = GemPool.Describe(record) is { Length: > 0 } gems ? gems : null;
         PreviewRequires = Headstone.JoinRequirementsLabel(Headstone.JoinRequirementsHex(record));
 
         string map = SelectedArea.HasTwoMaps ? (SecondMap ? ", map 2" : ", map 1") : string.Empty;

@@ -524,6 +524,9 @@
                                            IsVisible="{Binding SelectedSlotType, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                                 <TextBlock Classes="caption" Text="{Binding SelectedSlotJoin, StringFormat='Requires: {0} chalice'}"
                                            IsVisible="{Binding SelectedSlotJoin, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                <TextBlock Classes="caption" TextWrapping="Wrap" Text="{Binding SelectedSlotGems, StringFormat='Farms: {0}'}"
+                                           IsVisible="{Binding SelectedSlotGems, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                           ToolTip.Tip="The gem shape and effects this dungeon's pool favours (Tomb Prospectors gem-pool research)." />
                             </StackPanel>
 
                             <TabControl Grid.Row="1" Margin="0,16,0,0">

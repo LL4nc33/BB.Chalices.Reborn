@@ -34,4 +34,30 @@ public class GemPoolTests
     {
         Assert.Equal("", GemPool.Favoured(new byte[125]));
     }
+
+    [Theory]
+    [InlineData(0x32, "Radial")]   // Pthumeru 5
+    [InlineData(0x1F, "Radial")]   // Hintertomb 3
+    [InlineData(0x34, "Waning")]   // Loran 5
+    [InlineData(0x35, "Triangle")] // Isz 5
+    [InlineData(0x00, "")]         // unrecognised
+    public void Shape_MapsTheAreaByteToTheChaliceGemShape(byte area, string expected)
+    {
+        var record = new byte[125];
+        record[1] = area;
+        Assert.Equal(expected, GemPool.Shape(record));
+    }
+
+    [Fact]
+    public void Describe_CombinesShapeAndFavouredEffects()
+    {
+        var record = new byte[125];
+        record[1] = 0x35;                              // Isz 5 -> Triangle
+        record[Headstone.GemEffectOffset + 7] = 0x35;  // gem-effect -> Physical ATK %
+
+        string desc = GemPool.Describe(record);
+
+        Assert.StartsWith("Triangle gems - ", desc);
+        Assert.Contains("Physical ATK %", desc);
+    }
 }

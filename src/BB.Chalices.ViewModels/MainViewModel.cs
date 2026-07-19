@@ -349,6 +349,14 @@ public class MainViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref _selectedSlotJoin, value);
     }
 
+    private string _selectedSlotGems = string.Empty;
+    // What the selected slot's dungeon farms (shape + favoured gem effects).
+    public string SelectedSlotGems
+    {
+        get => _selectedSlotGems;
+        private set => this.RaiseAndSetIfChanged(ref _selectedSlotGems, value);
+    }
+
     // --- Centre view navigation (catalogue or the inline settings page) ---
 
     private AppView _currentView = AppView.Catalogue;
@@ -1524,6 +1532,7 @@ public class MainViewModel : ViewModelBase
             {
                 SelectedSlotType = "empty";
                 SelectedSlotJoin = "";
+                SelectedSlotGems = "";
                 foreach (var rite in RiteSlots) rite.Set(Headstone.Rite.None);
                 PoisonPossible = FourthLayerPossible = DifficultyPossible = false;
                 PoisonEnabled = FourthLayerOpen = DifficultyUp = false;
@@ -1533,6 +1542,7 @@ public class MainViewModel : ViewModelBase
 
             SelectedSlotType = Headstone.DungeonType(record);
             SelectedSlotJoin = Headstone.JoinRequirementsLabel(Headstone.JoinRequirementsHex(record));
+            SelectedSlotGems = GemPool.Describe(record);
             for (int i = 0; i < RiteSlots.Count; i++)
                 RiteSlots[i].Set(Headstone.ReadRite(record, Headstone.RiteSlotOffsets[i]));
             this.RaisePropertyChanged(nameof(RiteWarning));

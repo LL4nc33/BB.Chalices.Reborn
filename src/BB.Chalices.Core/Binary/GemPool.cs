@@ -67,6 +67,23 @@ public static class GemPool
         return seen.ToList();
     }
 
+    // The native gem shape of the dungeon's chalice, from the area/depth byte
+    // (Blood Gems 101 / Tomb Prospectors): Pthumeru and Hintertomb roll Radial gems,
+    // Loran rolls Waning, Isz rolls Triangle. Returns "" for anything unrecognised.
+    public static string Shape(ReadOnlySpan<byte> record)
+    {
+        if (record.Length < 2)
+            return "";
+        return record[1] switch
+        {
+            0x0A or 0x14 or 0x1E or 0x28 or 0x32 => "Radial",   // Pthumeru 1-5
+            0x15 or 0x1F => "Radial",                            // Hintertomb 2-3
+            0x2A or 0x34 => "Waning",                            // Loran 4-5
+            0x35 => "Triangle",                                  // Isz 5
+            _ => "",
+        };
+    }
+
     // A short, de-duplicated summary of the gem effects this dungeon favours.
     public static string Favoured(ReadOnlySpan<byte> record)
     {
@@ -76,5 +93,19 @@ public static class GemPool
                 headlines.Add(headline);
 
         return headlines.Count == 0 ? "" : string.Join(", ", headlines);
+    }
+
+    // Shape + favoured effects as one readable line, e.g. "Triangle gems - Physical
+    // ATK %, Fire / Bolt ATK %". Empty when the dungeon farms nothing recognisable.
+    public static string Describe(ReadOnlySpan<byte> record)
+    {
+        string favoured = Favoured(record);
+        string shape = Shape(record);
+
+        if (shape.Length == 0)
+            return favoured;
+        if (favoured.Length == 0)
+            return shape + " gems";
+        return $"{shape} gems - {favoured}";
     }
 }
