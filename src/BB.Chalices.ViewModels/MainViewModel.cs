@@ -26,6 +26,14 @@ public class MainViewModel : ViewModelBase
     private List<DungeonViewModel> _all = new();
     private bool _suppressEdits;
 
+    // Watches the open save on disk and reloads it when something else (the game)
+    // rewrites it, so the view always mirrors the current file - not just on load.
+    private System.IO.FileSystemWatcher? _saveWatcher;
+    private System.Threading.Timer? _reloadDebounce;
+    private readonly System.Threading.SynchronizationContext? _uiContext =
+        System.Threading.SynchronizationContext.Current; // captured on the UI thread (ctor)
+    private DateTime _suppressWatcherUntilUtc; // ignore the events our own Save() makes
+
     private string? _characterName;
     private bool _hasLoadedSave;
     private string _statusMessage = "Welcome. Open a save, or use Detect to find your shadPS4 characters.";
@@ -850,11 +858,13 @@ public class MainViewModel : ViewModelBase
             CanUndo = false;
             LoadSelectedSlot();
             RefreshSoundFixStatus(); // the opened save's folder may need the shadPS4 sound fix
+            WatchCurrentSave(path);  // keep the view in sync when the game rewrites the file
             StatusMessage = $"Loaded {System.IO.Path.GetFileName(path)} (Hunter {save.CharacterName}).";
         }
         catch (Exception ex)
         {
             HasLoadedSave = false;
+            StopWatchingSave();
             StatusMessage = $"Could not load save: {ex.Message}";
         }
     }
@@ -871,6 +881,9 @@ public class MainViewModel : ViewModelBase
             if (autoBackup && _saves.CurrentPath is { } path)
                 _backups.Create(path, "before save");
 
+            // Our own write trips the watcher; ignore its events for a moment so it
+            // doesn't reload on top of the save we just made.
+            _suppressWatcherUntilUtc = DateTime.UtcNow.AddSeconds(3);
             _saves.Save(createBackup: !autoBackup);
             SnapshotBaselines();
             StatusMessage = rejected.Count == 0
@@ -881,6 +894,96 @@ public class MainViewModel : ViewModelBase
         {
             StatusMessage = $"Save failed: {ex.Message}";
         }
+    }
+
+    // --- Live reload: keep the view in sync with the file on disk -------------
+
+    private void WatchCurrentSave(string path)
+    {
+        StopWatchingSave();
+
+        string? dir = System.IO.Path.GetDirectoryName(path);
+        string file = System.IO.Path.GetFileName(path);
+        if (string.IsNullOrEmpty(dir) || string.IsNullOrEmpty(file) || !System.IO.Directory.Exists(dir))
+            return;
+
+        var watcher = new System.IO.FileSystemWatcher(dir, file)
+        {
+            NotifyFilter = System.IO.NotifyFilters.LastWrite | System.IO.NotifyFilters.Size
+                         | System.IO.NotifyFilters.FileName | System.IO.NotifyFilters.CreationTime,
+        };
+        watcher.Changed += OnSaveFileTouched;
+        watcher.Created += OnSaveFileTouched;
+        watcher.Renamed += OnSaveFileTouched;
+        watcher.EnableRaisingEvents = true;
+        _saveWatcher = watcher;
+    }
+
+    private void StopWatchingSave()
+    {
+        if (_saveWatcher is null)
+            return;
+
+        _saveWatcher.EnableRaisingEvents = false;
+        _saveWatcher.Changed -= OnSaveFileTouched;
+        _saveWatcher.Created -= OnSaveFileTouched;
+        _saveWatcher.Renamed -= OnSaveFileTouched;
+        _saveWatcher.Dispose();
+        _saveWatcher = null;
+    }
+
+    // Fires on a background thread, often several times per save. Re-arm a one-shot
+    // timer so a burst collapses into a single reload once writing settles.
+    private void OnSaveFileTouched(object sender, System.IO.FileSystemEventArgs e)
+    {
+        if (DateTime.UtcNow < _suppressWatcherUntilUtc)
+            return; // this is the write our own Save() just made
+
+        _reloadDebounce ??= new System.Threading.Timer(_ => PostReload());
+        _reloadDebounce.Change(800, System.Threading.Timeout.Infinite);
+    }
+
+    // Hop back to the UI thread (captured at construction) before touching bound state.
+    private void PostReload()
+    {
+        if (_uiContext is { } ctx)
+            ctx.Post(_ => ReloadFromDiskIfSafe(), null);
+        else
+            ReloadFromDiskIfSafe();
+    }
+
+    private void ReloadFromDiskIfSafe()
+    {
+        if (!HasLoadedSave || _saves.CurrentPath is not { } path || !System.IO.File.Exists(path))
+            return;
+
+        if (HasUnsavedChanges())
+        {
+            StatusMessage = "The save changed on disk (an in-game save), but you have unsaved edits - the view was kept. Reopen the save to load the disk version and discard them.";
+            return;
+        }
+
+        LoadSave(path); // full reload + slot refresh; re-points the watcher too
+        StatusMessage = $"Save changed on disk - reloaded {System.IO.Path.GetFileName(path)} (Hunter {CharacterName}).";
+    }
+
+    // True when the user has staged edits (slots or character fields) not yet written,
+    // so a live reload would silently discard them.
+    private bool HasUnsavedChanges()
+    {
+        foreach (var s in Slots)
+        {
+            byte[]? baseline = _slotBaselines[s.Number];
+            if (baseline is null)
+                continue;
+            if (!_saves.GetSlotBytes(s.Number).AsSpan().SequenceEqual(baseline))
+                return true;
+        }
+
+        return EditableName != CharacterName
+            || EditableLevel != _saves.Level.ToString()
+            || EditableInsight != _saves.Insight.ToString()
+            || EditableEchoes != _saves.Echoes.ToString();
     }
 
     private void ApplyDungeon()
