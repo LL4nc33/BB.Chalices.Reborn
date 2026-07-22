@@ -536,8 +536,19 @@ public class MainViewModel : ViewModelBase
     public bool PoisonPossible
     {
         get => _poisonPossible;
-        private set => this.RaiseAndSetIfChanged(ref _poisonPossible, value);
+        private set { this.RaiseAndSetIfChanged(ref _poisonPossible, value); this.RaisePropertyChanged(nameof(PoisonForced)); }
     }
+
+    private bool _poisonNormallyAvailable;
+    public bool PoisonNormallyAvailable
+    {
+        get => _poisonNormallyAvailable;
+        private set { this.RaiseAndSetIfChanged(ref _poisonNormallyAvailable, value); this.RaisePropertyChanged(nameof(PoisonForced)); }
+    }
+
+    // Poison can be toggled here but is not part of this dungeon's normal generation
+    // (Loran, or a shallow Pthumeru). The UI shows an info hint instead of greying out.
+    public bool PoisonForced => PoisonPossible && !PoisonNormallyAvailable;
 
     public bool PoisonEnabled
     {
@@ -1511,7 +1522,7 @@ public class MainViewModel : ViewModelBase
                 SelectedSlotType = "";
                 SelectedSlotJoin = "";
                 foreach (var rite in RiteSlots) rite.Set(Headstone.Rite.None);
-                PoisonPossible = FourthLayerPossible = DifficultyPossible = false;
+                PoisonPossible = PoisonNormallyAvailable = FourthLayerPossible = DifficultyPossible = false;
                 PoisonEnabled = FourthLayerOpen = DifficultyUp = false;
                 SpecialEnemyOptions.Clear();
                 foreach (var field in Fields) field.Set(string.Empty);
@@ -1534,7 +1545,7 @@ public class MainViewModel : ViewModelBase
                 SelectedSlotJoin = "";
                 SelectedSlotGems = "";
                 foreach (var rite in RiteSlots) rite.Set(Headstone.Rite.None);
-                PoisonPossible = FourthLayerPossible = DifficultyPossible = false;
+                PoisonPossible = PoisonNormallyAvailable = FourthLayerPossible = DifficultyPossible = false;
                 PoisonEnabled = FourthLayerOpen = DifficultyUp = false;
                 SpecialEnemyOptions.Clear();
                 return;

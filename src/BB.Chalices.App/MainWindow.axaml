@@ -572,6 +572,9 @@
                                                     HorizontalAlignment="Right"
                                                     ToolTip.Tip="Empty this altar slot. Click Save changes to write it to disk." />
                                         </Grid>
+                                        <TextBlock Classes="caption accent" TextWrapping="Wrap" Margin="0,6,0,0"
+                                                   Text="ⓘ  Poison isn't part of this dungeon's normal generation - you can still force it here."
+                                                   IsVisible="{Binding PoisonForced}" />
                                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" Margin="0,8,0,0">
                                             <TextBlock Grid.Column="0" Classes="caption" Text="Special enemy" VerticalAlignment="Center" />
                                             <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"

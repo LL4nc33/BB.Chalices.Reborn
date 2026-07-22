@@ -41,11 +41,30 @@ public class HeadstoneTests
     [InlineData("Pthumeru4", true, 0x0D)]
     [InlineData("Pthumeru4", false, 0x0E)]
     [InlineData("Hintertomb2", true, 0x0A)]
+    [InlineData("Loran5", true, 0x0A)]
+    [InlineData("Loran5", false, 0xFF)]
     [InlineData("Isz5", true, 0x0F)]
     [InlineData("Other", true, 0xFF)]
     public void ExpectedPoisonByte_MatchesTable(string dungeonType, bool poisonOn, int expected)
     {
         Assert.Equal((byte)expected, Headstone.ExpectedPoisonByte(dungeonType, poisonOn));
+    }
+
+    [Theory]
+    // Loran 5 (map 0x34) can be forced, but only Hintertomb 2/3 and Pthumeru 4/5 are
+    // poison under normal generation.
+    [InlineData(0x34, true, false)]  // Loran 5: toggleable, not normal
+    [InlineData(0x28, true, true)]   // Pthumeru 4: toggleable and normal
+    [InlineData(0x0A, false, false)] // Pthumeru 1: not poison (unchanged)
+    [InlineData(0x35, false, false)] // Isz 5: never poison
+    public void PoisonPossibleAndNormal_MatchDungeonType(byte mapByte, bool possible, bool normal)
+    {
+        var record = new byte[125];
+        record[0] = 0x1D;
+        record[1] = mapByte;
+
+        Assert.Equal(possible, Headstone.PoisonPossible(record));
+        Assert.Equal(normal, Headstone.PoisonNormallyAvailable(record));
     }
 
     [Fact]
@@ -155,7 +174,7 @@ public class HeadstoneTests
     [InlineData(0x28, false, true, true)]    // Pthumeru 4: poison + 4th
     [InlineData(0x0A, false, false, false)]  // Pthumeru 1: neither
     [InlineData(0x35, false, false, true)]   // Isz 5: 4th only, poison excluded
-    [InlineData(0x2A, false, false, true)]   // Loran 4: 4th only (was wrongly excluded before)
+    [InlineData(0x2A, false, true, true)]    // Loran 4: poison now forceable (0x0A) + 4th
     [InlineData(0x35, true, false, false)]   // Sinister Isz 5: 4th excluded
     public void PoisonAndFourthLayerPossible_FollowAreaAndSinister(
         int areaByte, bool sinister, bool poisonPossible, bool fourthLayerPossible)

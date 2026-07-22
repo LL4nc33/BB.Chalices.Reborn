@@ -131,26 +131,35 @@ public static class Headstone
 
     public static byte[] NoPoison() => FromHex("FFFFFFFFFFFFFFFF");
 
-    // Which dungeon types can be poisoned, by area byte: Hintertomb 2/3 and Pthumeru
-    // 4/5 can, Isz is always non-poison, Pthumeru 1-3 and Loran never are. Sinister
-    // shares the same bytes. (Tomb Prospectors random-effects report.)
+    // Which dungeon types can carry poison, by area byte. Hintertomb 2/3 and Pthumeru
+    // 4/5 can under normal generation; Isz is always non-poison. Loran 4/5 never are
+    // in normal generation, but custom/edited dungeons force it (byte 0x0A, Hintertomb
+    // family), so they are listed to keep the toggle usable. (Tomb Prospectors report.)
     public static string PoisonDungeonType(ReadOnlySpan<byte> record) => record.Length < 2 ? "Other" : record[1] switch
     {
         0x15 => "Hintertomb2",
         0x1F => "Hintertomb3",
         0x28 => "Pthumeru4",
+        0x2A => "Loran4",
         0x32 => "Pthumeru5",
+        0x34 => "Loran5",
         0x35 => "Isz5",
         _    => "Other",
     };
 
     public static byte ExpectedPoisonByte(string dungeonType, bool poisonEnabled) => dungeonType switch
     {
-        "Hintertomb2" or "Hintertomb3" => poisonEnabled ? (byte)0x0A : (byte)0xFF, // 0A on, FF off
+        "Hintertomb2" or "Hintertomb3" or "Loran4" or "Loran5" => poisonEnabled ? (byte)0x0A : (byte)0xFF, // 0A on, FF off
         "Pthumeru4" or "Pthumeru5"     => poisonEnabled ? (byte)0x0D : (byte)0x0E, // 0D on, 0E off
         "Isz5"                          => (byte)0x0F,                              // always off
         _                               => (byte)0xFF,                              // no poison
     };
+
+    // Normal dungeon generation only poisons Hintertomb 2/3 and Pthumeru 4/5. The
+    // editor also lets you force it on Loran (byte 0x0A, confirmed on a real save);
+    // this reports whether poison is a *normal* option so the UI can flag a forced one.
+    public static bool PoisonNormallyAvailable(ReadOnlySpan<byte> record) =>
+        PoisonDungeonType(record) is "Hintertomb2" or "Hintertomb3" or "Pthumeru4" or "Pthumeru5";
 
     public static byte[] SmartPoison(ReadOnlySpan<byte> record, bool poisonEnabled)
     {
