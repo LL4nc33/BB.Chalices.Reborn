@@ -26,13 +26,11 @@ public class MainViewModel : ViewModelBase
     private List<DungeonViewModel> _all = new();
     private bool _suppressEdits;
 
-    // Watches the open save on disk and reloads it when something else (the game)
-    // rewrites it, so the view always mirrors the current file - not just on load.
-    private System.IO.FileSystemWatcher? _saveWatcher;
-    private System.Threading.Timer? _reloadDebounce;
+    // Reloads the open save when something else (the game) rewrites it, so the view
+    // always mirrors the current file - not just on load.
+    private readonly SaveFileWatcher _saveWatcher;
     private readonly System.Threading.SynchronizationContext? _uiContext =
         System.Threading.SynchronizationContext.Current; // captured on the UI thread (ctor)
-    private DateTime _suppressWatcherUntilUtc; // ignore the events our own Save() makes
 
     private string? _characterName;
     private bool _hasLoadedSave;
@@ -61,6 +59,7 @@ public class MainViewModel : ViewModelBase
         _online = online;
         _lists = lists;
         Builder = new DungeonBuilderViewModel(dungeons);
+        _saveWatcher = new SaveFileWatcher(PostReload);
 
         Dungeons = new ObservableCollection<DungeonViewModel>();
         Lists = new ObservableCollection<DungeonList>();
@@ -868,13 +867,13 @@ public class MainViewModel : ViewModelBase
             CanUndo = false;
             LoadSelectedSlot();
             RefreshSoundFixStatus(); // the opened save's folder may need the shadPS4 sound fix
-            WatchCurrentSave(path);  // keep the view in sync when the game rewrites the file
+            _saveWatcher.Watch(path); // keep the view in sync when the game rewrites the file
             StatusMessage = $"Loaded {System.IO.Path.GetFileName(path)} (Hunter {save.CharacterName}).";
         }
         catch (Exception ex)
         {
             HasLoadedSave = false;
-            StopWatchingSave();
+            _saveWatcher.Stop();
             StatusMessage = $"Could not load save: {ex.Message}";
         }
     }
@@ -891,9 +890,9 @@ public class MainViewModel : ViewModelBase
             if (autoBackup && _saves.CurrentPath is { } path)
                 _backups.Create(path, "before save");
 
-            // Our own write trips the watcher; ignore its events for a moment so it
-            // doesn't reload on top of the save we just made.
-            _suppressWatcherUntilUtc = DateTime.UtcNow.AddSeconds(3);
+            // Our own write trips the watcher; mute it briefly so the save does not
+            // reload on top of itself.
+            _saveWatcher.Mute(TimeSpan.FromSeconds(3));
             _saves.Save(createBackup: !autoBackup);
             SnapshotBaselines();
             StatusMessage = rejected.Count == 0
@@ -908,52 +907,8 @@ public class MainViewModel : ViewModelBase
 
     // --- Live reload: keep the view in sync with the file on disk -------------
 
-    private void WatchCurrentSave(string path)
-    {
-        StopWatchingSave();
-
-        string? dir = System.IO.Path.GetDirectoryName(path);
-        string file = System.IO.Path.GetFileName(path);
-        if (string.IsNullOrEmpty(dir) || string.IsNullOrEmpty(file) || !System.IO.Directory.Exists(dir))
-            return;
-
-        var watcher = new System.IO.FileSystemWatcher(dir, file)
-        {
-            NotifyFilter = System.IO.NotifyFilters.LastWrite | System.IO.NotifyFilters.Size
-                         | System.IO.NotifyFilters.FileName | System.IO.NotifyFilters.CreationTime,
-        };
-        watcher.Changed += OnSaveFileTouched;
-        watcher.Created += OnSaveFileTouched;
-        watcher.Renamed += OnSaveFileTouched;
-        watcher.EnableRaisingEvents = true;
-        _saveWatcher = watcher;
-    }
-
-    private void StopWatchingSave()
-    {
-        if (_saveWatcher is null)
-            return;
-
-        _saveWatcher.EnableRaisingEvents = false;
-        _saveWatcher.Changed -= OnSaveFileTouched;
-        _saveWatcher.Created -= OnSaveFileTouched;
-        _saveWatcher.Renamed -= OnSaveFileTouched;
-        _saveWatcher.Dispose();
-        _saveWatcher = null;
-    }
-
-    // Fires on a background thread, often several times per save. Re-arm a one-shot
-    // timer so a burst collapses into a single reload once writing settles.
-    private void OnSaveFileTouched(object sender, System.IO.FileSystemEventArgs e)
-    {
-        if (DateTime.UtcNow < _suppressWatcherUntilUtc)
-            return; // this is the write our own Save() just made
-
-        _reloadDebounce ??= new System.Threading.Timer(_ => PostReload());
-        _reloadDebounce.Change(800, System.Threading.Timeout.Infinite);
-    }
-
-    // Hop back to the UI thread (captured at construction) before touching bound state.
+    // The watcher raises this on a background thread; hop to the UI thread
+    // (captured at construction) before touching any bound state.
     private void PostReload()
     {
         if (_uiContext is { } ctx)

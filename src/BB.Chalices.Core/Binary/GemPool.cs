@@ -76,10 +76,10 @@ public static class GemPool
             return "";
         return record[1] switch
         {
-            0x0A or 0x14 or 0x1E or 0x28 or 0x32 => "Radial",   // Pthumeru 1-5
-            0x15 or 0x1F => "Radial",                            // Hintertomb 2-3
-            0x2A or 0x34 => "Waning",                            // Loran 4-5
-            0x35 => "Triangle",                                  // Isz 5
+            // Pthumeru 1-5 and Hintertomb 2-3
+            0x0A or 0x14 or 0x1E or 0x28 or 0x32 or 0x15 or 0x1F => "Radial",
+            0x2A or 0x34 => "Waning",    // Loran 4-5
+            0x35 => "Triangle",          // Isz 5
             _ => "",
         };
     }
