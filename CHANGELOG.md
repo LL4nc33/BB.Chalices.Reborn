@@ -3,6 +3,34 @@
 All notable changes to BB Chalices are listed here. Versions follow the
 NexusMods release numbers.
 
+## v0.98.5
+
+- The editor now recognises the rites a dungeon actually has. It used to compare
+  a rite slot against its own presets byte for byte, so rites the game generated
+  read back as "None": bytes 2-3 hold a per-dungeon id that varies. Rites are now
+  identified by their functional byte, including the ten Rotted enemy variants and
+  the Curse variants (0x46-0x49). A slot holding a non-standard byte shows
+  "custom effect (0xNN)" instead of looking empty.
+- Poison can be set on Loran dungeons. Loran was missing from the poison table, so
+  a Loran dungeon that already carried poison showed a ticked but greyed-out
+  checkbox. Effects outside a dungeon's normal generation are now offered with an
+  info hint instead of being locked out.
+- The open save reloads automatically when something else rewrites it (the game
+  saving its own state, a restore). Staged edits are never discarded: if you have
+  unsaved changes the view is kept and you are told instead.
+- The RITES tab scrolls, so MODIFIERS and the special-enemy row are no longer
+  clipped behind the live byte panel when the editor is zoomed.
+- The catalogue search box has a clear button; the window opens a little taller
+  and the sidebar renders slightly smaller by default.
+
+## v0.98.4
+
+- Added an in-app hex reference for people editing strings directly: what every
+  byte and string does, from the Tomb Prospectors byte map, including gem pools,
+  coffin-group locking and the rite-stacking gotchas.
+- Added a Launch shadPS4 button to the sidebar, and a setting to pick the shadPS4
+  program yourself when it isn't found automatically.
+
 ## v0.98.3
 
 - The app is now always portable: data (settings, database, catalogue cache,
