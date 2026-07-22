@@ -126,7 +126,7 @@ public class MainViewModel : ViewModelBase
     private const double ZoomStep = 0.1;
     private const double MinFactor = 0.8;
     private const double MaxFactor = 2.0;
-    private const double SidebarBaseline = 1.2;
+    private const double SidebarBaseline = 1.08; // 90% of the former 1.2 default, as the new standard size
     private const double CatalogueBaseline = 1.3;
     private const double EditorBaseline = 1.3;
 
@@ -302,8 +302,18 @@ public class MainViewModel : ViewModelBase
     public string SearchText
     {
         get => _searchText;
-        set { this.RaiseAndSetIfChanged(ref _searchText, value); ApplyFilter(); }
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _searchText, value);
+            this.RaisePropertyChanged(nameof(HasSearchText));
+            ApplyFilter();
+        }
     }
+
+    // Drives the clear (x) button inside the catalogue search box.
+    public bool HasSearchText => !string.IsNullOrEmpty(_searchText);
+
+    public void ClearSearch() => SearchText = string.Empty;
 
     public string SelectedCategory
     {

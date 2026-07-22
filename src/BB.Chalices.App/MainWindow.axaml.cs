@@ -415,6 +415,12 @@ public partial class MainWindow : Window
             await Launcher.LaunchUriAsync(new System.Uri(url));
     }
 
+    private void OnClearSearch(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.ClearSearch();
+    }
+
     private void OnBuilderClick(object? sender, RoutedEventArgs e)
     {
         if (DataContext is MainViewModel viewModel)
