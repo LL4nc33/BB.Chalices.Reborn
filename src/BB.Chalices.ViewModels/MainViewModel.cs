@@ -1555,10 +1555,17 @@ public class MainViewModel : ViewModelBase
             SelectedSlotJoin = Headstone.JoinRequirementsLabel(Headstone.JoinRequirementsHex(record));
             SelectedSlotGems = GemPool.Describe(record);
             for (int i = 0; i < RiteSlots.Count; i++)
-                RiteSlots[i].Set(Headstone.ReadRite(record, Headstone.RiteSlotOffsets[i]));
+            {
+                int off = Headstone.RiteSlotOffsets[i];
+                var rite = Headstone.ReadRite(record, off);
+                byte fn = Headstone.RiteFunctionalByte(record, off);
+                // A non-zero byte that isn't one of the four rites = a custom effect.
+                RiteSlots[i].Set(rite, rite == Headstone.Rite.None && fn != 0 ? fn : null);
+            }
             this.RaisePropertyChanged(nameof(RiteWarning));
 
             PoisonPossible = Headstone.PoisonPossible(record);
+            PoisonNormallyAvailable = Headstone.PoisonNormallyAvailable(record);
             PoisonEnabled = Headstone.IsPoisoned(record);
             FourthLayerPossible = Headstone.FourthLayerPossible(record);
             FourthLayerOpen = Headstone.IsFourthLayerOpen(record);

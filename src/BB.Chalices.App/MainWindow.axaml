@@ -543,11 +543,16 @@
                                                     <Border BorderThickness="3,0,0,0" Margin="0,0,12,8" Padding="8,0,0,0"
                                                             BorderBrush="{Binding Index, Converter={x:Static app:RiteColorConverter.Instance}}"
                                                             ToolTip.Tip="Set a rite (Fetid, Rotted, Cursed or Sinister), or None to remove it">
-                                                        <Grid ColumnDefinitions="44,*">
-                                                            <TextBlock Grid.Column="0" Classes="caption" Text="{Binding Label}" VerticalAlignment="Center" />
-                                                            <ComboBox Grid.Column="1" ItemsSource="{Binding Options}"
-                                                                      SelectedItem="{Binding Rite}" HorizontalAlignment="Stretch" />
-                                                        </Grid>
+                                                        <StackPanel Spacing="2">
+                                                            <Grid ColumnDefinitions="44,*">
+                                                                <TextBlock Grid.Column="0" Classes="caption" Text="{Binding Label}" VerticalAlignment="Center" />
+                                                                <ComboBox Grid.Column="1" ItemsSource="{Binding Options}"
+                                                                          SelectedItem="{Binding Rite}" HorizontalAlignment="Stretch" />
+                                                            </Grid>
+                                                            <TextBlock Classes="caption accent" Margin="44,0,0,0" FontSize="11"
+                                                                       Text="{Binding CustomLabel}" IsVisible="{Binding HasCustom}"
+                                                                       ToolTip.Tip="A non-standard effect byte from a save-edited dungeon (not one of the four rites)." />
+                                                        </StackPanel>
                                                     </Border>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>

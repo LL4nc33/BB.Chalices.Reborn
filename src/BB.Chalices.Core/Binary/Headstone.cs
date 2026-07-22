@@ -37,18 +37,41 @@ public static class Headstone
         _             => FromHex("FFFFFFFFFFFFFFFF"), // empty slot
     };
 
+    // The rite type lives in the functional last byte of the 8-byte slot; bytes 2-3
+    // are a per-dungeon rite ID that varies between dungeons (the app's own presets
+    // use one value, real/shared dungeons another), so classifying by the whole
+    // 8-byte preset misses rites the game generated. Match on the last byte instead.
+    // Ranges verified against Tomb Prospectors datamining + Nox's 216-dungeon list:
+    // Fetid 0x0B; Rotted 0x14-0x1D (10 enemy-spawn variants) + shared-fixed 0x2D;
+    // Curse 0x46-0x49 (0x49 documented, 0x46-0x48 variants); Sinister 0x28.
     public static Rite ReadRite(ReadOnlySpan<byte> record, int riteSlotOffset)
     {
+        return ClassifyRite(RiteFunctionalByte(record, riteSlotOffset));
+    }
+
+    private static Rite ClassifyRite(byte functional) => functional switch
+    {
+        0x0B => Rite.Fetid,
+        >= 0x46 and <= 0x49 => Rite.Cursed,
+        0x28 => Rite.Sinister,
+        >= 0x14 and <= 0x1D => Rite.Rotted,
+        0x2D => Rite.Rotted,
+        _ => Rite.None,
+    };
+
+    // The functional last byte of a rite slot, or 0 when the slot holds no rite
+    // (an all-FF slot). A non-zero value that ClassifyRite maps to None is a
+    // non-standard "custom" effect (Nox's edited/testing dungeons use several).
+    public static byte RiteFunctionalByte(ReadOnlySpan<byte> record, int riteSlotOffset)
+    {
         if (record.Length < riteSlotOffset + FieldLength)
-            return Rite.None;
+            return 0;
 
         var slot = record.Slice(riteSlotOffset, FieldLength);
-        foreach (var rite in (Rite[])[Rite.Fetid, Rite.Rotted, Rite.Cursed, Rite.Sinister])
-        {
-            if (slot.SequenceEqual(RiteBytes(rite)))
-                return rite;
-        }
-        return Rite.None;
+        bool allFf = true;
+        foreach (byte b in slot)
+            if (b != 0xFF) { allFf = false; break; }
+        return allFf ? (byte)0 : slot[FieldLength - 1];
     }
 
     // --- Dungeon type (from the map byte at offset 1) ------------------------

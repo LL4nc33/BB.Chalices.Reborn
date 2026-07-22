@@ -36,15 +36,38 @@ public class RiteSlotViewModel : ViewModelBase
         {
             this.RaiseAndSetIfChanged(ref _rite, value);
             if (!_suppress)
+            {
+                CustomByte = null; // picking a standard rite clears any custom effect
                 _apply(Index, value);
+            }
         }
     }
 
+    private byte? _customByte;
+
+    // When a slot holds a non-standard functional byte (Nox's edited/testing
+    // dungeons stuff custom effects here), the dropdown shows None; this surfaces
+    // the raw byte so the slot doesn't look empty when it isn't.
+    public byte? CustomByte
+    {
+        get => _customByte;
+        private set
+        {
+            this.RaiseAndSetIfChanged(ref _customByte, value);
+            this.RaisePropertyChanged(nameof(HasCustom));
+            this.RaisePropertyChanged(nameof(CustomLabel));
+        }
+    }
+
+    public bool HasCustom => _customByte is not null;
+    public string? CustomLabel => _customByte is { } b ? $"custom effect (0x{b:X2})" : null;
+
     // Set the displayed value without triggering an apply (used when loading a slot).
-    public void Set(Headstone.Rite rite)
+    public void Set(Headstone.Rite rite, byte? customByte = null)
     {
         _suppress = true;
         Rite = rite;
+        CustomByte = customByte;
         _suppress = false;
     }
 }

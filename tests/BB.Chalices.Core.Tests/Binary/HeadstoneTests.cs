@@ -26,6 +26,41 @@ public class HeadstoneTests
     }
 
     [Theory]
+    // Real/shared dungeons store a different rite ID in bytes 2-3 than the app's
+    // presets, so detection must key off the functional last byte. These are the
+    // three rites from a real save's occupied slot 1 (00 00 CF xx 00 00 00 ZZ).
+    [InlineData("00 00 CF 12 00 00 00 0B", Headstone.Rite.Fetid)]
+    [InlineData("00 00 CF 1C 00 00 00 15", Headstone.Rite.Rotted)] // a Rotted variant
+    [InlineData("00 00 CF 4E 00 00 00 49", Headstone.Rite.Cursed)]
+    [InlineData("00 00 C3 96 00 00 00 46", Headstone.Rite.Cursed)] // Curse variant (verified in Nox's list)
+    [InlineData("00 00 CB 66 00 00 00 47", Headstone.Rite.Cursed)] // Curse variant
+    [InlineData("00 00 C3 5A 00 00 00 48", Headstone.Rite.Cursed)] // Curse variant
+    [InlineData("00 00 00 00 00 00 00 28", Headstone.Rite.Sinister)]
+    [InlineData("00 00 9C B8 00 00 00 1B", Headstone.Rite.Rotted)] // the app's own Rotted preset
+    [InlineData("00 00 00 00 00 00 00 2D", Headstone.Rite.Rotted)] // Rotted, shared fixed
+    [InlineData("FF FF FF FF 00 00 00 32", Headstone.Rite.None)]   // custom effect byte -> not a rite
+    [InlineData("FF FF FF FF FF FF FF FF", Headstone.Rite.None)]
+    public void ReadRite_ClassifiesByFunctionalByte_IgnoringPerDungeonId(string hex, Headstone.Rite expected)
+    {
+        var record = new byte[125];
+        Convert.FromHexString(hex.Replace(" ", "")).CopyTo(record, Headstone.RiteSlot1Offset);
+
+        Assert.Equal(expected, Headstone.ReadRite(record, Headstone.RiteSlot1Offset));
+    }
+
+    [Theory]
+    [InlineData("FF FF FF FF FF FF FF FF", 0x00)]  // all-FF = no rite -> 0
+    [InlineData("FF FF FF FF 00 00 00 32", 0x32)]  // custom effect byte surfaces
+    [InlineData("00 00 CF 12 00 00 00 0B", 0x0B)]  // standard Fetid functional byte
+    public void RiteFunctionalByte_ReturnsLastByteOrZeroForEmpty(string hex, int expected)
+    {
+        var record = new byte[125];
+        Convert.FromHexString(hex.Replace(" ", "")).CopyTo(record, Headstone.RiteSlot1Offset);
+
+        Assert.Equal((byte)expected, Headstone.RiteFunctionalByte(record, Headstone.RiteSlot1Offset));
+    }
+
+    [Theory]
     [InlineData(0x14, "Pthumeru 2")]
     [InlineData(0x1F, "Hintertomb 3")]
     [InlineData(0x35, "Isz 5")]
