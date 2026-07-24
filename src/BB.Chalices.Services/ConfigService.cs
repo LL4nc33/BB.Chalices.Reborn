@@ -16,6 +16,12 @@ public class ConfigService
         _appDir = AppPaths.BaseDirectory;
         _path = Path.Combine(_appDir, "settings.json");
         Settings = Load();
+
+        // Older versions auto-saved the profile backup folder as an absolute path,
+        // which now overrides the portable data folder. Drop it so backups follow
+        // the app; a folder the user deliberately chose is left untouched.
+        if (AppPaths.IsLegacyBackupDefault(Settings.BackupDirectory))
+            Settings.BackupDirectory = null;
     }
 
     // The folder holding settings, database and catalogue cache (see AppPaths).

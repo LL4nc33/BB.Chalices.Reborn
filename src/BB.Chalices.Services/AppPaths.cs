@@ -14,6 +14,19 @@ public static class AppPaths
     private static string ProfileDir => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), FolderName);
 
+    // The backup folder older versions defaulted to and persisted as an absolute
+    // path in settings.json. It now overrides the portable folder, so it is treated
+    // as "unset" (see ConfigService); this exposes it for that check.
+    public static string ProfileBackupsDirectory => Path.Combine(ProfileDir, "Backups");
+
+    public static bool IsLegacyBackupDefault(string? dir) =>
+        !string.IsNullOrWhiteSpace(dir) && PathEquals(dir!, ProfileBackupsDirectory);
+
+    private static bool PathEquals(string a, string b) => string.Equals(
+        Path.TrimEndingDirectorySeparator(Path.GetFullPath(a)),
+        Path.TrimEndingDirectorySeparator(Path.GetFullPath(b)),
+        OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+
     // The base folder all app data goes under. Resolved once at startup.
     public static string BaseDirectory { get; } = Resolve();
 
@@ -28,6 +41,7 @@ public static class AppPaths
             Directory.CreateDirectory(PortableDir);
             IsPortable = true;
             MigrateFromProfile(PortableDir);
+            ImportLegacyBackups(PortableDir);
             return PortableDir;
         }
         catch
@@ -53,6 +67,37 @@ public static class AppPaths
         catch
         {
             // Best-effort; the app still runs with a fresh data folder.
+        }
+    }
+
+    // Older versions kept writing backups into the profile even after the portable
+    // move, because the profile path was pinned in settings. Bring those across once
+    // so the app still lists them; the copies are left in place (never delete a
+    // user's backups automatically).
+    private static void ImportLegacyBackups(string portable)
+    {
+        try
+        {
+            string dest = Path.Combine(portable, "Backups");
+            if (PathEquals(ProfileBackupsDirectory, dest) || !Directory.Exists(ProfileBackupsDirectory))
+                return;
+
+            string marker = Path.Combine(dest, ".legacy-imported");
+            if (File.Exists(marker))
+                return;
+
+            Directory.CreateDirectory(dest);
+            foreach (var file in Directory.GetFiles(ProfileBackupsDirectory))
+            {
+                string target = Path.Combine(dest, Path.GetFileName(file));
+                if (!File.Exists(target))
+                    File.Copy(file, target);
+            }
+            File.WriteAllText(marker, string.Empty);
+        }
+        catch
+        {
+            // Best-effort; the app still runs with whatever is already in place.
         }
     }
 

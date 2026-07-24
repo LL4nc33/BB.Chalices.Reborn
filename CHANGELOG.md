@@ -3,6 +3,16 @@
 All notable changes to BB Chalices are listed here. Versions follow the
 NexusMods release numbers.
 
+## Unreleased
+
+- Backups now live in the `data` folder next to the app, like everything else,
+  so moving the app folder takes them along. **Upgrading from an older version:**
+  earlier builds kept backups in `%LocalAppData%\BBChalices\Backups` and pinned
+  that path in settings. On first launch your existing backups are copied into
+  `data\Backups` once and the app switches to it automatically - nothing to do.
+  You can delete the old `%LocalAppData%\BBChalices` folder afterwards. A backup
+  folder you picked yourself is left unchanged.
+
 ## v0.98.5
 
 - The editor now recognises the rites a dungeon actually has. It used to compare
